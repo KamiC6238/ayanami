@@ -19,55 +19,58 @@ export function useDraw(props: Props) {
 
   const canvasRef = computed(() => props.canvas.value)
 
-  const initDrawer = () => {
-    const _canvas = canvasRef.value
-    if (!_canvas) return;
-
-    const ctx = _canvas.getContext("2d");
-
-    _canvas.addEventListener("mousedown", (event) => {
-      if (ctx) {
-        isDrawing.value = true;
-        drawPixel(event);
-      }
-    });
-  
-    _canvas.addEventListener("mousemove", (event) => {
-      if (isDrawing.value) {
-        drawPixel(event);
-      } else {
-        const { x, y } = getDrawPosition(event);
-        drawHoverPixel(x, y);
-      }
-    });
-  
-    _canvas.addEventListener("mouseup", () => (isDrawing.value = false));
-    _canvas.addEventListener("mouseleave", () => (isDrawing.value = false));
-  }
-
-  const scaleByDPR = () => {
-    const _canvas = canvasRef.value
-    if (!_canvas) return;
-  
-    const ctx = _canvas.getContext("2d");
+  const scaleByDPR = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) => {
     const dpr = Math.floor(window.devicePixelRatio) || 1;
   
-    _canvas.width = _canvas.clientWidth * dpr;
-    _canvas.height = _canvas.clientHeight * dpr;
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
     ctx?.scale(dpr, dpr);
   };
+
+  const initDrawer = () => {
+    const canvas = canvasRef.value
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (ctx) {
+      scaleByDPR(ctx, canvas)
+
+      canvas.addEventListener("mousedown", (event) => {
+        if (ctx) {
+          isDrawing.value = true;
+          drawPixel(event);
+        }
+      });
+    
+      canvas.addEventListener("mousemove", (event) => {
+        if (isDrawing.value) {
+          drawPixel(event);
+        } else {
+          const { x, y } = getDrawPosition(event);
+          drawHoverPixel(x, y);
+        }
+      });
+    
+      canvas.addEventListener("mouseup", () => (isDrawing.value = false));
+      canvas.addEventListener("mouseleave", () => (isDrawing.value = false));
+    }
+  }
 
   const checkIsDrawn = (x: number, y: number) => {
     return drawnPixels.value.has(makePositionKey(x, y));
   }
 
   const getDrawPosition = (event: MouseEvent) => {
-    const _canvas = canvasRef.value
-    if (!_canvas) {
+    const canvas = canvasRef.value
+    if (!canvas) {
       return { x: 0, y: 0 };
     }
   
-    const rect = _canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) / 10) * 10;
     const y = Math.floor((event.clientY - rect.top) / 10) * 10;
   
@@ -78,10 +81,10 @@ export function useDraw(props: Props) {
   };
   
   const drawPixel = (event: MouseEvent) => {
-    const _canvas = canvasRef.value
-    if (!_canvas) return;
+    const canvas = canvasRef.value
+    if (!canvas) return;
   
-    const ctx = _canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
     const { x, y } = getDrawPosition(event);
   
     if (ctx) {
@@ -92,10 +95,10 @@ export function useDraw(props: Props) {
   };
 
   const drawHoverPixel = (x: number, y: number) => {
-    const _canvas = canvasRef.value
-    if (!_canvas) return;
+    const canvas = canvasRef.value
+    if (!canvas) return;
 
-    const ctx = _canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
     if (ctx) {
       // Remove the previous hovered pixel if it's not drawn and not the current position
@@ -119,6 +122,5 @@ export function useDraw(props: Props) {
     positionX,
     positionY,
     initDrawer,
-    scaleByDPR
   }
 }

@@ -10,10 +10,9 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
-const { positionX, positionY, scaleByDPR, initDrawer } = useDraw({ canvas })
+const { positionX, positionY, initDrawer } = useDraw({ canvas })
 
 onMounted(() => {
-  scaleByDPR();
   initDrawer()
 });
 </script>

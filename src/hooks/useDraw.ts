@@ -1,4 +1,5 @@
-import { ShallowRef, computed, ref } from 'vue'
+import { ShallowRef, computed, onMounted, onUnmounted, ref } from 'vue'
+import { fromEvent, Observable, tap, merge, Subscription } from 'rxjs'
 
 export type PixelType = "draw" | "hover";
 
@@ -17,47 +18,67 @@ export function useDraw(props: Props) {
   const drawnPixels = ref<Set<string>>(new Set());
   const hoveredPixel = ref<{ x: number; y: number; }>({ x: 0, y: 0 });
 
-  const canvasRef = computed(() => props.canvas.value)
+  const draw$ = ref<Subscription>()
+  const mouseDown$ = ref<Observable<MouseEvent>>()
+  const mouseMove$ = ref<Observable<MouseEvent>>()
+  const mouseUp$ = ref<Observable<MouseEvent>>()
+  const mouseLeave$ = ref<Observable<MouseEvent>>()
+
+  const canvas = computed(() => props.canvas.value)
+  const canvasCtx = computed(() => canvas.value?.getContext('2d'))
+
+  onMounted(() => {
+    if (!canvas.value) return
+
+    mouseDown$.value = fromEvent<MouseEvent>(canvas.value, 'mousedown')
+    mouseMove$.value = fromEvent<MouseEvent>(canvas.value, 'mousemove');
+    mouseUp$.value = fromEvent<MouseEvent>(canvas.value, 'mouseup');
+    mouseLeave$.value = fromEvent<MouseEvent>(canvas.value, 'mouseleave');
+
+    scaleByDPR()
+    initDrawer()
+  })
+
+  onUnmounted(() => {
+    draw$.value?.unsubscribe()
+  })
 
   const scaleByDPR = (
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
   ) => {
+    if (!canvas.value || !canvasCtx.value) return
+
     const dpr = Math.floor(window.devicePixelRatio) || 1;
-  
-    canvas.width = canvas.clientWidth * dpr;
-    canvas.height = canvas.clientHeight * dpr;
-    ctx?.scale(dpr, dpr);
+
+    canvas.value.width = canvas.value.clientWidth * dpr;
+    canvas.value.height = canvas.value.clientHeight * dpr;
+    canvasCtx.value.scale(dpr, dpr);
   };
 
   const initDrawer = () => {
-    const canvas = canvasRef.value
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-
-    if (ctx) {
-      scaleByDPR(ctx, canvas)
-
-      canvas.addEventListener("mousedown", (event) => {
-        if (ctx) {
-          isDrawing.value = true;
-          drawPixel(event);
-        }
-      });
-    
-      canvas.addEventListener("mousemove", (event) => {
-        if (isDrawing.value) {
-          drawPixel(event);
-        } else {
-          const { x, y } = getDrawPosition(event);
-          drawHoverPixel(x, y);
-        }
-      });
-    
-      canvas.addEventListener("mouseup", () => (isDrawing.value = false));
-      canvas.addEventListener("mouseleave", () => (isDrawing.value = false));
-    }
+    draw$.value = merge(
+      mouseDown$.value!.pipe(
+        tap((event: MouseEvent) => {
+          isDrawing.value = true
+          drawPixel(event)
+        })
+      ),
+      mouseMove$.value!.pipe(
+        tap((event: MouseEvent) => {
+          if (isDrawing.value) {
+            drawPixel(event)
+          } else {
+            const position = getDrawPosition(event)
+            position && drawHoverPixel(position.x, position.y)
+          }
+        })
+      ),
+      mouseUp$.value!.pipe(
+        tap(() => isDrawing.value = false)
+      ),
+      mouseLeave$.value!.pipe(
+        tap(() => isDrawing.value = false)
+      ),
+    ).subscribe()
   }
 
   const checkIsDrawn = (x: number, y: number) => {
@@ -65,12 +86,9 @@ export function useDraw(props: Props) {
   }
 
   const getDrawPosition = (event: MouseEvent) => {
-    const canvas = canvasRef.value
-    if (!canvas) {
-      return { x: 0, y: 0 };
-    }
+    if (!canvas.value || !canvasCtx.value) return null
   
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvas.value.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) / 10) * 10;
     const y = Math.floor((event.clientY - rect.top) / 10) * 10;
   
@@ -81,46 +99,34 @@ export function useDraw(props: Props) {
   };
   
   const drawPixel = (event: MouseEvent) => {
-    const canvas = canvasRef.value
-    if (!canvas) return;
+    const position = getDrawPosition(event);
+    if (!canvas.value || !canvasCtx.value || !position) return 
+
+    const { x, y } = position
   
-    const ctx = canvas.getContext("2d");
-    const { x, y } = getDrawPosition(event);
-  
-    if (ctx) {
-      ctx.fillStyle = "black";
-      ctx.fillRect(x, y, 10, 10);
-      drawnPixels.value.add(makePositionKey(x, y));
-    }
+    canvasCtx.value.fillStyle = "black";
+    canvasCtx.value.fillRect(x, y, 10, 10);
+    drawnPixels.value.add(makePositionKey(x, y));
   };
 
   const drawHoverPixel = (x: number, y: number) => {
-    const canvas = canvasRef.value
-    if (!canvas) return;
+    const pixel = hoveredPixel.value;
 
-    const ctx = canvas.getContext("2d");
+    if (!pixel || !canvas.value || !canvasCtx.value) return
 
-    if (ctx) {
-      // Remove the previous hovered pixel if it's not drawn and not the current position
-      const pixel = hoveredPixel.value;
-      if (pixel) {
-        if (pixel.x === x && pixel.y === y) {
-          return;
-        } else if (!checkIsDrawn(pixel.x, pixel.y)) {
-          ctx.clearRect(pixel.x, pixel.y, 10, 10);
-        }
-      }
-
-      hoveredPixel.value = { x, y };
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      ctx.fillRect(x, y, 10, 10);
+    // Remove the previous hovered pixel if it's not drawn
+    if (!checkIsDrawn(pixel.x, pixel.y)) {
+      canvasCtx.value.clearRect(pixel.x, pixel.y, 10, 10);
     }
+
+    hoveredPixel.value = { x, y };
+    canvasCtx.value.fillStyle = "rgba(0, 0, 0, 0.5)";
+    canvasCtx.value.fillRect(x, y, 10, 10);
   }
 
   return {
     isDrawing,
     positionX,
     positionY,
-    initDrawer,
   }
 }

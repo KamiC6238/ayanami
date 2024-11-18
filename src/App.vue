@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CSSProperties, onMounted, ref, useTemplateRef } from "vue";
+import { CSSProperties, ref, useTemplateRef } from "vue";
 import { useDraw } from './hooks'
 
 const canvas = useTemplateRef('canvas');
@@ -10,11 +10,7 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
-const { positionX, positionY, initDrawer } = useDraw({ canvas })
-
-onMounted(() => {
-  initDrawer()
-});
+const { positionX, positionY } = useDraw({ canvas })
 </script>
 
 <template>

@@ -1,9 +1,8 @@
 import { ShallowRef, computed, onMounted, onUnmounted, ref } from 'vue'
-import { fromEvent, Observable, tap, merge, Subscription } from 'rxjs'
+import { tap, merge, Subscription } from 'rxjs'
+import { useMouse } from './useMouse'
 
-export type PixelType = "draw" | "hover";
-
-export interface Props {
+export interface PencilProps {
   canvas: Readonly<ShallowRef<HTMLCanvasElement | null>>
 }
 
@@ -11,50 +10,25 @@ function makePositionKey(x: number, y: number) {
   return `${x}-${y}`;
 }
 
-export function useDraw(props: Props) {
+export function usePencil(props: PencilProps) {
   const isDrawing = ref(false);
   const positionX = ref(0);
   const positionY = ref(0);
   const drawnPixels = ref<Set<string>>(new Set());
   const hoveredPixel = ref<{ x: number; y: number; }>({ x: 0, y: 0 });
-
   const draw$ = ref<Subscription>()
-  const mouseDown$ = ref<Observable<MouseEvent>>()
-  const mouseMove$ = ref<Observable<MouseEvent>>()
-  const mouseUp$ = ref<Observable<MouseEvent>>()
-  const mouseLeave$ = ref<Observable<MouseEvent>>()
+
+  const { mouseDown$, mouseMove$, mouseUp$ } = useMouse({ canvas: props.canvas })
 
   const canvas = computed(() => props.canvas.value)
+
   const canvasCtx = computed(() => canvas.value?.getContext('2d'))
 
-  onMounted(() => {
-    if (!canvas.value) return
+  onMounted(() => initPencil())
 
-    mouseDown$.value = fromEvent<MouseEvent>(canvas.value, 'mousedown')
-    mouseMove$.value = fromEvent<MouseEvent>(canvas.value, 'mousemove');
-    mouseUp$.value = fromEvent<MouseEvent>(canvas.value, 'mouseup');
-    mouseLeave$.value = fromEvent<MouseEvent>(canvas.value, 'mouseleave');
+  onUnmounted(() => disposePencil())
 
-    scaleByDPR()
-    initDrawer()
-  })
-
-  onUnmounted(() => {
-    draw$.value?.unsubscribe()
-  })
-
-  const scaleByDPR = (
-  ) => {
-    if (!canvas.value || !canvasCtx.value) return
-
-    const dpr = Math.floor(window.devicePixelRatio) || 1;
-
-    canvas.value.width = canvas.value.clientWidth * dpr;
-    canvas.value.height = canvas.value.clientHeight * dpr;
-    canvasCtx.value.scale(dpr, dpr);
-  };
-
-  const initDrawer = () => {
+  const initPencil = () => {
     draw$.value = merge(
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
@@ -75,10 +49,11 @@ export function useDraw(props: Props) {
       mouseUp$.value!.pipe(
         tap(() => isDrawing.value = false)
       ),
-      mouseLeave$.value!.pipe(
-        tap(() => isDrawing.value = false)
-      ),
     ).subscribe()
+  }
+
+  const disposePencil = () => {
+    draw$.value?.unsubscribe()
   }
 
   const checkIsDrawn = (x: number, y: number) => {

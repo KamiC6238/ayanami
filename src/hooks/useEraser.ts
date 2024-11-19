@@ -1,14 +1,10 @@
-import { onMounted, onUnmounted, ref, ShallowRef } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useMouse } from './useMouse'
 import { merge, Subscription } from 'rxjs'
 
-export interface EraserProps {
-  canvas: Readonly<ShallowRef<HTMLCanvasElement | null>>
-}
-
-export function useEraser(props: EraserProps) {
+export function useEraser() {
   const erase$ = ref<Subscription>()
-  const { mouseDown$, mouseMove$, mouseUp$ } = useMouse({ canvas: props.canvas })
+  const { mouseDown$, mouseMove$, mouseUp$ } = useMouse()
 
   onMounted(() => initEraser())
 

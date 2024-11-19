@@ -1,23 +1,22 @@
-import { ref, ShallowRef, computed, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { Observable, fromEvent } from 'rxjs'
+import { storeToRefs } from 'pinia'
+import { useCanvasStore } from '../store'
 
-interface Props {
-  canvas: Readonly<ShallowRef<HTMLCanvasElement | null>>
-}
-
-export function useMouse(props: Props) {
+export function useMouse() {
   const mouseDown$ = ref<Observable<MouseEvent>>()
   const mouseMove$ = ref<Observable<MouseEvent>>()
   const mouseUp$ = ref<Observable<MouseEvent>>()
 
-  const canvas = computed(() => props.canvas.value)
+  const canvasStore = useCanvasStore()
+  const { canvas } = storeToRefs(canvasStore)
 
-  onMounted(() => {
-    if (!canvas.value) return
+  watch(canvas, _canvas => {
+    if (!_canvas) return
 
-    mouseDown$.value = fromEvent<MouseEvent>(canvas.value, 'mousedown')
-    mouseMove$.value = fromEvent<MouseEvent>(canvas.value, 'mousemove');
-    mouseUp$.value = fromEvent<MouseEvent>(canvas.value, 'mouseup');
+    mouseDown$.value = fromEvent<MouseEvent>(_canvas, 'mousedown')
+    mouseMove$.value = fromEvent<MouseEvent>(_canvas, 'mousemove');
+    mouseUp$.value = fromEvent<MouseEvent>(_canvas, 'mouseup');
   })
 
   return {

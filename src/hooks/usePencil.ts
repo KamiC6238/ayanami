@@ -1,16 +1,14 @@
-import { ShallowRef, computed, onMounted, onUnmounted, ref } from 'vue'
+import { watch, onUnmounted, ref } from 'vue'
 import { tap, merge, Subscription } from 'rxjs'
+import { storeToRefs } from 'pinia'
 import { useMouse } from './useMouse'
-
-export interface PencilProps {
-  canvas: Readonly<ShallowRef<HTMLCanvasElement | null>>
-}
+import { useCanvasStore } from '../store';
 
 function makePositionKey(x: number, y: number) {
   return `${x}-${y}`;
 }
 
-export function usePencil(props: PencilProps) {
+export function usePencil() {
   const isDrawing = ref(false);
   const positionX = ref(0);
   const positionY = ref(0);
@@ -18,13 +16,15 @@ export function usePencil(props: PencilProps) {
   const hoveredPixel = ref<{ x: number; y: number; }>({ x: 0, y: 0 });
   const draw$ = ref<Subscription>()
 
-  const { mouseDown$, mouseMove$, mouseUp$ } = useMouse({ canvas: props.canvas })
+  const canvasStore = useCanvasStore()
+  const { mouseDown$, mouseMove$, mouseUp$ } = useMouse()
 
-  const canvas = computed(() => props.canvas.value)
+  const { canvas, canvasContext } = storeToRefs(canvasStore)
 
-  const canvasCtx = computed(() => canvas.value?.getContext('2d'))
-
-  onMounted(() => initPencil())
+  watch(canvas, _canvas => {
+    if (!_canvas) return
+    initPencil()
+  })
 
   onUnmounted(() => disposePencil())
 
@@ -61,7 +61,7 @@ export function usePencil(props: PencilProps) {
   }
 
   const getDrawPosition = (event: MouseEvent) => {
-    if (!canvas.value || !canvasCtx.value) return null
+    if (!canvas.value || !canvasContext.value) return null
   
     const rect = canvas.value.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) / 10) * 10;
@@ -75,28 +75,28 @@ export function usePencil(props: PencilProps) {
   
   const drawPixel = (event: MouseEvent) => {
     const position = getDrawPosition(event);
-    if (!canvas.value || !canvasCtx.value || !position) return 
+    if (!canvas.value || !canvasContext.value || !position) return 
 
     const { x, y } = position
   
-    canvasCtx.value.fillStyle = "black";
-    canvasCtx.value.fillRect(x, y, 10, 10);
+    canvasContext.value.fillStyle = "black";
+    canvasContext.value.fillRect(x, y, 10, 10);
     drawnPixels.value.add(makePositionKey(x, y));
   };
 
   const drawHoverPixel = (x: number, y: number) => {
     const pixel = hoveredPixel.value;
 
-    if (!pixel || !canvas.value || !canvasCtx.value) return
+    if (!pixel || !canvas.value || !canvasContext.value) return
 
     // Remove the previous hovered pixel if it's not drawn
     if (!checkIsDrawn(pixel.x, pixel.y)) {
-      canvasCtx.value.clearRect(pixel.x, pixel.y, 10, 10);
+      canvasContext.value.clearRect(pixel.x, pixel.y, 10, 10);
     }
 
     hoveredPixel.value = { x, y };
-    canvasCtx.value.fillStyle = "rgba(0, 0, 0, 0.5)";
-    canvasCtx.value.fillRect(x, y, 10, 10);
+    canvasContext.value.fillStyle = "rgba(0, 0, 0, 0.5)";
+    canvasContext.value.fillRect(x, y, 10, 10);
   }
 
   return {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { CSSProperties, ref, useTemplateRef } from "vue";
+import { CSSProperties, onMounted, ref, useTemplateRef } from "vue";
+import { useCanvasStore } from './store'
 import { useInitialization, usePencil } from './hooks'
 
 const canvas = useTemplateRef('canvas');
@@ -10,10 +11,16 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
-// 增加 useCanvas? 把 canvas 存到 store 里，用 pinia
+const { setCanvas } = useCanvasStore()
 
-useInitialization({ canvas })
-usePencil({ canvas })
+onMounted(() => {
+  if (canvas.value) {
+    setCanvas(canvas.value)
+  }
+})
+
+useInitialization()
+usePencil()
 </script>
 
 <template>

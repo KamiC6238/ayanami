@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CSSProperties, ref, useTemplateRef } from "vue";
-import { useDraw } from './hooks'
+import { useInitialization, usePencil } from './hooks'
 
 const canvas = useTemplateRef('canvas');
 const canvasStyle = ref<CSSProperties>({
@@ -10,15 +10,14 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
-const { positionX, positionY } = useDraw({ canvas })
+// 增加 useCanvas? 把 canvas 存到 store 里，用 pinia
+
+useInitialization({ canvas })
+usePencil({ canvas })
 </script>
 
 <template>
   <div class="container">
-    <div>
-      <span style="margin-right: 10px">X: {{ positionX }}</span>
-      <span>Y: {{ positionY }}</span>
-    </div>
     <canvas ref="canvas" :style="canvasStyle" />
   </div>
 </template>

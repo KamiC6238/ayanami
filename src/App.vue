@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { CSSProperties, onMounted, ref, useTemplateRef } from "vue";
-import { useCanvasStore } from './store'
-import { useInitialization, usePencil } from './hooks'
+import { useCanvasStore, usePixelToolsStore } from './store'
+import { useEraser, useInitialization, usePencil } from './hooks'
+import { ToolTypeEnum } from './types';
 
 const canvas = useTemplateRef('canvas');
 const canvasStyle = ref<CSSProperties>({
@@ -11,20 +12,24 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
+const { setToolType } = usePixelToolsStore()
 const { setCanvas } = useCanvasStore()
+
+useInitialization()
+usePencil()
+useEraser()
 
 onMounted(() => {
   if (canvas.value) {
     setCanvas(canvas.value)
   }
 })
-
-useInitialization()
-usePencil()
 </script>
 
 <template>
   <div class="container">
+    <button @click="setToolType(ToolTypeEnum.Pencil)">pencil</button>
+    <button @click="setToolType(ToolTypeEnum.Eraser)">eraser</button>
     <canvas ref="canvas" :style="canvasStyle" />
   </div>
 </template>

@@ -1,14 +1,17 @@
 import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useCanvasStore } from '../store'
+import { useCanvasStore, usePixelToolsStore } from '../store'
+import { ToolTypeEnum } from '../types'
 
 export function useInitialization() {
+  const pixeltoolsStore = usePixelToolsStore()
   const canvasStore = useCanvasStore()
   const { canvas, canvasContext } = storeToRefs(canvasStore)
 
   watch(canvas, _canvas => {
     if (!_canvas) return
     scaleCanvasByDPR()
+    pixeltoolsStore.setToolType(ToolTypeEnum.Pencil)
   })
 
   const scaleCanvasByDPR = () => {

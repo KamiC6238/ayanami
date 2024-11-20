@@ -1,1 +1,5 @@
-export type ToolType = 'pencil' | 'eraser'
+export enum ToolTypeEnum {
+  Unknown = 'unknown',
+  Pencil = 'pencil',
+  Eraser = 'eraser'
+}

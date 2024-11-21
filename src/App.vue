@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CSSProperties, onMounted, ref, useTemplateRef } from "vue";
-import { useCanvasStore, usePixelToolsStore } from './store'
+import { useCanvasStore, useToolsStore } from './store'
 import { useEraser, useInitialization, usePencil } from './hooks'
 import { ToolTypeEnum } from './types';
 
@@ -12,7 +12,7 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
-const { setToolType } = usePixelToolsStore()
+const { setToolType } = useToolsStore()
 const { setCanvas } = useCanvasStore()
 
 useInitialization()

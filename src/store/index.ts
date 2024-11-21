@@ -1,2 +1,3 @@
 export * from './canvas'
-export * from './pixelTools'
+export * from './pixel'
+export * from './tool'

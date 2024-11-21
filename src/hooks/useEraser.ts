@@ -2,21 +2,20 @@ import { watch, ref } from 'vue'
 import { merge, Subscription, tap } from 'rxjs'
 import { storeToRefs } from 'pinia'
 import { useMouse } from './useMouse'
-import { usePixels } from './usePixels'
-import { useCanvasStore, usePixelToolsStore } from '../store'
+import { useCanvasStore, usePixelStore, useToolsStore } from '../store'
 import { ToolTypeEnum } from '../types'
 
 export function useEraser() {
   const isErasing = ref(false);
   const erase$ = ref<Subscription>()
 
-  const pixelToosStore = usePixelToolsStore()
+  const pixelStore = usePixelStore()
+  const toolsStore = useToolsStore()
   const canvasStore = useCanvasStore()
   const { mouseDown$, mouseMove$, mouseUp$ } = useMouse()
-  const { erasePixel, getPixelPosition, drawHoverPixel } = usePixels()
 
   const { canvas } = storeToRefs(canvasStore)
-  const { toolType } = storeToRefs(pixelToosStore)
+  const { toolType } = storeToRefs(toolsStore)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Eraser) {
@@ -35,16 +34,15 @@ export function useEraser() {
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
           isErasing.value = true
-          erasePixel(event)
+          pixelStore.erasePixel(event)
         })
       ),
       mouseMove$.value!.pipe(
         tap((event: MouseEvent) => {
           if (isErasing.value) {
-            erasePixel(event)
+            pixelStore.erasePixel(event)
           } else {
-            const position = getPixelPosition(event)
-            position && drawHoverPixel(position.x, position.y)
+            pixelStore.drawHoverPixel(event)
           }
         })
       ),

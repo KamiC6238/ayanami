@@ -24,7 +24,7 @@ export const usePixelStore = defineStore('pixel', () => {
     if (!position) return
 
     canvasStore.clearRect(position)
-    setDrawnPixels(position)
+    setDrawnPixel(position)
   }
 
   const drawPixel = (event: MouseEvent) => {
@@ -33,10 +33,10 @@ export const usePixelStore = defineStore('pixel', () => {
     if (!position) return
 
     canvasStore.fillRect(position)
-    setDrawnPixels(position)
+    setDrawnPixel(position)
   }
 
-  const setDrawnPixels = (position: Position) => {
+  const setDrawnPixel = (position: Position) => {
     const key = makePositionKey(position)
 
     switch (toolType.value) {
@@ -49,7 +49,10 @@ export const usePixelStore = defineStore('pixel', () => {
     }
   }
 
-  const setHoveredPixel = (position: Position) => {
+  const setHoveredPixel = (position: Position | null) => {
+    if (!position && hoveredPixel.value) {
+      canvasStore.clearRect(hoveredPixel.value)
+    }
     hoveredPixel.value = position
   }
 
@@ -86,7 +89,7 @@ export const usePixelStore = defineStore('pixel', () => {
   return {
     erasePixel,
     drawPixel,
-    setDrawnPixels,
+    setDrawnPixel,
     drawHoverPixel,
     setHoveredPixel,
     getPixelPosition,

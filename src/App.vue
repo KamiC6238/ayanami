@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CSSProperties, onMounted, ref, useTemplateRef } from "vue";
 import { useCanvasStore, useToolsStore } from './store'
-import { useEraser, useInitialization, usePencil } from './hooks'
+import { useEraser, usePencil } from './hooks'
 import { ToolTypeEnum } from './types';
 
 const canvas = useTemplateRef('canvas');
@@ -15,13 +15,13 @@ const canvasStyle = ref<CSSProperties>({
 const { setToolType } = useToolsStore()
 const { setCanvas } = useCanvasStore()
 
-useInitialization()
 usePencil()
 useEraser()
 
 onMounted(() => {
   if (canvas.value) {
     setCanvas(canvas.value)
+    setToolType(ToolTypeEnum.Pencil)
   }
 })
 </script>

@@ -12,7 +12,7 @@ export function usePencil() {
   const pixelStore = usePixelStore()
   const toolsStore = useToolsStore()
   const canvasStore = useCanvasStore()
-  const { mouseDown$, mouseMove$, mouseUp$ } = useMouse()
+  const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = useMouse()
 
   const { canvas } = storeToRefs(canvasStore)
   const { toolType } = storeToRefs(toolsStore)
@@ -49,6 +49,9 @@ export function usePencil() {
       mouseUp$.value!.pipe(
         tap(() => isDrawing.value = false)
       ),
+      mouseLeave$.value!.pipe(
+        tap(() => pixelStore.setHoveredPixel(null))
+      )
     ).subscribe()
   }
 

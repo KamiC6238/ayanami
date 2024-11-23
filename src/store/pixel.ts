@@ -16,7 +16,11 @@ export const usePixelStore = defineStore('pixel', () => {
   const toolsStore = useToolsStore()
 
   const { toolType } = storeToRefs(toolsStore)
-  const { canvas, canvasContext } = storeToRefs(canvasStore)
+  const { canvas } = storeToRefs(canvasStore)
+
+  const isPixelPositionChanged = (prePosition: Position, curPosition: Position) => {
+    return prePosition.x !== curPosition.x || prePosition.y !== curPosition.y
+  }
 
   const erasePixel = (event: MouseEvent) => {
     const position = getPixelPosition(event);
@@ -63,6 +67,11 @@ export const usePixelStore = defineStore('pixel', () => {
 
     if (hoveredPixel.value) {
       const { x, y } = hoveredPixel.value
+
+      if (!isPixelPositionChanged(position, hoveredPixel.value)) {
+        return
+      }
+
       const previousHoveredPixelPosition = { x, y }
       const key = makePositionKey(previousHoveredPixelPosition)
 
@@ -77,7 +86,7 @@ export const usePixelStore = defineStore('pixel', () => {
   }
 
   const getPixelPosition = (event: MouseEvent) => {
-    if (!canvas.value || !canvasContext.value) return null
+    if (!canvas.value) return null
   
     const rect = canvas.value.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) / 10) * 10;
@@ -93,5 +102,6 @@ export const usePixelStore = defineStore('pixel', () => {
     drawHoverPixel,
     setHoveredPixel,
     getPixelPosition,
+    isPixelPositionChanged,
   }
 })

@@ -41,9 +41,8 @@ export function useEraser() {
         tap((event: MouseEvent) => {
           if (isErasing.value) {
             pixelStore.erasePixel(event)
-          } else {
-            pixelStore.drawHoverPixel(event)
           }
+          pixelStore.drawHoverPixel(event)
         })
       ),
       mouseUp$.value!.pipe(

@@ -20,19 +20,17 @@ export const useCanvasStore = defineStore('canvas', () => {
     scaleCanvasByDPR(_canvas)
   }
 
-  const clearRect = (position: Position) => {
+  const clearRect = ({ x, y }: Position) => {
     if (canvasContext.value) {
-      const { x, y } = position
       canvasContext.value.clearRect(x, y, 10, 10)
     }
   }
 
-  const fillRect = (position: Position, type: 'draw' | 'hover' = 'draw') => {
+  const fillRect = ({ x, y }: Position, type: 'draw' | 'hover' = 'draw') => {
     if (canvasContext.value) {
-      const { x, y } = position
-      canvasContext.value.fillStyle = type === 'draw'
-        ? 'black'
-        : 'rgba(0, 0, 0, 0.5)';
+      const style = type === 'draw' ? 'black' : 'rgba(0, 0, 0, 0.5)';
+
+      canvasContext.value.fillStyle = style
       canvasContext.value.fillRect(x, y, 10, 10);
     }
   }

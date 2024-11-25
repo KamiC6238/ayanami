@@ -1,9 +1,9 @@
 import { watch, ref } from 'vue'
 import { merge, Subscription, tap } from 'rxjs'
 import { storeToRefs } from 'pinia'
+import { useCanvasStore, usePixelStore, useToolsStore } from '@/store'
+import { ToolTypeEnum } from '@/types'
 import { useMouse } from './useMouse'
-import { useCanvasStore, usePixelStore, useToolsStore } from '../store'
-import { ToolTypeEnum } from '../types'
 
 export function useEraser() {
   const isErasing = ref(false);

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { CSSProperties, onMounted, ref, useTemplateRef } from "vue";
-import { useCanvasStore, useToolsStore } from './store'
-import { useEraser, usePencil } from './hooks'
-import { ToolTypeEnum } from './types';
+import { CSSProperties, onMounted, ref, useTemplateRef } from 'vue'
+import { useCanvasStore, useToolsStore } from '@/store'
+import { useEraser, usePencil } from '@/hooks'
+import { ToolTypeEnum } from '@/types';
 
 const canvas = useTemplateRef('canvas');
 const canvasStyle = ref<CSSProperties>({
@@ -43,4 +43,5 @@ onMounted(() => {
   align-items: center;
   flex-direction: column;
 }
+
 </style>

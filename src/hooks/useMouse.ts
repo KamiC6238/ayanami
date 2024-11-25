@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue'
 import { Observable, fromEvent } from 'rxjs'
 import { storeToRefs } from 'pinia'
-import { useCanvasStore } from '../store'
+import { useCanvasStore } from '@/store'
 
 export function useMouse() {
   const mouseDown$ = ref<Observable<MouseEvent>>()

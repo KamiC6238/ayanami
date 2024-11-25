@@ -1,8 +1,8 @@
 import { ref } from 'vue';
 import { defineStore, storeToRefs } from 'pinia'
-import type { Position } from '../types'
+import type { Position } from '@/types'
+import { isPixelPositionChanged, makePixelPositionKey, getPixelPosition } from '@/utils'
 import { useCanvasStore } from './canvas';
-import { isPixelPositionChanged, makePixelPositionKey, getPixelPosition } from '../utils'
 
 export const usePixelStore = defineStore('pixel', () => {
   const drawnPixels = ref<Set<string>>(new Set());

@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { Position } from '../types'
+import type { Position } from '@/types'
 
 function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
   const dpr = Math.floor(window.devicePixelRatio) || 1;

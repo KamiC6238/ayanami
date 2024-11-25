@@ -1,9 +1,9 @@
 import { ref, watch } from 'vue'
 import { tap, merge, Subscription } from 'rxjs'
 import { storeToRefs } from 'pinia'
+import { useCanvasStore, useToolsStore, usePixelStore } from '@/store';
+import { ToolTypeEnum } from '@/types'
 import { useMouse } from './useMouse'
-import { useCanvasStore, useToolsStore, usePixelStore } from '../store';
-import { ToolTypeEnum } from '../types'
 
 export function usePencil() {
   const isDrawing = ref(false);

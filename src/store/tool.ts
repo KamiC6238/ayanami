@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ToolTypeEnum } from '../types'
+import { ToolTypeEnum } from '@/types'
 import { ref } from 'vue'
 
 export const useToolsStore = defineStore('tools', () => {

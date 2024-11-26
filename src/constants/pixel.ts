@@ -1,0 +1,2 @@
+export const DEFAULT_PIXEL_SIZE = 10
+export const DEFAULT_PIXEL_COLOR = '#000000'

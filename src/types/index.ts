@@ -4,3 +4,4 @@ export type Position = {
 }
 
 export * from './toolbar'
+export * from './pixel'

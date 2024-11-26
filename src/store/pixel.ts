@@ -2,11 +2,14 @@ import { ref } from 'vue';
 import { defineStore, storeToRefs } from 'pinia'
 import type { Position } from '@/types'
 import { isPixelPositionChanged, makePixelPositionKey, getPixelPosition } from '@/utils'
+import { DEFAULT_PIXEL_COLOR, DEFAULT_PIXEL_SIZE } from '@/constants';
 import { useCanvasStore } from './canvas';
 
 export const usePixelStore = defineStore('pixel', () => {
   const drawnPixels = ref<Set<string>>(new Set());
   const hoveredPixel = ref<Position | null>(null);
+  const pixelSize = ref(DEFAULT_PIXEL_SIZE)
+  const pixelColor = ref(DEFAULT_PIXEL_COLOR)
 
   const canvasStore = useCanvasStore()
   const { canvas } = storeToRefs(canvasStore)
@@ -20,7 +23,9 @@ export const usePixelStore = defineStore('pixel', () => {
     if (!drawnPixels.value.has(key)) return
 
     drawnPixels.value.delete(key)
-    canvasStore.clearRect(position)
+    canvasStore.clearRect(position, {
+      pixelSize: pixelSize.value
+    })
   }
 
   const drawPixel = (event: MouseEvent) => {
@@ -28,11 +33,15 @@ export const usePixelStore = defineStore('pixel', () => {
 
     const position = getPixelPosition(canvas.value, event);
     const key = makePixelPositionKey(position)
-    
+
     if (drawnPixels.value.has(key)) return
 
     drawnPixels.value.add(key)
-    canvasStore.fillRect(position)
+
+    canvasStore.fillRect(position, {
+      pixelSize: pixelSize.value,
+      color: pixelColor.value
+    })
   }
 
   const drawHoverPixel = (event: MouseEvent) => {
@@ -69,14 +78,26 @@ export const usePixelStore = defineStore('pixel', () => {
       }
 
       hoveredPixel.value = position
-      canvasStore.fillRect(position, 'hover')
+      canvasStore.fillHoverRect(position, {
+        pixelSize: pixelSize.value,
+      })
       return
     }
 
     if (!position && hoveredPixel.value) {
-      canvasStore.clearRect(hoveredPixel.value)
+      canvasStore.clearRect(hoveredPixel.value, {
+        pixelSize: pixelSize.value
+      })
       hoveredPixel.value = null
     }
+  }
+
+  const setPixelSize = (size: number) => {
+    pixelSize.value = size
+  }
+
+  const setPixelColor = (color: string) => {
+    pixelColor.value = color
   }
 
   return {
@@ -84,5 +105,7 @@ export const usePixelStore = defineStore('pixel', () => {
     drawPixel,
     drawHoverPixel,
     setHoveredPixel,
+    setPixelSize,
+    setPixelColor,
   }
 })

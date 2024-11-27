@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { defineStore, storeToRefs } from 'pinia'
 import type { Position } from '@/types'
 import { isPixelPositionChanged, makePixelPositionKey, getPixelPosition } from '@/utils'
@@ -18,7 +18,7 @@ export const usePixelStore = defineStore('pixel', () => {
     if (!canvas.value) return
 
     const position = getPixelPosition(canvas.value, event)
-    const key = makePixelPositionKey(position)
+    const key = makePixelPositionKey(position, pixelSize.value)
 
     if (!drawnPixels.value.has(key)) return
 
@@ -32,7 +32,9 @@ export const usePixelStore = defineStore('pixel', () => {
     if (!canvas.value) return
 
     const position = getPixelPosition(canvas.value, event);
-    const key = makePixelPositionKey(position)
+    const key = makePixelPositionKey(position, pixelSize.value)
+
+    console.log(key)
 
     if (drawnPixels.value.has(key)) return
 
@@ -56,12 +58,12 @@ export const usePixelStore = defineStore('pixel', () => {
   const clearPreHoveredPixel = (position: Position) => {
     if (
       !hoveredPixel.value ||
-      !isPixelPositionChanged(position, hoveredPixel.value)
+      !isPixelPositionChanged(position, hoveredPixel.value, pixelSize.value)
     ) {
       return
     }
 
-    const key = makePixelPositionKey(hoveredPixel.value)
+    const key = makePixelPositionKey(hoveredPixel.value, pixelSize.value)
 
     if (!drawnPixels.value.has(key)) {
       setHoveredPixel(null)
@@ -72,7 +74,7 @@ export const usePixelStore = defineStore('pixel', () => {
     if (position) {
       if (
         hoveredPixel.value &&
-        !isPixelPositionChanged(hoveredPixel.value, position)
+        !isPixelPositionChanged(position, hoveredPixel.value, pixelSize.value)
       ) {
         return
       }

@@ -1,2 +1,8 @@
 # Ayanami
-A free online pixel art drawing tool based on Vue3 + TypeScript.
+A free online pixel art drawing tool.
+
+# Teck stack
+- Vue3.5
+- TypeScript
+- RxJS
+- Vite

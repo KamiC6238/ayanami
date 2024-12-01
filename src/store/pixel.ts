@@ -101,6 +101,7 @@ export const usePixelStore = defineStore('pixel', () => {
   }
 
   return {
+    pixelSize,
     erasePixel,
     drawPixel,
     drawHoverPixel,

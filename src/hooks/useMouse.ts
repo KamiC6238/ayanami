@@ -10,9 +10,9 @@ export function useMouse() {
   const mouseLeave$ = ref<Observable<MouseEvent>>()
 
   const canvasStore = useCanvasStore()
-  const { canvas } = storeToRefs(canvasStore)
+  const { displayCanvas } = storeToRefs(canvasStore)
 
-  watch(canvas, _canvas => {
+  watch(displayCanvas, _canvas => {
     if (!_canvas) return
 
     mouseDown$.value = fromEvent<MouseEvent>(_canvas, 'mousedown')

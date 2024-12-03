@@ -1,3 +1,4 @@
+import { DEFAULT_PIXEL_SIZE } from '@/constants'
 import type { Position } from '@/types'
 
 export function makePixelPositionKey({ x, y }: Position) {
@@ -14,7 +15,11 @@ export function isPixelPositionChanged(
   return prePosKey !== curPosKey
 }
 
-export function getPixelPosition(canvas: HTMLCanvasElement, event: MouseEvent, pixelSize: number): Position {
+export function getPixelPosition(
+  canvas: HTMLCanvasElement,
+  event: MouseEvent,
+  pixelSize: number = DEFAULT_PIXEL_SIZE
+): Position {
   const rect = canvas.getBoundingClientRect();
   const x = Math.floor((event.clientX - rect.left) / pixelSize) * pixelSize;
   const y = Math.floor((event.clientY - rect.top) / pixelSize) * pixelSize;

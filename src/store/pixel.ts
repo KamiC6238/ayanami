@@ -12,15 +12,13 @@ export const usePixelStore = defineStore('pixel', () => {
   const pixelColor = ref(DEFAULT_PIXEL_COLOR)
 
   const canvasStore = useCanvasStore()
-  const { canvas } = storeToRefs(canvasStore)
+  const { displayCanvas } = storeToRefs(canvasStore)
 
   const erasePixel = (event: MouseEvent) => {
-    if (!canvas.value) return
+    if (!displayCanvas.value) return
 
-    const position = getPixelPosition(canvas.value, event, pixelSize.value)
+    const position = getPixelPosition(displayCanvas.value, event)
     const key = makePixelPositionKey(position)
-
-    if (!drawnPixels.value.has(key)) return
 
     drawnPixels.value.delete(key)
     canvasStore.clearRect(position, {
@@ -29,9 +27,9 @@ export const usePixelStore = defineStore('pixel', () => {
   }
 
   const drawPixel = (event: MouseEvent) => {
-    if (!canvas.value) return
+    if (!displayCanvas.value) return
 
-    const position = getPixelPosition(canvas.value, event, pixelSize.value);
+    const position = getPixelPosition(displayCanvas.value, event);
     const key = makePixelPositionKey(position)
 
     if (drawnPixels.value.has(key)) return
@@ -45,9 +43,13 @@ export const usePixelStore = defineStore('pixel', () => {
   }
 
   const drawHoverPixel = (event: MouseEvent) => {
-    if (!canvas.value) return
+    if (!displayCanvas.value) return
 
-    const position = getPixelPosition(canvas.value, event, pixelSize.value);
+    const position = getPixelPosition(
+      displayCanvas.value,
+      event,
+      DEFAULT_PIXEL_SIZE
+    )
 
     clearPreHoveredPixel(position)
     setHoveredPixel(position)
@@ -61,11 +63,7 @@ export const usePixelStore = defineStore('pixel', () => {
       return
     }
 
-    const key = makePixelPositionKey(hoveredPixel.value)
-
-    if (!drawnPixels.value.has(key)) {
-      setHoveredPixel(null)
-    }
+    setHoveredPixel(null)
   }
 
   const setHoveredPixel = (position: Position | null) => {
@@ -85,7 +83,7 @@ export const usePixelStore = defineStore('pixel', () => {
     }
 
     if (!position && hoveredPixel.value) {
-      canvasStore.clearRect(hoveredPixel.value, {
+      canvasStore.clearHoverRect(hoveredPixel.value, {
         pixelSize: pixelSize.value
       })
       hoveredPixel.value = null

@@ -5,6 +5,7 @@ import { useEraser, usePencil } from '@/hooks'
 import { ToolTypeEnum } from '@/types';
 
 const canvas = useTemplateRef('canvas');
+const displayCanvas = useTemplateRef('displayCanvas')
 const canvasStyle = ref<CSSProperties>({
   width: "600px",
   height: "600px",
@@ -13,15 +14,16 @@ const canvasStyle = ref<CSSProperties>({
 });
 
 const { setToolType } = useToolsStore()
-const { setCanvas } = useCanvasStore()
+const { setCanvas, setDisplayCanvas } = useCanvasStore()
 const pixelStore = usePixelStore()
 
 usePencil()
 useEraser()
 
 onMounted(() => {
-  if (canvas.value) {
+  if (canvas.value && displayCanvas.value) {
     setCanvas(canvas.value)
+    setDisplayCanvas(displayCanvas.value)
     setToolType(ToolTypeEnum.Pencil)
   }
 })
@@ -49,18 +51,40 @@ const onPixelSizeChange = (e: Event) => {
         />
       </div>
     </div>
-    <canvas ref="canvas" :style="canvasStyle" />
+    <div class="canvas-wrapper">
+      <canvas ref="canvas" :style="canvasStyle" class="canvas" />
+      <canvas ref="displayCanvas" :style="canvasStyle" class="display-canvas" />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .container {
-  width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
+.canvas-wrapper {
+  position: relative;
+  width: 600px;
+  height: 600px;
+}
+.canvas,
+.display-canvas {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.canvas {
+  z-index: 9;
+}
+.display-canvas {
+  z-index: 10;
+}
 </style>

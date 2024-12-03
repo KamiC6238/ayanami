@@ -13,24 +13,19 @@ function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 
 export const useCanvasStore = defineStore('canvas', () => {
   const canvas = ref<HTMLCanvasElement  | null>(null)
+  const displayCanvas = ref<HTMLCanvasElement  | null>(null)
 
   const canvasContext = computed(() => canvas.value?.getContext('2d'))
+  const displayCanvasContext = computed(() => displayCanvas.value?.getContext('2d'))
 
   const setCanvas = (_canvas: HTMLCanvasElement) => {
     canvas.value = _canvas
     scaleCanvasByDPR(_canvas)
   }
 
-  const clearRect = (
-    { x, y }: Position,
-    config: ClearRectConfig = {
-      pixelSize: DEFAULT_PIXEL_SIZE
-    }
-  ) => {
-    if (canvasContext.value) {
-      const { pixelSize } = config
-      canvasContext.value.clearRect(x, y, pixelSize, pixelSize)
-    }
+  const setDisplayCanvas = (_canvas: HTMLCanvasElement) => {
+    displayCanvas.value = _canvas
+    scaleCanvasByDPR(_canvas)
   }
 
   const fillRect = (
@@ -48,26 +43,53 @@ export const useCanvasStore = defineStore('canvas', () => {
     }
   }
 
+  const clearRect = (
+    { x, y }: Position,
+    config: ClearRectConfig = {
+      pixelSize: DEFAULT_PIXEL_SIZE
+    }
+  ) => {
+    if (canvasContext.value) {
+      const { pixelSize } = config
+      canvasContext.value.clearRect(x, y, pixelSize, pixelSize)
+    }
+  }
+
   const fillHoverRect = (
     { x, y }: Position,
     config: FillHoverRectConfig = {
       pixelSize: DEFAULT_PIXEL_SIZE
     }
   ) => {
-    if (canvasContext.value) {
+    if (displayCanvasContext.value) {
       const { pixelSize } = config
 
-      canvasContext.value.fillStyle = 'rgba(0, 0, 0, 0.5)'
-      canvasContext.value.fillRect(x, y, pixelSize, pixelSize);
+      displayCanvasContext.value.fillStyle = 'rgba(0, 0, 0, 0.5)'
+      displayCanvasContext.value.fillRect(x, y, pixelSize, pixelSize);
+    }
+  }
+
+  const clearHoverRect = (
+    { x, y }: Position,
+    config: ClearRectConfig = {
+      pixelSize: DEFAULT_PIXEL_SIZE
+    }
+  ) => {
+    if (displayCanvasContext.value) {
+      const { pixelSize } = config
+      displayCanvasContext.value.clearRect(x, y, pixelSize, pixelSize)
     }
   }
 
   return {
     canvas,
     canvasContext,
+    displayCanvas,
     setCanvas,
-    clearRect,
+    setDisplayCanvas,
     fillRect,
+    clearRect,
     fillHoverRect,
+    clearHoverRect,
   }
 })

@@ -16,3 +16,6 @@ A free online pixel art drawing tool.
 - TypeScript
 - RxJS
 - Vite
+
+# License
+Licensed under the MIT License.

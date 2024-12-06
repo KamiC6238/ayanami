@@ -10,7 +10,7 @@ A free online pixel art drawing tool.
 - [ ] Color picker
 
 
-# Teck stack
+# Tech stack
 - Vue3.5
 - Pinia
 - TypeScript

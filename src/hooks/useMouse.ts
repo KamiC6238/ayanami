@@ -9,6 +9,10 @@ export function useMouse() {
   const mouseUp$ = ref<Observable<MouseEvent>>()
   const mouseLeave$ = ref<Observable<MouseEvent>>()
 
+  const globalMouseUp$ = ref<Observable<MouseEvent>>(
+    fromEvent<MouseEvent>(document, 'mouseup')
+  )
+
   const canvasStore = useCanvasStore()
   const { displayCanvas } = storeToRefs(canvasStore)
 
@@ -26,5 +30,7 @@ export function useMouse() {
     mouseMove$,
     mouseUp$,
     mouseLeave$,
+
+    globalMouseUp$,
   }
 }

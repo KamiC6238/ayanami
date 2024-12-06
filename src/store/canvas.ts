@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { ClearRectConfig, FillHoverRectConfig, FillRectConfig, Position } from '@/types'
-import { DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_COLOR } from '@/constants';
+import { DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_COLOR, DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
 
 function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
   const dpr = Math.floor(window.devicePixelRatio) || 1;
@@ -64,7 +64,7 @@ export const useCanvasStore = defineStore('canvas', () => {
     if (displayCanvasContext.value) {
       const { pixelSize } = config
 
-      displayCanvasContext.value.fillStyle = 'rgba(0, 0, 0, 0.5)'
+      displayCanvasContext.value.fillStyle = DEFAULT_HOVERED_PIXEL_COLOR
       displayCanvasContext.value.fillRect(x, y, pixelSize, pixelSize);
     }
   }

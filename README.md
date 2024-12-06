@@ -3,11 +3,22 @@ A free online pixel art drawing tool.
 
 # 🚧 Version 0.1.0
 ## features
-- [x] Pencil
-- [x] Eraser
+- [x] Pencil tool
+- [x] Eraser tool
+- [ ] Square tool
+- [ ] Line tool
+- [ ] Circle tool
+- [ ] Select tool
+- [ ] Bucket tool
 - [x] Change pixel size
 - [x] Clear all pixel
 - [ ] Color picker
+- [ ] Undo & Redo
+- [ ] Download and save
+  - [ ] as PNG
+  - [ ] as RAW
+- [ ] Import RAW file
+      
 
 
 # Tech stack

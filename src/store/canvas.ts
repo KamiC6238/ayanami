@@ -81,6 +81,17 @@ export const useCanvasStore = defineStore('canvas', () => {
     }
   }
 
+  const clearAllPixels = () => {
+    if (!canvas.value || !canvasContext.value) return
+
+    canvasContext.value.clearRect(
+      0,
+      0,
+      canvas.value.width,
+      canvas.value.height
+    )
+  }
+
   return {
     canvas,
     canvasContext,
@@ -91,5 +102,6 @@ export const useCanvasStore = defineStore('canvas', () => {
     clearRect,
     fillHoverRect,
     clearHoverRect,
+    clearAllPixels,
   }
 })

@@ -14,7 +14,7 @@ const canvasStyle = ref<CSSProperties>({
 });
 
 const { setToolType } = useToolsStore()
-const { setCanvas, setDisplayCanvas } = useCanvasStore()
+const { setCanvas, setDisplayCanvas, clearAllPixels } = useCanvasStore()
 const pixelStore = usePixelStore()
 
 usePencil()
@@ -38,6 +38,7 @@ const onPixelSizeChange = (e: Event) => {
     <div style="display: flex; margin-bottom: 20px;">
       <button style="margin-right: 10px" @click="setToolType(ToolTypeEnum.Pencil)">pencil</button>
       <button style="margin-right: 10px" @click="setToolType(ToolTypeEnum.Eraser)">eraser</button>
+      <button style="margin-right: 10px" @click="clearAllPixels">clear all pixels</button>
       <div style="display: flex;">
         <span>pixel size {{ pixelStore.pixelSize }}: </span>
         <input

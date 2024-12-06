@@ -6,8 +6,8 @@ A free online pixel art drawing tool.
 - [x] Pencil
 - [x] Eraser
 - [x] Change pixel size
+- [x] Clear all pixel
 - [ ] Color picker
-- [ ] Clear all pixel
 
 
 # Teck stack

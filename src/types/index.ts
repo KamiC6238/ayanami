@@ -3,5 +3,5 @@ export type Position = {
   y: number;
 }
 
-export * from './toolbar'
+export * from './config'
 export * from './pixel'

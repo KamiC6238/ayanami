@@ -1,21 +1,23 @@
 import { watch, ref } from 'vue'
 import { merge, Subscription, tap } from 'rxjs'
 import { storeToRefs } from 'pinia'
-import { useCanvasStore, usePixelStore, useToolsStore } from '@/store'
+import { useCanvasStore, useConfigStore } from '@/store'
 import { ToolTypeEnum } from '@/types'
+import { getPixelPosition } from '@/utils'
 import { useMouse } from './useMouse'
+import { useHoverPixel } from './useHover'
 
 export function useEraser() {
   const isErasing = ref(false);
   const erase$ = ref<Subscription>()
 
-  const pixelStore = usePixelStore()
-  const toolsStore = useToolsStore()
+  const toolsStore = useConfigStore()
   const canvasStore = useCanvasStore()
   const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
+  const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
-  const { canvas } = storeToRefs(canvasStore)
-  const { toolType } = storeToRefs(toolsStore)
+  const { canvas, displayCanvas } = storeToRefs(canvasStore)
+  const { toolType, pixelSize } = storeToRefs(toolsStore)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Eraser) {
@@ -34,27 +36,37 @@ export function useEraser() {
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
           isErasing.value = true
-          pixelStore.erasePixel(event)
+          erasePixel(event)
         })
       ),
       mouseMove$.value!.pipe(
         tap((event: MouseEvent) => {
           if (isErasing.value) {
-            pixelStore.erasePixel(event)
+            erasePixel(event)
           }
-          pixelStore.drawHoverPixel(event)
+          drawHoverPixel(event)
         })
       ),
       mouseUp$.value!.pipe(
         tap(() => isErasing.value = false)
       ),
       mouseLeave$.value!.pipe(
-        tap(() => pixelStore.setHoveredPixel(null))
+        tap(() => setHoveredPixel(null))
       ),
       globalMouseUp$.value!.pipe(
         tap(() => isErasing.value = false)
       )
     ).subscribe()
+  }
+
+  const erasePixel = (event: MouseEvent) => {
+    if (!displayCanvas.value) return
+
+    const position = getPixelPosition(displayCanvas.value, event)
+
+    canvasStore.clearRect(position, {
+      pixelSize: pixelSize.value
+    })
   }
 
   return {

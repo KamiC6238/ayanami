@@ -1,21 +1,23 @@
-import { ref, watch } from 'vue'
-import { tap, merge, Subscription } from 'rxjs'
+import { watch, ref } from 'vue'
+import { merge, Subscription, tap } from 'rxjs'
 import { storeToRefs } from 'pinia'
-import { useCanvasStore, useToolsStore, usePixelStore } from '@/store';
+import { useCanvasStore, useConfigStore } from '@/store'
 import { ToolTypeEnum } from '@/types'
+import { getPixelPosition } from '@/utils'
 import { useMouse } from './useMouse'
+import { useHoverPixel } from './useHover'
 
 export function usePencil() {
   const isDrawing = ref(false);
   const draw$ = ref<Subscription>()
 
-  const pixelStore = usePixelStore()
-  const toolsStore = useToolsStore()
+  const toolsStore = useConfigStore()
   const canvasStore = useCanvasStore()
   const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
+  const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
-  const { canvas } = storeToRefs(canvasStore)
-  const { toolType } = storeToRefs(toolsStore)
+  const { canvas, displayCanvas } = storeToRefs(canvasStore)
+  const { toolType, pixelColor, pixelSize } = storeToRefs(toolsStore)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Pencil) {
@@ -34,16 +36,16 @@ export function usePencil() {
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
           isDrawing.value = true
-          pixelStore.drawPixel(event)
-          pixelStore.setHoveredPixel(null)
+          drawPixel(event)
+          setHoveredPixel(null)
         })
       ),
       mouseMove$.value!.pipe(
         tap((event: MouseEvent) => {
           if (isDrawing.value) {
-            pixelStore.drawPixel(event)
+            drawPixel(event)
           } else {
-            pixelStore.drawHoverPixel(event)
+            drawHoverPixel(event)
           }
         })
       ),
@@ -51,12 +53,23 @@ export function usePencil() {
         tap(() => isDrawing.value = false)
       ),
       mouseLeave$.value!.pipe(
-        tap(() => pixelStore.setHoveredPixel(null))
+        tap(() => setHoveredPixel(null))
       ),
       globalMouseUp$.value!.pipe(
         tap(() => isDrawing.value = false)
       )
     ).subscribe()
+  }
+
+  const drawPixel = (event: MouseEvent) => {
+    if (!displayCanvas.value) return
+
+    const position = getPixelPosition(displayCanvas.value, event);
+
+    canvasStore.fillRect(position, {
+      pixelSize: pixelSize.value,
+      color: pixelColor.value
+    })
   }
 
   return {

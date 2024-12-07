@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CSSProperties, onMounted, ref, useTemplateRef } from 'vue'
-import { useCanvasStore, usePixelStore, useToolsStore } from '@/store'
+import { useCanvasStore, useConfigStore } from '@/store'
 import { useEraser, usePencil } from '@/hooks'
 import { ToolTypeEnum } from '@/types';
 
@@ -13,9 +13,8 @@ const canvasStyle = ref<CSSProperties>({
   imageRendering: "pixelated",
 });
 
-const { setToolType } = useToolsStore()
+const configStore = useConfigStore()
 const { setCanvas, setDisplayCanvas, clearAllPixels } = useCanvasStore()
-const pixelStore = usePixelStore()
 
 usePencil()
 useEraser()
@@ -24,23 +23,23 @@ onMounted(() => {
   if (canvas.value && displayCanvas.value) {
     setCanvas(canvas.value)
     setDisplayCanvas(displayCanvas.value)
-    setToolType(ToolTypeEnum.Pencil)
+    configStore.setToolType(ToolTypeEnum.Pencil)
   }
 })
 
 const onPixelSizeChange = (e: Event) => {
-  pixelStore.setPixelSize(Number((e.target as HTMLInputElement).value))
+  configStore.setPixelSize(Number((e.target as HTMLInputElement).value))
 }
 </script>
 
 <template>
   <div class="container">
     <div style="display: flex; margin-bottom: 20px;">
-      <button style="margin-right: 10px" @click="setToolType(ToolTypeEnum.Pencil)">pencil</button>
-      <button style="margin-right: 10px" @click="setToolType(ToolTypeEnum.Eraser)">eraser</button>
+      <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Pencil)">pencil</button>
+      <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
       <button style="margin-right: 10px" @click="clearAllPixels">clear all pixels</button>
       <div style="display: flex;">
-        <span>pixel size {{ pixelStore.pixelSize }}: </span>
+        <span>pixel size {{ configStore.pixelSize }}: </span>
         <input
           type="range"
           id='pixelSize'

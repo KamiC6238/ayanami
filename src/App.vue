@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { CSSProperties, onMounted, ref, useTemplateRef } from 'vue'
 import { useCanvasStore, useConfigStore } from '@/store'
-import { useEraser, usePencil } from '@/hooks'
+// import { useEraserTool, useLineTool, usePencilTool } from '@/hooks'
+import { useEraserTool, usePencilTool } from '@/hooks';
 import { ToolTypeEnum } from '@/types';
 
 const canvas = useTemplateRef('canvas');
@@ -16,8 +17,9 @@ const canvasStyle = ref<CSSProperties>({
 const configStore = useConfigStore()
 const { setCanvas, setDisplayCanvas, clearAllPixels } = useCanvasStore()
 
-usePencil()
-useEraser()
+usePencilTool()
+useEraserTool()
+// useLineTool()
 
 onMounted(() => {
   if (canvas.value && displayCanvas.value) {
@@ -37,6 +39,7 @@ const onPixelSizeChange = (e: Event) => {
     <div style="display: flex; margin-bottom: 20px;">
       <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Pencil)">pencil</button>
       <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
+      <!-- <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Line)">line</button> -->
       <button style="margin-right: 10px" @click="clearAllPixels">clear all pixels</button>
       <div style="display: flex;">
         <span>pixel size {{ configStore.pixelSize }}: </span>

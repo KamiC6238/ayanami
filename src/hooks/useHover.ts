@@ -3,13 +3,10 @@ import { storeToRefs } from 'pinia'
 import type { Position } from '@/types'
 import { isPixelPositionChanged, getPixelPosition } from '@/utils'
 import { DEFAULT_PIXEL_SIZE } from '@/constants';
-import { useCanvasStore, useConfigStore } from '@/store';
+import { useCanvasStore } from '@/store';
 
 export function useHoverPixel() {
   const hoveredPixel = ref<Position | null>(null);
-
-  const configStore = useConfigStore()
-  const { pixelSize } = storeToRefs(configStore)
 
   const canvasStore = useCanvasStore()
   const { displayCanvas } = storeToRefs(canvasStore)
@@ -48,16 +45,12 @@ export function useHoverPixel() {
       }
 
       hoveredPixel.value = position
-      canvasStore.fillHoverRect(position, {
-        pixelSize: pixelSize.value,
-      })
+      canvasStore.fillHoverRect(position)
       return
     }
 
     if (!position && hoveredPixel.value) {
-      canvasStore.clearHoverRect(hoveredPixel.value, {
-        pixelSize: pixelSize.value
-      })
+      canvasStore.clearHoverRect(hoveredPixel.value)
       hoveredPixel.value = null
     }
   }

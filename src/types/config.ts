@@ -1,5 +1,6 @@
 export enum ToolTypeEnum {
   Unknown = 'unknown',
   Pencil = 'pencil',
-  Eraser = 'eraser'
+  Eraser = 'eraser',
+  Line = 'line',
 }

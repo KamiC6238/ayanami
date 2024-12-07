@@ -7,17 +7,17 @@ import { getPixelPosition } from '@/utils'
 import { useMouse } from './useMouse'
 import { useHoverPixel } from './useHover'
 
-export function useEraser() {
+export function useEraserTool() {
   const isErasing = ref(false);
   const erase$ = ref<Subscription>()
 
-  const toolsStore = useConfigStore()
+  const configTool = useConfigStore()
   const canvasStore = useCanvasStore()
   const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
   const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
   const { canvas, displayCanvas } = storeToRefs(canvasStore)
-  const { toolType, pixelSize } = storeToRefs(toolsStore)
+  const { toolType } = storeToRefs(configTool)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Eraser) {
@@ -64,9 +64,7 @@ export function useEraser() {
 
     const position = getPixelPosition(displayCanvas.value, event)
 
-    canvasStore.clearRect(position, {
-      pixelSize: pixelSize.value
-    })
+    canvasStore.clearRect(position)
   }
 
   return {

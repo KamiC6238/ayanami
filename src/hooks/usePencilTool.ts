@@ -7,17 +7,17 @@ import { getPixelPosition } from '@/utils'
 import { useMouse } from './useMouse'
 import { useHoverPixel } from './useHover'
 
-export function usePencil() {
+export function usePencilTool() {
   const isDrawing = ref(false);
   const draw$ = ref<Subscription>()
 
-  const toolsStore = useConfigStore()
+  const configTool = useConfigStore()
   const canvasStore = useCanvasStore()
   const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
   const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
   const { canvas, displayCanvas } = storeToRefs(canvasStore)
-  const { toolType, pixelColor, pixelSize } = storeToRefs(toolsStore)
+  const { toolType } = storeToRefs(configTool)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Pencil) {
@@ -66,15 +66,13 @@ export function usePencil() {
 
     const position = getPixelPosition(displayCanvas.value, event);
 
-    canvasStore.fillRect(position, {
-      pixelSize: pixelSize.value,
-      color: pixelColor.value
-    })
+    canvasStore.fillRect(position)
   }
 
   return {
     isDrawing,
     initPencil,
-    disposePencil
+    disposePencil,
+    drawPixel,
   }
 }

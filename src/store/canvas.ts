@@ -31,28 +31,32 @@ export const useCanvasStore = defineStore('canvas', () => {
     scaleCanvasByDPR(_canvas)
   }
 
-  const fillRect = ({ x, y }: Position) => {
-    if (canvasContext.value) {
+  const fillRect = ({ x, y }: Position, context?: CanvasRenderingContext2D) => {
+    const _canvasContext = context ?? canvasContext.value
 
-      canvasContext.value.fillStyle = configStore.pixelColor
-      canvasContext.value.fillRect(
-        x,
-        y,
-        configStore.pixelSize,
-        configStore.pixelSize
-      );
-    }
+    if (!_canvasContext) return
+
+    _canvasContext.fillStyle = configStore.pixelColor
+    _canvasContext.fillRect(
+      x,
+      y,
+      configStore.pixelSize,
+      configStore.pixelSize
+    )
   }
 
-  const clearRect = ({ x, y }: Position) => {
-    if (canvasContext.value) {
-      canvasContext.value.clearRect(
-        x,
-        y,
-        configStore.pixelSize,
-        configStore.pixelSize
-      )
-    }
+  const clearRect = ({ x, y }: Position, context?: CanvasRenderingContext2D) => {
+    const _canvasContext = context ?? canvasContext.value
+
+    if (!_canvasContext) return
+
+    _canvasContext.fillStyle = configStore.pixelColor
+    _canvasContext.clearRect(
+      x,
+      y,
+      configStore.pixelSize,
+      configStore.pixelSize
+    )
   }
 
   const fillHoverRect = ({ x, y }: Position) => {
@@ -78,14 +82,16 @@ export const useCanvasStore = defineStore('canvas', () => {
     }
   }
 
-  const clearAllPixels = () => {
-    if (!canvas.value || !canvasContext.value) return
+  const clearAllPixels = (context?: CanvasRenderingContext2D) => {
+    const _canvasContext = context ?? canvasContext.value
 
-    canvasContext.value.clearRect(
+    if (!_canvasContext) return
+
+    _canvasContext.clearRect(
       0,
       0,
-      canvas.value.width,
-      canvas.value.height
+      _canvasContext.canvas.width,
+      _canvasContext.canvas.height
     )
   }
 

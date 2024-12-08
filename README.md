@@ -6,7 +6,7 @@ A free online pixel art drawing tool.
 - [x] Pencil tool
 - [x] Eraser tool
 - [ ] Square tool
-- [ ] Line tool
+- [x] Line tool
 - [ ] Circle tool
 - [ ] Select tool
 - [ ] Bucket tool

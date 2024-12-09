@@ -14,7 +14,7 @@ const canvasStyle = ref<CSSProperties>({
 });
 
 const configStore = useConfigStore()
-const { setCanvas, setDisplayCanvas, clearAllPixels } = useCanvasStore()
+const { initCanvas, clearAllPixels } = useCanvasStore()
 
 usePencilTool()
 useEraserTool()
@@ -22,8 +22,8 @@ useLineTool()
 
 onMounted(() => {
   if (canvas.value && displayCanvas.value) {
-    setCanvas(canvas.value)
-    setDisplayCanvas(displayCanvas.value)
+    initCanvas(canvas.value, { type: 'main' })
+    initCanvas(displayCanvas.value, { type: 'display' })
     configStore.setToolType(ToolTypeEnum.Pencil)
   }
 })

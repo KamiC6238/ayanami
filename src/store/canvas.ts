@@ -4,6 +4,10 @@ import type { Position } from '@/types'
 import { DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
 import { useConfigStore } from './config';
 
+interface InitCanvasConfig {
+  type: 'main' | 'display'
+}
+
 function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
   const dpr = Math.floor(window.devicePixelRatio) || 1;
   
@@ -21,13 +25,16 @@ export const useCanvasStore = defineStore('canvas', () => {
   const canvasContext = computed(() => canvas.value?.getContext('2d'))
   const displayCanvasContext = computed(() => displayCanvas.value?.getContext('2d'))
 
-  const setCanvas = (_canvas: HTMLCanvasElement) => {
-    canvas.value = _canvas
-    scaleCanvasByDPR(_canvas)
-  }
+  const initCanvas = (_canvas: HTMLCanvasElement, config: InitCanvasConfig) => {
+    switch (config.type) {
+      case 'main':
+        canvas.value = _canvas
+        break
+      case 'display':
+        displayCanvas.value = _canvas
+        break
+    }
 
-  const setDisplayCanvas = (_canvas: HTMLCanvasElement) => {
-    displayCanvas.value = _canvas
     scaleCanvasByDPR(_canvas)
   }
 
@@ -100,8 +107,7 @@ export const useCanvasStore = defineStore('canvas', () => {
     canvasContext,
     displayCanvas,
     displayCanvasContext,
-    setCanvas,
-    setDisplayCanvas,
+    initCanvas,
     fillRect,
     clearRect,
     fillHoverRect,

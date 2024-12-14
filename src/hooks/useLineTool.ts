@@ -1,5 +1,5 @@
 import { watch, ref } from 'vue';
-import { merge, Subscription, tap } from 'rxjs';
+import { merge, Subscription, tap, throttleTime } from 'rxjs';
 import { storeToRefs } from 'pinia';
 import { useCanvasStore, useConfigStore } from '@/store';
 import { Position, ToolTypeEnum } from '@/types';
@@ -65,6 +65,7 @@ export function useLineTool() {
         })
       ),
       mouseMove$.value!.pipe(
+        throttleTime(16),
         tap((event: MouseEvent) => {
           if (isDrawingLine.value) {
             drawLineEnd(event)

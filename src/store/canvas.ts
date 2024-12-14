@@ -5,7 +5,7 @@ import { DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
 import { useConfigStore } from './config';
 
 interface InitCanvasConfig {
-  type: 'main' | 'display'
+  type: 'main' | 'preview'
 }
 
 function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
@@ -30,7 +30,7 @@ export const useCanvasStore = defineStore('canvas', () => {
       case 'main':
         canvas.value = _canvas
         break
-      case 'display':
+      case 'preview':
         displayCanvas.value = _canvas
         break
     }

@@ -23,7 +23,7 @@ useLineTool()
 onMounted(() => {
   if (canvas.value && displayCanvas.value) {
     initCanvas(canvas.value, { type: 'main' })
-    initCanvas(displayCanvas.value, { type: 'display' })
+    initCanvas(displayCanvas.value, { type: 'preview' })
     configStore.setToolType(ToolTypeEnum.Pencil)
   }
 })

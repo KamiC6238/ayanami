@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { storeToRefs } from 'pinia'
 import type { Position } from '@/types'
 import { isPixelPositionChanged, getPixelPosition } from '@/utils'
 import { DEFAULT_PIXEL_SIZE } from '@/constants';
@@ -9,13 +8,14 @@ export function useHoverPixel() {
   const hoveredPixel = ref<Position | null>(null);
 
   const canvasStore = useCanvasStore()
-  const { displayCanvas } = storeToRefs(canvasStore)
 
   const drawHoverPixel = (event: MouseEvent) => {
-    if (!displayCanvas.value) return
+    const canvas = canvasStore.getCanvas('preview')
+
+    if (!canvas) return
 
     const position = getPixelPosition(
-      displayCanvas.value,
+      canvas,
       event,
       DEFAULT_PIXEL_SIZE
     )

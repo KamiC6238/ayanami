@@ -3,5 +3,7 @@ export type Position = {
   y: number;
 }
 
+export type CanvasType = 'main' | 'preview' | 'grid'
+
 export * from './config'
 export * from './pixel'

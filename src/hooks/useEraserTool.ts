@@ -4,7 +4,6 @@ import { storeToRefs } from 'pinia'
 import { useCanvasStore, useConfigStore } from '@/store'
 import { ToolTypeEnum } from '@/types'
 import { getPixelPosition } from '@/utils'
-import { useMouse } from './useMouse'
 import { useHoverPixel } from './useHover'
 
 export function useEraserTool() {
@@ -13,11 +12,10 @@ export function useEraserTool() {
 
   const configTool = useConfigStore()
   const canvasStore = useCanvasStore()
-  const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
   const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
-  const { canvas, displayCanvas } = storeToRefs(canvasStore)
   const { toolType } = storeToRefs(configTool)
+  const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$} = storeToRefs(canvasStore)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Eraser) {
@@ -30,8 +28,6 @@ export function useEraserTool() {
   const disposeEraser = () => erase$.value?.unsubscribe()
 
   const initEraser = () =>  {
-    if (!canvas) return
-
     erase$.value = merge(
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
@@ -60,11 +56,14 @@ export function useEraserTool() {
   }
 
   const erasePixel = (event: MouseEvent) => {
-    if (!displayCanvas.value) return
+    const canvas = canvasStore.getCanvas('preview')
 
-    const position = getPixelPosition(displayCanvas.value, event)
-
-    canvasStore.clearRect(position)
+    if (canvas) {
+      canvasStore.clearRect({
+        position: getPixelPosition(canvas, event),
+        canvasType: 'main'
+      })
+    }
   }
 
   return {

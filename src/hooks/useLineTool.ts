@@ -2,8 +2,7 @@ import { watch, ref } from 'vue';
 import { merge, Subscription, tap, throttleTime } from 'rxjs';
 import { storeToRefs } from 'pinia';
 import { useCanvasStore, useConfigStore } from '@/store';
-import { Position, ToolTypeEnum } from '@/types';
-import { useMouse } from './useMouse';
+import { CanvasType, Position, ToolTypeEnum } from '@/types';
 import { useHoverPixel } from './useHover';
 import { getPixelPosition } from '@/utils';
 
@@ -36,11 +35,10 @@ export function useLineTool() {
 
   const configStore = useConfigStore()
   const canvasStore = useCanvasStore()
-  const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
   const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
-  const { canvas, displayCanvas, displayCanvasContext } = storeToRefs(canvasStore)
   const { toolType, pixelSize } = storeToRefs(configStore)
+  const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$} = storeToRefs(canvasStore)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Line) {
@@ -53,10 +51,6 @@ export function useLineTool() {
   const disposeLineTool = () => line$.value?.unsubscribe()
 
   const initLineTool = () => {
-    if (!canvas.value || !displayCanvas.value) {
-      return
-    }
-
     line$.value = merge(
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
@@ -83,8 +77,8 @@ export function useLineTool() {
   }
 
   const onMouseUpHandler = () => {
-    drawBresenhamLine(canvasStore.canvasContext!)
-    canvasStore.clearAllPixels(displayCanvasContext.value!)
+    drawBresenhamLine('main')
+    canvasStore.clearAllPixels('preview')
 
     isDrawingLine.value = false
     lineStartPosition.value = null
@@ -92,21 +86,26 @@ export function useLineTool() {
   }
 
   const drawLineStart = (event: MouseEvent) => {
-    lineStartPosition.value = getPixelPosition(displayCanvas.value!, event)
+    const canvas = canvasStore.getCanvas('preview')
 
-    canvasStore.fillRect(
-      lineStartPosition.value,
-      displayCanvasContext.value!
-    )
+    if (canvas) {
+      lineStartPosition.value = getPixelPosition(canvas, event)
+
+      canvasStore.fillRect({
+        position: lineStartPosition.value,
+        canvasType: 'preview'
+      })
+    }
   }
 
   const drawLineEnd = (event: MouseEvent) => {
-    lineEndPosition.value = getPixelPosition(displayCanvas.value!, event)
-    canvasStore.clearAllPixels(displayCanvasContext.value!)
-    drawBresenhamLine(displayCanvasContext.value!)
+    const canvas = canvasStore.getCanvas('preview')
+    lineEndPosition.value = getPixelPosition(canvas!, event)
+    canvasStore.clearAllPixels('preview')
+    drawBresenhamLine('preview')
   }
 
-  const drawBresenhamLine = (canvasContext: CanvasRenderingContext2D) => {
+  const drawBresenhamLine = (canvasType: CanvasType) => {
     if (!lineStartPosition.value || !lineEndPosition.value) {
       return
     }
@@ -124,7 +123,10 @@ export function useLineTool() {
     let err = dx - dy
 
     while (true) {
-      canvasStore.fillRect({ x: startX, y: startY }, canvasContext)
+      canvasStore.fillRect({
+        position: { x: startX, y: startY },
+        canvasType
+      })
 
       if (startX === endX && startY === endY) {
         break

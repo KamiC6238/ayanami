@@ -1,11 +1,17 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Position } from '@/types'
+import { type Observable, fromEvent } from 'rxjs';
+import type { Position, CanvasType } from '@/types'
 import { DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
 import { useConfigStore } from './config';
 
 interface InitCanvasConfig {
-  type: 'main' | 'preview'
+  type: CanvasType
+}
+
+interface RectConfig {
+  position: Position
+  canvasType: CanvasType
 }
 
 function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
@@ -18,12 +24,32 @@ function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 
 export const useCanvasStore = defineStore('canvas', () => {
   const canvas = ref<HTMLCanvasElement  | null>(null)
-  const displayCanvas = ref<HTMLCanvasElement  | null>(null)
+  const gridCanvas = ref<HTMLCanvasElement  | null>(null)
+  const previewCanvas = ref<HTMLCanvasElement  | null>(null)
+
+  const mouseDown$ = ref<Observable<MouseEvent>>()
+  const mouseMove$ = ref<Observable<MouseEvent>>()
+  const mouseUp$ = ref<Observable<MouseEvent>>()
+  const mouseLeave$ = ref<Observable<MouseEvent>>()
+  const globalMouseUp$ = ref<Observable<MouseEvent>>(
+    fromEvent<MouseEvent>(document, 'mouseup')
+  )
 
   const configStore = useConfigStore()
 
-  const canvasContext = computed(() => canvas.value?.getContext('2d'))
-  const displayCanvasContext = computed(() => displayCanvas.value?.getContext('2d'))
+  const canvasMap = computed<Record<CanvasType, HTMLCanvasElement | null>>(() => ({
+    main: canvas.value,
+    grid: gridCanvas.value,
+    preview: previewCanvas.value,
+  }))
+
+  const getCanvas = (canvasType: CanvasType) => {
+    return canvasMap.value[canvasType]
+  }
+
+  const getCanvasContext = (canvasType: CanvasType) => {
+    return getCanvas(canvasType)?.getContext('2d')
+  }
 
   const initCanvas = (_canvas: HTMLCanvasElement, config: InitCanvasConfig) => {
     switch (config.type) {
@@ -31,34 +57,43 @@ export const useCanvasStore = defineStore('canvas', () => {
         canvas.value = _canvas
         break
       case 'preview':
-        displayCanvas.value = _canvas
+        previewCanvas.value = _canvas
+        initCanvasMouse$(_canvas)
         break
+      case 'grid':
+        gridCanvas.value = _canvas
     }
 
     scaleCanvasByDPR(_canvas)
   }
 
-  const fillRect = ({ x, y }: Position, context?: CanvasRenderingContext2D) => {
-    const _canvasContext = context ?? canvasContext.value
-
-    if (!_canvasContext) return
-
-    _canvasContext.fillStyle = configStore.pixelColor
-    _canvasContext.fillRect(
-      x,
-      y,
-      configStore.pixelSize,
-      configStore.pixelSize
-    )
+  const initCanvasMouse$ = (canvas: HTMLCanvasElement) => {
+    mouseDown$.value = fromEvent<MouseEvent>(canvas, 'mousedown')
+    mouseMove$.value = fromEvent<MouseEvent>(canvas, 'mousemove');
+    mouseUp$.value = fromEvent<MouseEvent>(canvas, 'mouseup');
+    mouseLeave$.value = fromEvent<MouseEvent>(canvas, 'mouseleave');
   }
 
-  const clearRect = ({ x, y }: Position, context?: CanvasRenderingContext2D) => {
-    const _canvasContext = context ?? canvasContext.value
+  const fillRect = (config: RectConfig) => {
+    const { x, y } = config.position
+    const context = getCanvasContext(config.canvasType)
 
-    if (!_canvasContext) return
+    if (context) {
+      context.fillStyle = configStore.pixelColor
+      context.fillRect(
+        x,
+        y,
+        configStore.pixelSize,
+        configStore.pixelSize
+      )
+    }
+  }
 
-    _canvasContext.fillStyle = configStore.pixelColor
-    _canvasContext.clearRect(
+  const clearRect = (config: RectConfig) => {
+    const { x, y } = config.position
+    const context = getCanvasContext(config.canvasType)
+
+    context?.clearRect(
       x,
       y,
       configStore.pixelSize,
@@ -67,9 +102,11 @@ export const useCanvasStore = defineStore('canvas', () => {
   }
 
   const fillHoverRect = ({ x, y }: Position) => {
-    if (displayCanvasContext.value) {
-      displayCanvasContext.value.fillStyle = DEFAULT_HOVERED_PIXEL_COLOR
-      displayCanvasContext.value.fillRect(
+    const context = getCanvasContext('preview')
+
+    if (context) {
+      context.fillStyle = DEFAULT_HOVERED_PIXEL_COLOR
+      context.fillRect(
         x,
         y,
         configStore.pixelSize,
@@ -79,8 +116,10 @@ export const useCanvasStore = defineStore('canvas', () => {
   }
 
   const clearHoverRect = ({ x, y }: Position) => {
-    if (displayCanvasContext.value) {
-      displayCanvasContext.value.clearRect(
+    const context = getCanvasContext('preview')
+
+    if (context) {
+      context.clearRect(
         x,
         y,
         configStore.pixelSize,
@@ -89,29 +128,31 @@ export const useCanvasStore = defineStore('canvas', () => {
     }
   }
 
-  const clearAllPixels = (context?: CanvasRenderingContext2D) => {
-    const _canvasContext = context ?? canvasContext.value
+  const clearAllPixels = (canvasType: CanvasType) => {
+    const context = getCanvasContext(canvasType)
 
-    if (!_canvasContext) return
-
-    _canvasContext.clearRect(
+    context?.clearRect(
       0,
       0,
-      _canvasContext.canvas.width,
-      _canvasContext.canvas.height
+      context.canvas.width,
+      context.canvas.height
     )
   }
 
   return {
-    canvas,
-    canvasContext,
-    displayCanvas,
-    displayCanvasContext,
+    getCanvas,
+    getCanvasContext,
     initCanvas,
     fillRect,
     clearRect,
     fillHoverRect,
     clearHoverRect,
     clearAllPixels,
+
+    mouseDown$,
+    mouseMove$,
+    mouseUp$,
+    mouseLeave$,
+    globalMouseUp$,
   }
 })

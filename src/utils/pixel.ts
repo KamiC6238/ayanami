@@ -20,9 +20,9 @@ export function getPixelPosition(
   event: MouseEvent,
   pixelSize: number = DEFAULT_PIXEL_SIZE
 ): Position {
-  const rect = canvas.getBoundingClientRect();
-  const x = Math.floor((event.clientX - rect.left) / pixelSize) * pixelSize;
-  const y = Math.floor((event.clientY - rect.top) / pixelSize) * pixelSize;
+  const rect = canvas.getBoundingClientRect()
+  const x = Math.floor((event.clientX - rect.left) / pixelSize) * pixelSize
+  const y = Math.floor((event.clientY - rect.top) / pixelSize) * pixelSize
 
   return { x, y };
 };

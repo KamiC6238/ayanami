@@ -5,7 +5,8 @@ import { useEraserTool, useLineTool, usePencilTool } from '@/hooks'
 import { ToolTypeEnum } from '@/types';
 
 const canvas = useTemplateRef('canvas');
-const displayCanvas = useTemplateRef('displayCanvas')
+const previewCanvas = useTemplateRef('previewCanvas')
+const gridCanvas = useTemplateRef('gridCanvas')
 const canvasStyle = ref<CSSProperties>({
   width: "600px",
   height: "600px",
@@ -21,9 +22,14 @@ useEraserTool()
 useLineTool()
 
 onMounted(() => {
-  if (canvas.value && displayCanvas.value) {
+  if (
+    canvas.value &&
+    previewCanvas.value &&
+    gridCanvas.value
+  ) {
+    initCanvas(gridCanvas.value, { type: 'grid' })
     initCanvas(canvas.value, { type: 'main' })
-    initCanvas(displayCanvas.value, { type: 'preview' })
+    initCanvas(previewCanvas.value, { type: 'preview' })
     configStore.setToolType(ToolTypeEnum.Pencil)
   }
 })
@@ -39,7 +45,7 @@ const onPixelSizeChange = (e: Event) => {
       <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Pencil)">pencil</button>
       <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
       <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Line)">line</button>
-      <button style="margin-right: 10px" @click="() => clearAllPixels()">clear all pixels</button>
+      <button style="margin-right: 10px" @click="() => clearAllPixels('main')">clear all pixels</button>
       <div style="display: flex;">
         <span>pixel size {{ configStore.pixelSize }}: </span>
         <input
@@ -55,7 +61,8 @@ const onPixelSizeChange = (e: Event) => {
     </div>
     <div class="canvas-wrapper">
       <canvas ref="canvas" :style="canvasStyle" class="canvas" />
-      <canvas ref="displayCanvas" :style="canvasStyle" class="display-canvas" />
+      <canvas ref="previewCanvas" :style="canvasStyle" class="preview-canvas" />
+      <canvas ref="gridCanvas" :style="canvasStyle" class="grid-canvas" />
     </div>
   </div>
 </template>
@@ -76,7 +83,14 @@ const onPixelSizeChange = (e: Event) => {
   height: 600px;
 }
 .canvas,
-.display-canvas {
+.preview-canvas {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.grid-canvas {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -86,7 +100,10 @@ const onPixelSizeChange = (e: Event) => {
 .canvas {
   z-index: 9;
 }
-.display-canvas {
+.preview-canvas {
   z-index: 10;
+}
+.grid-canvas {
+  z-index: 8;
 }
 </style>

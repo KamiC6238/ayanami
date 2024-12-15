@@ -4,7 +4,6 @@ import { storeToRefs } from 'pinia'
 import { useCanvasStore, useConfigStore } from '@/store'
 import { ToolTypeEnum } from '@/types'
 import { getPixelPosition } from '@/utils'
-import { useMouse } from './useMouse'
 import { useHoverPixel } from './useHover'
 
 export function usePencilTool() {
@@ -13,11 +12,10 @@ export function usePencilTool() {
 
   const configTool = useConfigStore()
   const canvasStore = useCanvasStore()
-  const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$, globalMouseUp$ } = useMouse()
   const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
 
-  const { canvas, displayCanvas } = storeToRefs(canvasStore)
   const { toolType } = storeToRefs(configTool)
+  const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$} = storeToRefs(canvasStore)
 
   watch(toolType, type => {
     if (type === ToolTypeEnum.Pencil) {
@@ -30,8 +28,6 @@ export function usePencilTool() {
   const disposePencil = () => draw$.value?.unsubscribe()
 
   const initPencil = () => {
-    if (!canvas) return
-
     draw$.value = merge(
       mouseDown$.value!.pipe(
         tap((event: MouseEvent) => {
@@ -62,11 +58,14 @@ export function usePencilTool() {
   }
 
   const drawPixel = (event: MouseEvent) => {
-    if (!displayCanvas.value) return
+    const canvas = canvasStore.getCanvas('preview')
 
-    const position = getPixelPosition(displayCanvas.value, event);
-
-    canvasStore.fillRect(position)
+    if (canvas) {
+      canvasStore.fillRect({
+        position:  getPixelPosition(canvas, event),
+        canvasType: 'main'
+      })
+    }
   }
 
   return {

@@ -1,26 +1,10 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { type Observable, fromEvent } from 'rxjs';
-import type { Position, CanvasType } from '@/types'
+import type { Position, CanvasType, InitCanvasConfig, RectConfig } from '@/types'
 import { DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
+import { scaleCanvasByDPR, drawGrid } from '@/utils'
 import { useConfigStore } from './config';
-
-interface InitCanvasConfig {
-  type: CanvasType
-}
-
-interface RectConfig {
-  position: Position
-  canvasType: CanvasType
-}
-
-function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
-  const dpr = Math.floor(window.devicePixelRatio) || 1;
-  
-  canvas.width = canvas.clientWidth * dpr;
-  canvas.height = canvas.clientHeight * dpr;
-  canvas.getContext('2d')?.scale(dpr, dpr)
-}
 
 export const useCanvasStore = defineStore('canvas', () => {
   const canvas = ref<HTMLCanvasElement  | null>(null)
@@ -62,9 +46,14 @@ export const useCanvasStore = defineStore('canvas', () => {
         break
       case 'grid':
         gridCanvas.value = _canvas
+        break
     }
-
+    
     scaleCanvasByDPR(_canvas)
+
+    if (config.type === 'grid') {
+      drawGrid(_canvas)
+    }
   }
 
   const initCanvasMouse$ = (canvas: HTMLCanvasElement) => {

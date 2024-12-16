@@ -8,9 +8,11 @@ const canvas = useTemplateRef('canvas');
 const previewCanvas = useTemplateRef('previewCanvas')
 const gridCanvas = useTemplateRef('gridCanvas')
 const canvasStyle = ref<CSSProperties>({
-  width: "600px",
-  height: "600px",
-  border: "1px solid black",
+  width: "500px",
+  height: "500px",
+  borderWidth: '1px',
+  borderStyle: 'solid',
+  borderColor: 'rgba(0,0,0,0.02)',
   imageRendering: "pixelated",
 });
 
@@ -79,8 +81,8 @@ const onPixelSizeChange = (e: Event) => {
 
 .canvas-wrapper {
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: 500px;
+  height: 500px;
 }
 .canvas,
 .preview-canvas {

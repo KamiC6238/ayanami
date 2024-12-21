@@ -74,23 +74,20 @@ export function useSquareTool() {
   }
 
   const drawSquareEnd = (event: MouseEvent) => {
-    const canvas = canvasStore.getCanvas('preview')
     const context = canvasStore.getCanvasContext('preview')
 
     if (!squareStartPosition.value) return
 
-    if (canvas && context) {
+    if (context) {
       canvasStore.clearAllPixels('preview')
-      squareEndPosition.value = getPixelPosition(canvas, event)
+      squareEndPosition.value = getPixelPosition(context.canvas, event)
 
       drawSquare('preview')
     }
   }
 
   const drawSquare = (canvasType: CanvasType) => {
-    const context = canvasStore.getCanvasContext(canvasType)
-
-    if (!context || !squareStartPosition.value || !squareEndPosition.value) {
+    if (!squareStartPosition.value || !squareEndPosition.value) {
       return
     }
 

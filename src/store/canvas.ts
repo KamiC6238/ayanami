@@ -72,7 +72,15 @@ export const useCanvasStore = defineStore('canvas', () => {
 
       context.strokeStyle = configStore.pixelColor
       context.lineWidth = configStore.pixelSize
-      context.strokeRect(startX, startY, endX - startX, endY - startY)
+
+      const offset = configStore.pixelSize / 2
+
+      context.strokeRect(
+        startX + offset,
+        startY + offset,
+        endX - startX,
+        endY - startY
+      )
     }
   }
 

@@ -3,5 +3,6 @@ export enum ToolTypeEnum {
   Pencil = 'pencil',
   Eraser = 'eraser',
   Line = 'line',
-  Square = 'square'
+  Square = 'square',
+  Circle = 'circle',
 }

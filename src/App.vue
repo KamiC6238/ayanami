@@ -3,6 +3,7 @@ import { CSSProperties, onMounted, ref, useTemplateRef } from 'vue'
 import { useCanvasStore, useConfigStore } from '@/store'
 import { useEraserTool, useLineTool, usePencilTool, useSquareTool } from '@/hooks'
 import { ToolTypeEnum } from '@/types';
+import { useCircleTool } from './hooks/useCircleTool';
 
 const canvas = useTemplateRef('canvas');
 const previewCanvas = useTemplateRef('previewCanvas')
@@ -23,6 +24,7 @@ usePencilTool()
 useEraserTool()
 useLineTool()
 useSquareTool()
+useCircleTool()
 
 onMounted(() => {
   if (
@@ -45,11 +47,14 @@ const onPixelSizeChange = (e: Event) => {
 <template>
   <div class="container">
     <div style="display: flex; margin-bottom: 20px;">
-      <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Pencil)">pencil</button>
-      <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
-      <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Line)">line</button>
-      <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Square)">square</button>
-      <button style="margin-right: 10px" @click="() => clearAllPixels('main')">clear all pixels</button>
+      <div style='display: flex'>
+        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Pencil)">pencil</button>
+        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
+        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Line)">line</button>
+        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Square)">square</button>
+        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Circle)">circle</button>
+        <button style="margin-right: 10px" @click="() => clearAllPixels('main')">clear</button>
+      </div>
       <div style="display: flex;">
         <span>pixel size {{ configStore.pixelSize }}: </span>
         <input

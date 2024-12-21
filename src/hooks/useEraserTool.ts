@@ -65,10 +65,4 @@ export function useEraserTool() {
       })
     }
   }
-
-  return {
-    isErasing,
-    initEraser,
-    disposeEraser
-  }
 }

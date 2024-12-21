@@ -67,11 +67,4 @@ export function usePencilTool() {
       })
     }
   }
-
-  return {
-    isDrawing,
-    initPencil,
-    disposePencil,
-    drawPixel,
-  }
 }

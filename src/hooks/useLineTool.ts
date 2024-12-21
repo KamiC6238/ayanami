@@ -69,9 +69,7 @@ export function useLineTool() {
         })
       ),
       mouseUp$.value!.pipe(tap(() => tap(() => onMouseUpHandler()))),
-      mouseLeave$.value!.pipe(
-        tap(() => setHoveredPixel(null))
-      ),
+      mouseLeave$.value!.pipe(tap(() => setHoveredPixel(null))),
       globalMouseUp$.value!.pipe(tap(() => onMouseUpHandler()))
     ).subscribe()
   }

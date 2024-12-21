@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { type Observable, fromEvent } from 'rxjs';
-import type { Position, CanvasType, InitCanvasConfig, RectConfig } from '@/types'
+import type { Position, CanvasType, InitCanvasConfig, RectConfig, SquareRectConfig } from '@/types'
 import { DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
 import { scaleCanvasByDPR, drawGrid } from '@/utils'
 import { useConfigStore } from './config';
@@ -61,6 +61,19 @@ export const useCanvasStore = defineStore('canvas', () => {
     mouseMove$.value = fromEvent<MouseEvent>(canvas, 'mousemove');
     mouseUp$.value = fromEvent<MouseEvent>(canvas, 'mouseup');
     mouseLeave$.value = fromEvent<MouseEvent>(canvas, 'mouseleave');
+  }
+
+  const strokeRect = (config: SquareRectConfig) => {
+    const context = getCanvasContext(config.canvasType)
+
+    if (context) {
+      const { x: startX, y: startY } = config.position
+      const { x: endX, y: endY } = config.endPosition
+
+      context.strokeStyle = configStore.pixelColor
+      context.lineWidth = configStore.pixelSize
+      context.strokeRect(startX, startY, endX - startX, endY - startY)
+    }
   }
 
   const fillRect = (config: RectConfig) => {
@@ -132,6 +145,7 @@ export const useCanvasStore = defineStore('canvas', () => {
     getCanvas,
     getCanvasContext,
     initCanvas,
+    strokeRect,
     fillRect,
     clearRect,
     fillHoverRect,

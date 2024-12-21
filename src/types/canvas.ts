@@ -10,3 +10,7 @@ export interface RectConfig {
   position: Position
   canvasType: CanvasType
 }
+
+export type SquareRectConfig = RectConfig & {
+  endPosition: Position
+}

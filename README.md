@@ -8,7 +8,7 @@ A free online pixel art drawing tool.
 - [x] Square tool
 - [x] Line tool
 - [ ] Circle tool
-- [ ] Select tool
+- [ ] ~~Select tool~~
 - [ ] Bucket tool
 - [x] Change pixel size
 - [x] Clear all pixel

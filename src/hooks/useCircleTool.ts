@@ -23,11 +23,11 @@ export function useCircleTool() {
     if (type === ToolTypeEnum.Circle) {
       initCircle()
     } else {
-      disposeSquare()
+      disposeCircle()
     }
   })
 
-  const disposeSquare = () => circle$.value?.unsubscribe()
+  const disposeCircle = () => circle$.value?.unsubscribe()
 
   const initCircle = () => {
     circle$.value = merge(

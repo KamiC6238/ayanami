@@ -91,7 +91,7 @@ export function useLineTool() {
 
       canvasStore.fillRect({
         position: lineStartPosition.value,
-        canvasType: 'preview'
+        canvasType: 'main'
       })
     }
   }

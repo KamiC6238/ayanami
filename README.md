@@ -7,11 +7,9 @@ A free online pixel art drawing tool.
 - [x] Eraser tool
 - [x] Square tool
 - [x] Line tool
-- [ ] Circle tool
-- [ ] ~~Select tool~~
+- [x] Circle tool
+- [ ] Select tool
 - [ ] Bucket tool
-- [x] Change pixel size
-- [x] Clear all pixel
 - [ ] Color picker
 - [ ] Undo & Redo
 - [ ] Download and save

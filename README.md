@@ -8,9 +8,9 @@ A free online pixel art drawing tool.
 - [x] Square tool
 - [x] Line tool
 - [x] Circle tool
-- [ ] Select tool
-- [ ] Bucket tool
 - [ ] Color picker
+- [ ] Bucket tool
+- [ ] Select tool
 - [ ] Undo & Redo
 - [ ] Download and save
   - [ ] as PNG

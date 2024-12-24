@@ -56,6 +56,7 @@ export function useSquareTool() {
 
   const onMouseUpHandler = () => {
     drawSquare('main')
+    canvasStore.clearAllPixels('preview')
     isDrawingSquare.value = false
     squareStartPosition.value = null
     squareEndPosition.value = null

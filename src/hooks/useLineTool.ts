@@ -77,7 +77,6 @@ export function useLineTool() {
   const onMouseUpHandler = () => {
     drawBresenhamLine('main')
     canvasStore.clearAllPixels('preview')
-
     isDrawingLine.value = false
     lineStartPosition.value = null
     lineEndPosition.value = null

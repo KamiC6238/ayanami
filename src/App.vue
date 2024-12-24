@@ -2,7 +2,7 @@
 import { CSSProperties, onMounted, ref, useTemplateRef } from 'vue'
 import { useCanvasStore, useConfigStore } from '@/store'
 import { useEraserTool, useLineTool, usePencilTool, useSquareTool } from '@/hooks'
-import { ToolTypeEnum } from '@/types';
+import { CircleTypeEnum, ToolTypeEnum } from '@/types';
 import { useCircleTool } from './hooks/useCircleTool';
 
 const canvas = useTemplateRef('canvas');
@@ -24,7 +24,7 @@ usePencilTool()
 useEraserTool()
 useLineTool()
 useSquareTool()
-useCircleTool()
+const { setCircleType } = useCircleTool()
 
 onMounted(() => {
   if (
@@ -42,6 +42,10 @@ onMounted(() => {
 const onPixelSizeChange = (e: Event) => {
   configStore.setPixelSize(Number((e.target as HTMLInputElement).value))
 }
+
+const onCircleTypeChange = (e: any) => {
+  setCircleType(e.target!.value as CircleTypeEnum)
+}
 </script>
 
 <template>
@@ -52,7 +56,13 @@ const onPixelSizeChange = (e: Event) => {
         <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
         <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Line)">line</button>
         <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Square)">square</button>
-        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Circle)">circle</button>
+        <div style="margin-right: 10px; display: flex; flex-direction: column;">
+          <button style="margin-bottom: 10px" @click="configStore.setToolType(ToolTypeEnum.Circle)">circle</button>
+          <select :value="CircleTypeEnum.Circle" @change="onCircleTypeChange">
+            <option :value="CircleTypeEnum.Circle">圆形</option>
+            <option :value="CircleTypeEnum.Ellipse">椭圆</option>
+          </select>
+        </div>
         <button style="margin-right: 10px" @click="() => clearAllPixels('main')">clear</button>
       </div>
       <div style="display: flex;">

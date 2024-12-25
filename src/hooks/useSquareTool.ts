@@ -90,10 +90,17 @@ export function useSquareTool() {
       return
     }
 
-    canvasStore.strokeRect({
-      position: squareStartPosition.value,
-      canvasType,
-      endPosition: squareEndPosition.value
-    })
+    if (squareStartPosition.value.x === squareEndPosition.value.x) {
+      canvasStore.fillRect({
+        position: squareStartPosition.value,
+        canvasType
+      })
+    } else {
+      canvasStore.strokeRect({
+        position: squareStartPosition.value,
+        canvasType,
+        endPosition: squareEndPosition.value
+      })
+    }
   }
 }

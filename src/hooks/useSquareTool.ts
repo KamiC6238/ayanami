@@ -66,11 +66,9 @@ export function useSquareTool() {
     const canvas = canvasStore.getCanvas('preview')
 
     if (canvas) {
-      squareStartPosition.value = getPixelPosition(canvas, event)
-      canvasStore.fillRect({
-        position: squareStartPosition.value,
-        canvasType: 'main'
-      })
+      const position = getPixelPosition(canvas, event)
+      squareStartPosition.value = position
+      squareEndPosition.value = position
     }
   }
 

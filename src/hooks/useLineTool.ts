@@ -86,12 +86,9 @@ export function useLineTool() {
     const canvas = canvasStore.getCanvas('preview')
 
     if (canvas) {
-      lineStartPosition.value = getPixelPosition(canvas, event)
-
-      canvasStore.fillRect({
-        position: lineStartPosition.value,
-        canvasType: 'main'
-      })
+      const position = getPixelPosition(canvas, event)
+      lineStartPosition.value = position
+      lineEndPosition.value = position
     }
   }
 

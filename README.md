@@ -11,6 +11,7 @@ A free online pixel art drawing tool.
 - [ ] Color picker
 - [ ] Bucket tool
 - [ ] Select tool
+- [ ] Support different canvas sizes
 - [ ] Undo & Redo
 - [ ] Download and save
   - [ ] as PNG

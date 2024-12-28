@@ -85,7 +85,12 @@ const onCircleTypeChange = (e: any) => {
     </div>
   </div>
 </template>
-
+<style>
+@font-face {
+  font-family: 'pixel-font';
+  src: url('@/assets/pixel.ttf');
+}
+</style>
 <style scoped>
 .container {
   display: flex;

@@ -37,7 +37,6 @@ export function useCircleTool() {
         tap((event: MouseEvent) => {
           isDrawingCircle.value = true
           drawCircleStart(event)
-          setHoveredPixel(null)
         })
       ),
       mouseMove$.value!.pipe(

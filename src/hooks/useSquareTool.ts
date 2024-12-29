@@ -35,7 +35,6 @@ export function useSquareTool() {
         tap((event: MouseEvent) => {
           isDrawingSquare.value = true
           drawSquareStart(event)
-          setHoveredPixel(null)
         })
       ),
       mouseMove$.value!.pipe(

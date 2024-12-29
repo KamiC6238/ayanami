@@ -33,7 +33,6 @@ export function usePencilTool() {
         tap((event: MouseEvent) => {
           isDrawing.value = true
           drawPixel(event)
-          setHoveredPixel(null)
         })
       ),
       mouseMove$.value!.pipe(

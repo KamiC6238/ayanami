@@ -4,6 +4,15 @@ import { useCanvasStore, useConfigStore } from '@/store'
 import { useEraserTool, useLineTool, usePencilTool, useSquareTool } from '@/hooks'
 import { CircleTypeEnum, ToolTypeEnum } from '@/types';
 import { useCircleTool } from './hooks/useCircleTool';
+import ColorPicker from '@/components/ColorPicker/index.vue'
+
+const tools = [
+  ToolTypeEnum.Pencil,
+  ToolTypeEnum.Eraser,
+  ToolTypeEnum.Line,
+  ToolTypeEnum.Square,
+  ToolTypeEnum.Circle
+]
 
 const canvas = useTemplateRef('canvas');
 const previewCanvas = useTemplateRef('previewCanvas')
@@ -50,22 +59,23 @@ const onCircleTypeChange = (e: any) => {
 
 <template>
   <div class="container">
-    <div style="display: flex; margin-bottom: 20px;">
-      <div style='display: flex'>
-        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Pencil)">pencil</button>
-        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Eraser)">eraser</button>
-        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Line)">line</button>
-        <button style="margin-right: 10px" @click="configStore.setToolType(ToolTypeEnum.Square)">square</button>
-        <div style="margin-right: 10px; display: flex; flex-direction: column;">
-          <button style="margin-bottom: 10px" @click="configStore.setToolType(ToolTypeEnum.Circle)">circle</button>
-          <select :value="CircleTypeEnum.Circle" @change="onCircleTypeChange">
-            <option :value="CircleTypeEnum.Circle">圆形</option>
-            <option :value="CircleTypeEnum.Ellipse">椭圆</option>
-          </select>
-        </div>
-        <button style="margin-right: 10px" @click="() => clearAllPixels('main')">clear</button>
+    <div style="display: flex; flex-direction: column; margin-bottom: 20px;">
+      <div style='display: flex; flex-direction: column; width: 100px;'>
+        <button
+          v-for="toolType of tools"
+          style='width: 100px; margin-bottom: 10px;'
+          @click="() => configStore.setToolType(toolType)"
+        >
+          {{ toolType }}
+        </button>
+        <select :value="CircleTypeEnum.Circle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
+           <option :value="CircleTypeEnum.Circle">圆形</option>
+           <option :value="CircleTypeEnum.Ellipse">椭圆</option>
+         </select>
+        <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
       </div>
-      <div style="display: flex;">
+      <ColorPicker />
+      <div style="display: flex; flex-direction: column; margin-top: 10px" >
         <span>pixel size {{ configStore.pixelSize }}: </span>
         <input
           type="range"
@@ -96,7 +106,6 @@ const onCircleTypeChange = (e: any) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   width: 100%;
   height: 100%;
 }

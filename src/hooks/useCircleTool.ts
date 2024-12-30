@@ -210,16 +210,16 @@ export function useCircleTool() {
     const { x: endX, y: endY } = circleEndPosition.value
     const { x: startX, y: startY} = circleStartPosition.value
 
-    const dx = endX - startX
-    const dy = endY - startY
+    const centerX = Math.floor((endX + startX) / 2)
+    const centerY = Math.floor((endY + startY) / 2)
+
+    const radiusX = Math.floor(Math.abs(endX - startX) / 2)
+    const radiusY = Math.floor(Math.abs(endY - startY) / 2)
 
     if (circleType.value === CircleTypeEnum.Circle) {
-      const radius = Math.sqrt(dx * dx + dy * dy)
-      drawPerfectCircle(startX, startY, radius, canvasType)
+      drawPerfectCircle(centerX, centerY, radiusX, canvasType)
     } else {
-      const radiusX = Math.abs(dx)
-      const radiusY = Math.abs(dy)
-      drawEllipseCircle(startX, startY, radiusX, radiusY, canvasType)
+      drawEllipseCircle(centerX, centerY, radiusX, radiusY, canvasType)
     }
   }
 

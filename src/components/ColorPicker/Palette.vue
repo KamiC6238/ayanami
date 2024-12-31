@@ -1,82 +1,73 @@
 <script lang="ts" setup>
-import { onMounted, useTemplateRef, ref } from 'vue';
-import { fromEvent, tap } from 'rxjs'
+import { onMounted, useTemplateRef, ref } from 'vue'
+import { fromEvent, merge, tap, throttleTime } from 'rxjs'
+import { drawHSLPalette, calculateRGB, hslToRgb, makeRGB } from '@/utils'
+import type { RGB } from '@/types'
+import { PixelBorder } from '@/components/Pixel'
+
+const rgb = ref<RGB>({ r: 0, g: 0, b: 0 })
+const pickedRGB = ref<RGB | null>(null)
 
 const paletteRef = useTemplateRef('paletteRef')
-const hue = ref(0)
-const canvasWidth = ref(0)
-const canvasHeight = ref(0)
 
-onMounted(() => initCanvas())
+onMounted(() => initPalette())
 
-const initCanvas = () => {
-  const canvas = paletteRef.value
+const initPalette = () => {
+  if (!paletteRef.value) return
 
-  if (canvas) {
-    const ctx = canvas.getContext('2d')
-    canvasWidth.value = canvas.width = canvas.offsetWidth;
-    canvasHeight.value = canvas.height = canvas.offsetHeight;
-    ctx && drawGradient(ctx);
-
-    initCavnasListener()
+  const hsl = {
+    h: 0,
+    s: 100,
+    l: 50
   }
+  const _rgb = hslToRgb(hsl.h, hsl.s, hsl.l)
+  const ctx = paletteRef.value.getContext('2d')
+
+  rgb.value = { ..._rgb }
+  pickedRGB.value = { ..._rgb }
+
+  ctx && drawHSLPalette(ctx, hsl)
+  initCavnasListener()
 }
 
 const initCavnasListener = () => {
   const canvas = paletteRef.value
 
   if (canvas) {
-    fromEvent<MouseEvent>(canvas, 'mousedown').pipe(
-      tap((event) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-        const rgb = getRGBFromPosition(x, y);
-        // updateRGBInputs(rgb);
-        // updateCursor(x, y);
-        console.log(rgb)
-      })
+    merge(
+      fromEvent<MouseEvent>(canvas, 'mousedown').pipe(
+        tap((event) => {
+          rgb.value = calculateRGB(event, canvas)
+        })
+      ),
+      fromEvent<MouseEvent>(canvas, 'mousemove').pipe(
+        throttleTime(16),
+        tap((event) => {
+          rgb.value = calculateRGB(event, canvas)
+        })
+      ),
+      fromEvent<MouseEvent>(canvas, 'mouseup').pipe(
+        tap(() => {
+          pickedRGB.value = { ...rgb.value! }
+        })
+      ),
     ).subscribe()
   }
 }
-
-const getRGBFromPosition = (x: number, y: number) => {
-  const ctx = paletteRef.value!.getContext("2d")
-  const imageData = ctx!.getImageData(x, y, 1, 1).data
-  return { r: imageData[0], g: imageData[1], b: imageData[2] }
-}
-
-const drawGradient = (ctx: CanvasRenderingContext2D) => {
-  const draw = (direction: 'row' | 'column') => {
-    let gradient: CanvasGradient | null = null
-
-    if (direction == 'row') {
-      gradient = ctx.createLinearGradient(0, 0, canvasWidth.value, 0)  
-      gradient.addColorStop(0, 'white')
-      gradient.addColorStop(1, `hsl(${hue.value}, 100%, 50%)`)
-    } else {
-      gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight.value)
-      gradient.addColorStop(0, 'transparent')
-      gradient.addColorStop(1, 'black')
-    }
-
-    ctx.fillStyle = gradient
-    ctx.fillRect(0, 0, canvasWidth.value, canvasHeight.value)
-  }
-
-  draw('row')
-  draw('column')
-}
 </script>
 <template>
-  <div class="palette-wrapper">
-    <canvas class="palette" ref="paletteRef" />
-  </div>
+  <canvas class="palette" ref="paletteRef" />
+  <PixelBorder :rgb="rgb" />
 </template>
 <style scoped>
 .palette {
+  display: flex;
+  flex-direction: column;
   width: 100px;
   height: 100px;
+}
+.color-preview {
+  width: 100px;
+  height: 40px;
 }
 </style>

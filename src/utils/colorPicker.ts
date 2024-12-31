@@ -1,0 +1,129 @@
+import type { RGB } from '@/types'
+
+export const rgbToHsl = (r: number, g: number, b: number) => {
+  r = r / 255
+  g = g / 255
+  b = b / 255
+
+  let h = 0
+  let s = 0
+  let l = 0
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const diff = max - min
+  const sum = max + min
+
+  l = sum / 2
+  
+  if (diff) {
+    s = l > 0.5 ? diff / (2 - sum) : diff / sum
+    switch (max) {
+      case r:
+        h = (g - b) / diff + (g < b ? 6 : 0)
+        break
+      case g:
+        h = (b - r) / diff + 2
+        break
+      case b:
+        h = (r - g) / diff + 4
+        break
+    }
+    h = h / 6
+  }
+
+  return {
+    h: Math.round(h * 360),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100)
+  }
+}
+
+
+export const hslToRgb = (h: number, s: number, l: number) => {
+  h = h / 360
+  s = s / 100
+  l = l / 100
+
+  let red, green, blue
+
+  const hueTorgb = (v1: number, v2: number, vH: number) => {
+    vH = vH < 0 ? (vH + 1) : vH > 1 ? (vH - 1) : vH
+
+    if (vH < 1 / 6) {
+      return v1 + (v2 - v1) * 6 * vH
+    }
+    if (vH < 1 / 2) {
+      return v2
+    }
+    if (vH < 2 / 3) {
+      return v1 + (v2 - v1) * (2 / 3 - vH) * 6
+    }
+    return v1
+  }
+
+  if (s === 0) {
+    red = green = blue = l;
+  } else {
+    const v2 = l <= 0.5 ? l * (s + 1) : (l + s) - (l * s)
+    const v1 = l * 2 - v2
+
+    red = hueTorgb(v1, v2, h + 1 / 3)
+    green = hueTorgb(v1, v2, h)
+    blue = hueTorgb(v1, v2, h - 1 / 3)
+  }
+
+  return {
+    r: Math.round(red * 255),
+    g: Math.round(green * 255),
+    b: Math.round(blue * 255)
+  }
+}
+
+export const makeRGB = (rgb: RGB) => `
+  rgba(
+    ${rgb.r},
+    ${rgb.g},
+    ${rgb.b},
+    1
+  )
+`
+
+interface DrawHSLPaletteConfig {
+  h: number
+  s: number
+  l: number
+}
+export const drawHSLPalette = (ctx: CanvasRenderingContext2D, config: DrawHSLPaletteConfig) => {
+  const draw = (direction: 'row' | 'column') => {
+    let gradient: CanvasGradient | null = null
+
+    const { h, s, l } = config
+
+    if (direction == 'row') {
+      gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0)  
+      gradient.addColorStop(0, 'white')
+      gradient.addColorStop(1, `hsl(${h}, ${s}%, ${l}%)`)
+    } else {
+      gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height)
+      gradient.addColorStop(0, 'transparent')
+      gradient.addColorStop(1, 'black')
+    }
+
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  }
+
+  draw('row')
+  draw('column')
+}
+
+export const calculateRGB = (event: MouseEvent, canvas: HTMLCanvasElement) => {
+  const rect = canvas.getBoundingClientRect()
+  const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+  const ctx = canvas.getContext("2d")
+  const [r, g, b] = ctx!.getImageData(x, y, 1, 1).data
+
+  return { r, g, b }
+}

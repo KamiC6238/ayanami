@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 // import { type CSSProperties, computed } from 'vue'
 import { makeRGB } from '@/utils'
 import { useColorPickerStore } from '@/store';

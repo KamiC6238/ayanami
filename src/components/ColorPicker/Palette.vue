@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onMounted, useTemplateRef, ref, onBeforeUnmount } from 'vue'
 import { fromEvent, Subscription, tap } from 'rxjs'
 import { calculateRGB, hslToRgb, drawHSLPalette } from '@/utils'

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onMounted, useTemplateRef } from 'vue'
 import { drawHSLPalette, hslToRgb, makeRGB } from '@/utils';
 import { useColorPickerStore } from '@/store';

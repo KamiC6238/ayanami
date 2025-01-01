@@ -1,10 +1,37 @@
 <script lang="ts" setup>
-import { useTemplateRef } from 'vue';
+import { onMounted, useTemplateRef } from 'vue'
+import { drawHSLPalette, hslToRgb, makeRGB } from '@/utils';
+import { useColorPickerStore } from '@/store';
+import { storeToRefs } from 'pinia';
 
 const hueRef = useTemplateRef('hueRef')
+
+const colorPickerStore = useColorPickerStore()
+const { palette, hsl, rgb } = storeToRefs(colorPickerStore)
+
+onMounted(() => {
+  const hue = hueRef.value
+
+  if (hue) {
+    hue.addEventListener("click", (e) => {
+      const ctx = palette.value?.getContext('2d')
+
+      if (ctx) {
+        const rect = hue.getBoundingClientRect()
+        const curHue = Math.round((e.clientX - rect.left) / rect.width * 360)
+        const curHSL = { ...hsl.value, h: curHue }
+
+        colorPickerStore.setRGB(hslToRgb(curHSL))
+
+        drawHSLPalette(ctx, curHue)
+      }
+    });
+  }
+})
 </script>
 <template>
   <div class="hue" ref="hueRef" />
+  <div :style="{ background: makeRGB(rgb), width: '100px', height: '20px' }"></div>
 </template>
 <style scoped>
 .hue {

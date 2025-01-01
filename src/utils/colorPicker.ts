@@ -91,21 +91,14 @@ export const makeRGB = (rgb: RGB) => `
   )
 `
 
-interface DrawHSLPaletteConfig {
-  h: number
-  s: number
-  l: number
-}
-export const drawHSLPalette = (ctx: CanvasRenderingContext2D, config: DrawHSLPaletteConfig) => {
+export const drawHSLPalette = (ctx: CanvasRenderingContext2D, hue: number) => {
   const draw = (direction: 'row' | 'column') => {
     let gradient: CanvasGradient | null = null
-
-    const { h, s, l } = config
 
     if (direction == 'row') {
       gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0)  
       gradient.addColorStop(0, 'white')
-      gradient.addColorStop(1, `hsl(${h}, ${s}%, ${l}%)`)
+      gradient.addColorStop(1, `hsl(${hue}, 100%, 50%)`)
     } else {
       gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height)
       gradient.addColorStop(0, 'transparent')
@@ -116,6 +109,7 @@ export const drawHSLPalette = (ctx: CanvasRenderingContext2D, config: DrawHSLPal
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   }
 
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   draw('row')
   draw('column')
 }

@@ -4,27 +4,27 @@ import type { RGB } from '@/types'
 import { makeRGB, rgbToHsl } from '@/utils'
 
 export const useColorPickerStore = defineStore('colorPicker', () => {
-  const rgb = ref<RGB>({ r: 0, g: 0, b: 0 })
-  const pickedRGB = ref<RGB>({ r: 0, g: 0, b: 0 })
+  const palette = ref<HTMLCanvasElement | null>(null)
+  const rgb = ref<RGB>({ r: 255, g: 0, b: 0 })
 
   const hsl = computed(() => rgbToHsl(rgb.value))
 
   const previewColor = computed(() => makeRGB(rgb.value))
 
+  const setPalette = (canvas: HTMLCanvasElement) => {
+    palette.value = canvas
+  }
+
   const setRGB = (val: RGB) => {
     rgb.value = val
   }
 
-  const updatePickedColor = () => {
-    pickedRGB.value = { ...rgb.value }
-  }
-
   return {
+    palette,
     hsl,
     rgb,
-    pickedRGB,
     previewColor,
     setRGB,
-    updatePickedColor,
+    setPalette,
   }
 })

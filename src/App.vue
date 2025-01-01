@@ -59,7 +59,7 @@ const onCircleTypeChange = (e: any) => {
 
 <template>
   <div class="container">
-    <div style="display: flex; flex-direction: column; margin-bottom: 20px;">
+    <div style="display: flex; flex-direction: column; margin-right: 20px;">
       <div style='display: flex; flex-direction: column; width: 100px;'>
         <button
           v-for="toolType of tools"
@@ -75,7 +75,7 @@ const onCircleTypeChange = (e: any) => {
         <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
       </div>
       <ColorPicker />
-      <div style="display: flex; flex-direction: column; margin-top: 10px" >
+      <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
         <span>pixel size {{ configStore.pixelSize }}: </span>
         <input
           type="range"

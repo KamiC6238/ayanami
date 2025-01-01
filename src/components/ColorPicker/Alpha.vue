@@ -12,7 +12,11 @@ onMounted(() => {
   const alpha = alphaRef.value
 
   if (alpha) {
-
+    /**
+     * TODO
+     * 1. palette, hue, alpha 增加选中的位置样式
+     * 2. alpha 支持 mouse 点击选中和滑动选中
+     */
   }
 })
 </script>

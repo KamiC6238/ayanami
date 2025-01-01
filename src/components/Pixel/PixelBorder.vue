@@ -1,25 +1,23 @@
 <script lang="ts" setup>
-import { type CSSProperties, computed } from 'vue'
-import type { RGB } from '@/types'
-import { hslToRgb, makeRGB, rgbToHsl } from '@/utils'
+// import { type CSSProperties, computed } from 'vue'
+import { makeRGB } from '@/utils'
+import { useColorPickerStore } from '@/store';
+import { storeToRefs } from 'pinia';
 
-interface Props {
-  rgb: RGB
-}
+const colorPickerStore = useColorPickerStore()
+const { rgb } = storeToRefs(colorPickerStore)
 
-const props = defineProps<Props>()
-
-const borderStyle = computed<CSSProperties>(() => ({
-  borderStyle: 'solid',
-  borderWidth: '4px',
-  borderColor: makeRGB(props.rgb),
-  borderImageSlice: 4,
-  borderImageOutset: 0,
-}))
+// const borderStyle = computed<CSSProperties>(() => ({
+//   borderStyle: 'solid',
+//   borderWidth: '4px',
+//   borderColor: makeRGB(rgb.value),
+//   borderImageSlice: 4,
+//   borderImageOutset: 0,
+// }))
 </script>
 <template>
   <div class="pixel-border">
-    <div class="pixel-border-layer-1" :style="{ background: makeRGB(props.rgb) }"></div>
+    <div class="pixel-border-layer-1" :style="{ background: makeRGB(rgb) }"></div>
   </div>
 </template>
 <style scoped>

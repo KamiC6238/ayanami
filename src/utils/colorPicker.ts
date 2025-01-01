@@ -1,6 +1,7 @@
-import type { RGB } from '@/types'
+import type { HSL, RGB } from '@/types'
 
-export const rgbToHsl = (r: number, g: number, b: number) => {
+export const rgbToHsl = (rgb: RGB) => {
+  let { r, g, b } = rgb
   r = r / 255
   g = g / 255
   b = b / 255
@@ -40,7 +41,8 @@ export const rgbToHsl = (r: number, g: number, b: number) => {
 }
 
 
-export const hslToRgb = (h: number, s: number, l: number) => {
+export const hslToRgb = (hsl: HSL) => {
+  let { h, s, l } = hsl
   h = h / 360
   s = s / 100
   l = l / 100

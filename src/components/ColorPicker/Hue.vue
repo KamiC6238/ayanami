@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onMounted, useTemplateRef } from 'vue'
-import { drawHSLPalette, hslToRgb, makeRGB } from '@/utils';
+import { drawHSLPalette, hslToRgb } from '@/utils';
 import { useColorPickerStore } from '@/store';
 import { storeToRefs } from 'pinia';
 
-const hueRef = useTemplateRef('hueRef')
+const hueRef = useTemplateRef('hue')
 
 const colorPickerStore = useColorPickerStore()
-const { palette, hsl, rgb } = storeToRefs(colorPickerStore)
+const { palette, hsl } = storeToRefs(colorPickerStore)
 
 onMounted(() => {
   const hue = hueRef.value
@@ -30,8 +30,7 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="hue" ref="hueRef" />
-  <div :style="{ background: makeRGB(rgb), width: '100px', height: '20px' }"></div>
+  <div class="hue" ref="hue" />
 </template>
 <style scoped>
 .hue {

@@ -1,11 +1,5 @@
 <script setup lang="ts">
 // import { type CSSProperties, computed } from 'vue'
-import { makeRGB } from '@/utils'
-import { useColorPickerStore } from '@/store';
-import { storeToRefs } from 'pinia';
-
-const colorPickerStore = useColorPickerStore()
-const { rgb } = storeToRefs(colorPickerStore)
 
 // const borderStyle = computed<CSSProperties>(() => ({
 //   borderStyle: 'solid',
@@ -17,7 +11,7 @@ const { rgb } = storeToRefs(colorPickerStore)
 </script>
 <template>
   <div class="pixel-border">
-    <div class="pixel-border-layer-1" :style="{ background: makeRGB(rgb) }"></div>
+    <slot />
   </div>
 </template>
 <style scoped>
@@ -30,11 +24,5 @@ const { rgb } = storeToRefs(colorPickerStore)
   border-image-width: 2;
   border-image-outset: 0;
   border-image-source: url('@/assets/pixelBorder.svg');
-  padding: 15px 20px;
-}
-.pixel-border-layer-1,
-.pixel-border-layer-2 {
-  width: 100px;
-  height: 40px;
 }
 </style>

@@ -87,7 +87,7 @@ export const makeRGB = (rgb: RGB) => `
     ${rgb.r},
     ${rgb.g},
     ${rgb.b},
-    1
+    ${rgb?.a ?? 1}
   )
 `
 

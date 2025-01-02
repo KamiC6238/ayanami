@@ -24,26 +24,26 @@ const initMouse$ = () => {
     fromEvent<MouseEvent>(hueRef.value, 'mousedown').pipe(
       tap((e) => {
         isDragging.value = true
-        updateHue(e)
+        setHue(e)
       })
     ),
     fromEvent<MouseEvent>(hueRef.value, 'mousemove').pipe(
       throttleTime(16),
       tap((e) => {
         if (!isDragging.value) return
-        updateHue(e)
+        setHue(e)
       })
     ),
     fromEvent<MouseEvent>(hueRef.value, 'mouseup').pipe(
       tap((e) => {
         isDragging.value = false
-        updateHue(e)
+        setHue(e)
       })
     ),
   ).subscribe()
 }
 
-const updateHue = (e: MouseEvent) => {
+const setHue = (e: MouseEvent) => {
   const hue = hueRef.value
 
   if (hue) {

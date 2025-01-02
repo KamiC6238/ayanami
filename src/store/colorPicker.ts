@@ -6,6 +6,7 @@ import { makeRGB, rgbToHsl } from '@/utils'
 export const useColorPickerStore = defineStore('colorPicker', () => {
   const palette = ref<HTMLCanvasElement | null>(null)
   const rgb = ref<RGB>({ r: 255, g: 0, b: 0 })
+  const alpha = ref(1)
 
   const hsl = computed(() => rgbToHsl(rgb.value))
 
@@ -19,12 +20,18 @@ export const useColorPickerStore = defineStore('colorPicker', () => {
     rgb.value = val
   }
 
+  const setAlpha = (val: number) => {
+    alpha.value = val
+  }
+
   return {
+    alpha,
     palette,
     hsl,
     rgb,
     previewColor,
     setRGB,
     setPalette,
+    setAlpha,
   }
 })

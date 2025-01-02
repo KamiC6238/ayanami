@@ -1,33 +1,63 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef } from 'vue'
+import { ref, onMounted, useTemplateRef } from 'vue'
+import { fromEvent, merge, Subscription, tap, throttleTime } from 'rxjs'
 import { drawHSLPalette, hslToRgb } from '@/utils';
 import { useColorPickerStore } from '@/store';
 import { storeToRefs } from 'pinia';
+
+const isDragging = ref(false)
+const mouse$ = ref<Subscription | null>(null)
 
 const hueRef = useTemplateRef('hue')
 
 const colorPickerStore = useColorPickerStore()
 const { palette, hsl } = storeToRefs(colorPickerStore)
 
-onMounted(() => {
+onMounted(() => initMouse$())
+
+const initMouse$ = () => {
+  if (!hueRef.value) return
+
+  mouse$.value = merge(
+    fromEvent<MouseEvent>(hueRef.value, 'mousedown').pipe(
+      tap((e) => {
+        isDragging.value = true
+        updateHue(e)
+      })
+    ),
+    fromEvent<MouseEvent>(hueRef.value, 'mousemove').pipe(
+      throttleTime(16),
+      tap((e) => {
+        if (!isDragging.value) return
+        updateHue(e)
+      })
+    ),
+    fromEvent<MouseEvent>(hueRef.value, 'mouseup').pipe(
+      tap((e) => {
+        isDragging.value = false
+        updateHue(e)
+      })
+    ),
+  ).subscribe()
+}
+
+const updateHue = (e: MouseEvent) => {
   const hue = hueRef.value
 
   if (hue) {
-    hue.addEventListener("click", (e) => {
-      const ctx = palette.value?.getContext('2d')
+    const ctx = palette.value?.getContext('2d')
 
-      if (ctx) {
-        const rect = hue.getBoundingClientRect()
-        const curHue = Math.round((e.clientX - rect.left) / rect.width * 360)
-        const curHSL = { ...hsl.value, h: curHue }
+    if (ctx) {
+      const rect = hue.getBoundingClientRect()
+      const curHue = Math.round((e.clientX - rect.left) / rect.width * 360)
+      const curHSL = { ...hsl.value, h: curHue }
 
-        colorPickerStore.setRGB(hslToRgb(curHSL))
+      colorPickerStore.setRGB(hslToRgb(curHSL))
 
-        drawHSLPalette(ctx, curHue)
-      }
-    });
+      drawHSLPalette(ctx, curHue)
+    } 
   }
-})
+}
 </script>
 <template>
   <div class="hue" ref="hue" />

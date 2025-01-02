@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef } from 'vue'
+import { ref, onMounted, useTemplateRef, onBeforeUnmount } from 'vue'
 import { fromEvent, merge, Subscription, tap, throttleTime } from 'rxjs'
+import { storeToRefs } from 'pinia';
 import { drawHSLPalette, hslToRgb } from '@/utils';
 import { useColorPickerStore } from '@/store';
-import { storeToRefs } from 'pinia';
 
 const isDragging = ref(false)
 const mouse$ = ref<Subscription | null>(null)
@@ -14,6 +14,8 @@ const colorPickerStore = useColorPickerStore()
 const { palette, hsl } = storeToRefs(colorPickerStore)
 
 onMounted(() => initMouse$())
+
+onBeforeUnmount(() => mouse$.value?.unsubscribe())
 
 const initMouse$ = () => {
   if (!hueRef.value) return

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, useTemplateRef, ref, onBeforeUnmount } from 'vue'
-import { fromEvent, merge, Subscription, tap, throttleTime } from 'rxjs'
-import { calculateRGB, hslToRgb, drawHSLPalette } from '@/utils'
+import { Subscription } from 'rxjs'
+import { calculateRGB, hslToRgb, drawHSLPalette, getMouse$ } from '@/utils'
 import { useColorPickerStore } from '@/store'
 
 const isDragging = ref(false)
@@ -33,27 +33,29 @@ const initPalette = (canvas: HTMLCanvasElement) => {
 }
 
 const initMouse$ = (canvas: HTMLCanvasElement) => {
-  mouse$.value = merge(
-    fromEvent<MouseEvent>(canvas, 'mousedown').pipe(
-      tap((e) => {
-        isDragging.value = true
-        colorPickerStore.setRGB(calculateRGB(e, canvas))
-      })
-    ),
-    fromEvent<MouseEvent>(canvas, 'mousemove').pipe(
-      throttleTime(16),
-      tap((e) => {
-        if (!isDragging.value) return
-        colorPickerStore.setRGB(calculateRGB(e, canvas))
-      })
-    ),
-    fromEvent<MouseEvent>(canvas, 'mouseup').pipe(
-      tap((e) => {
-        isDragging.value = false
-        colorPickerStore.setRGB(calculateRGB(e, canvas))
-      })
-    ),
-  ).subscribe()
+  const mousedown = (e: MouseEvent) => {
+    isDragging.value = true
+    colorPickerStore.setRGB(calculateRGB(e, canvas))
+  }
+
+  const mousemove = (e: MouseEvent) => {
+    if (!isDragging.value) return
+    colorPickerStore.setRGB(calculateRGB(e, canvas))
+  }
+
+  mouse$.value = getMouse$({
+    palette: {
+      el: canvas,
+      mousedown,
+      mousemove,
+      mouseup: (e) => colorPickerStore.setRGB(calculateRGB(e, canvas))
+    },
+    doc: {
+      el: document,
+      mousemove,
+      mouseup: () => isDragging.value = false
+    }
+  }).subscribe()
 }
 </script>
 <template>

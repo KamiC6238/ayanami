@@ -1,3 +1,4 @@
+import { fromEvent, merge, Observable, tap, throttleTime, noop } from 'rxjs'
 import type { HSL, RGB } from '@/types'
 
 export const rgbToHsl = (rgb: RGB) => {
@@ -65,7 +66,7 @@ export const hslToRgb = (hsl: HSL) => {
   }
 
   if (s === 0) {
-    red = green = blue = l;
+    red = green = blue = l
   } else {
     const v2 = l <= 0.5 ? l * (s + 1) : (l + s) - (l * s)
     const v1 = l * 2 - v2
@@ -114,12 +115,90 @@ export const drawHSLPalette = (ctx: CanvasRenderingContext2D, hue: number) => {
   draw('column')
 }
 
-export const calculateRGB = (event: MouseEvent, canvas: HTMLCanvasElement) => {
-  const rect = canvas.getBoundingClientRect()
-  const x = (event.clientX - rect.left) * (canvas.width / rect.width);
-  const y = (event.clientY - rect.top) * (canvas.height / rect.height);
-  const ctx = canvas.getContext("2d")
-  const [r, g, b] = ctx!.getImageData(x, y, 1, 1).data
+export const calculateHue = (e: MouseEvent, el: HTMLDivElement) => {
+  const rect = el.getBoundingClientRect()
+  const hue = Math.round((e.clientX - rect.left) / rect.width * 360)
 
-  return { r, g, b }
+  return hue > 360
+    ? 360
+    : hue < 0
+    ? 0
+    : hue
+}
+
+export const calculateAlpha = (e: MouseEvent, el: HTMLDivElement) => {
+  const rect = el.getBoundingClientRect()
+  const temp = Math.round((e.clientX - rect.left) / rect.width * 100)
+  const alpha = Number((temp / 100).toFixed(2))
+
+  return alpha > 1
+    ? 1
+    : alpha < 0
+    ? 0
+    : alpha
+}
+
+export const calculateRGB = (e: MouseEvent, el: HTMLCanvasElement) => {
+  const rect = el.getBoundingClientRect()
+  const inTopSide = e.clientY < rect.top
+  const inRightSide = e.clientX > rect.left && e.clientX - rect.left > rect.width
+  const inBottomSide = e.clientY > rect.top && e.clientY - rect.top > rect.height
+
+  const getRGB = (x: number, y: number) => {
+    x = Math.abs(x) * (el.width / rect.width)
+    y = Math.abs(y) * (el.height / rect.height)
+
+    const ctx = el.getContext("2d")
+    const [r, g, b] = ctx!.getImageData(x, y, 1, 1).data
+    return { r, g, b }
+  }
+
+  if (inTopSide && inRightSide) {
+    return getRGB(e.clientX - rect.width, e.clientY - rect.top)
+  }
+
+  if (inBottomSide && inRightSide) {
+    return getRGB(e.clientX - rect.width, e.clientY - rect.height)
+  }
+
+  if (inRightSide && !inTopSide && !inBottomSide) {
+    return getRGB(e.clientX - rect.width, e.clientY - rect.top)
+  }
+
+  return getRGB(e.clientX - rect.left, e.clientY - rect.top)
+}
+
+interface Mouse$ {
+  [key: string]: {
+    el: HTMLElement | Document
+    mousedown?: (e: MouseEvent) => void
+    mousemove?: (e: MouseEvent) => void
+    mouseup?: (e: MouseEvent) => void
+  }
+}
+export const getMouse$ = (props: Mouse$) => {
+  const keys = Object.keys(props)
+  const streams: Observable<MouseEvent>[] = []
+
+  keys.forEach(key => {
+    const {
+      el,
+      mousedown = noop,
+      mousemove = noop,
+      mouseup = noop
+    } = props[key]
+
+    streams.push(fromEvent<MouseEvent>(el, 'mousedown').pipe(
+      tap(mousedown)
+    ))
+    streams.push(fromEvent<MouseEvent>(el, 'mousemove').pipe(
+      throttleTime(16),
+      tap(mousemove)
+    ))
+    streams.push(fromEvent<MouseEvent>(el, 'mouseup').pipe(
+      tap(mouseup)
+    ))
+  })
+
+  return merge(...streams)
 }

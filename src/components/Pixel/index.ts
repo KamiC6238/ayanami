@@ -1,1 +1,1 @@
-export { default as PixelBorder } from './PixelBorder.vue'
+export { default as PixelBorder } from "./PixelBorder.vue";

@@ -1,4 +1,4 @@
 export type FillRectConfig = {
-  pixelSize: number
-  color: string
-}
+	pixelSize: number;
+	color: string;
+};

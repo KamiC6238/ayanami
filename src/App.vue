@@ -1,60 +1,66 @@
 <script setup lang="ts">
-import { CSSProperties, onMounted, ref, useTemplateRef } from 'vue'
-import { useCanvasStore, useConfigStore } from '@/store'
-import { useEraserTool, useLineTool, usePencilTool, useSquareTool } from '@/hooks'
-import { CircleTypeEnum, ToolTypeEnum } from '@/types';
-import { useCircleTool } from './hooks/useCircleTool';
-import ColorPicker from '@/components/ColorPicker/index.vue'
+import ColorPicker from "@/components/ColorPicker/index.vue";
+import {
+	useEraserTool,
+	useLineTool,
+	usePencilTool,
+	useSquareTool,
+} from "@/hooks";
+import { useCanvasStore, useConfigStore } from "@/store";
+import { CircleTypeEnum, ToolTypeEnum } from "@/types";
+import { type CSSProperties, onMounted, ref, useTemplateRef } from "vue";
+import { useCircleTool } from "./hooks/useCircleTool";
 
 const tools = [
-  ToolTypeEnum.Pencil,
-  ToolTypeEnum.Eraser,
-  ToolTypeEnum.Line,
-  ToolTypeEnum.Square,
-  ToolTypeEnum.Circle
-]
+	ToolTypeEnum.Pencil,
+	ToolTypeEnum.Eraser,
+	ToolTypeEnum.Line,
+	ToolTypeEnum.Square,
+	ToolTypeEnum.Circle,
+];
+const perfectCircle = CircleTypeEnum.Circle;
+const ellipseCircle = CircleTypeEnum.Ellipse;
 
-const canvas = useTemplateRef('canvas');
-const previewCanvas = useTemplateRef('previewCanvas')
-const gridCanvas = useTemplateRef('gridCanvas')
+const canvas = useTemplateRef("canvas");
+const previewCanvas = useTemplateRef("previewCanvas");
+const gridCanvas = useTemplateRef("gridCanvas");
 const canvasStyle = ref<CSSProperties>({
-  width: "500px",
-  height: "500px",
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  borderColor: 'rgba(0,0,0,0.02)',
-  imageRendering: "pixelated",
+	width: "500px",
+	height: "500px",
+	borderWidth: "1px",
+	borderStyle: "solid",
+	borderColor: "rgba(0,0,0,0.02)",
+	imageRendering: "pixelated",
 });
 
-const configStore = useConfigStore()
-const { initCanvas, clearAllPixels } = useCanvasStore()
+const configStore = useConfigStore();
+const { initCanvas, clearAllPixels } = useCanvasStore();
 
-usePencilTool()
-useEraserTool()
-useLineTool()
-useSquareTool()
-const { setCircleType } = useCircleTool()
+usePencilTool();
+useEraserTool();
+useLineTool();
+useSquareTool();
+const { setCircleType } = useCircleTool();
 
 onMounted(() => {
-  if (
-    canvas.value &&
-    previewCanvas.value &&
-    gridCanvas.value
-  ) {
-    initCanvas(gridCanvas.value, { type: 'grid' })
-    initCanvas(canvas.value, { type: 'main' })
-    initCanvas(previewCanvas.value, { type: 'preview' })
-    configStore.setToolType(ToolTypeEnum.Pencil)
-  }
-})
+	if (canvas.value && previewCanvas.value && gridCanvas.value) {
+		initCanvas(gridCanvas.value, { type: "grid" });
+		initCanvas(canvas.value, { type: "main" });
+		initCanvas(previewCanvas.value, { type: "preview" });
+		configStore.setToolType(ToolTypeEnum.Pencil);
+	}
+});
 
 const onPixelSizeChange = (e: Event) => {
-  configStore.setPixelSize(Number((e.target as HTMLInputElement).value))
-}
+	configStore.setPixelSize(Number((e.target as HTMLInputElement).value));
+};
 
-const onCircleTypeChange = (e: any) => {
-  setCircleType(e.target!.value as CircleTypeEnum)
-}
+const onCircleTypeChange = (e: Event) => {
+	if (e.target) {
+		const target = e.target as HTMLSelectElement;
+		setCircleType(target.value as CircleTypeEnum);
+	}
+};
 </script>
 
 <template>
@@ -68,9 +74,9 @@ const onCircleTypeChange = (e: any) => {
         >
           {{ toolType }}
         </button>
-        <select :value="CircleTypeEnum.Circle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
-           <option :value="CircleTypeEnum.Circle">圆形</option>
-           <option :value="CircleTypeEnum.Ellipse">椭圆</option>
+        <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
+           <option :value="perfectCircle">圆形</option>
+           <option :value="ellipseCircle">椭圆</option>
          </select>
         <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
       </div>

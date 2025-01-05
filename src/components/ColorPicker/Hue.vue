@@ -1,67 +1,76 @@
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef, onBeforeUnmount, computed, CSSProperties } from 'vue'
-import { Subscription } from 'rxjs'
-import { storeToRefs } from 'pinia';
-import { drawHSLPalette, getMouse$, calculateHue, hslToRgb } from '@/utils';
-import { useColorPickerStore } from '@/store';
+import { useColorPickerStore } from "@/store";
+import { calculateHue, drawHSLPalette, getMouse$, hslToRgb } from "@/utils";
+import { storeToRefs } from "pinia";
+import type { Subscription } from "rxjs";
+import {
+	type CSSProperties,
+	computed,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	useTemplateRef,
+} from "vue";
 
-const isDragging = ref(false)
-const mouse$ = ref<Subscription | null>(null)
+const isDragging = ref(false);
+const mouse$ = ref<Subscription | null>(null);
 
-const hueRef = useTemplateRef('hue')
+const hueRef = useTemplateRef("hue");
 
-const colorPickerStore = useColorPickerStore()
-const { palette, hsl } = storeToRefs(colorPickerStore)
+const colorPickerStore = useColorPickerStore();
+const { palette, hsl } = storeToRefs(colorPickerStore);
 
-onMounted(() => initMouse$())
+onMounted(() => initMouse$());
 
-onBeforeUnmount(() => mouse$.value?.unsubscribe())
+onBeforeUnmount(() => mouse$.value?.unsubscribe());
 
 const hueIndicatorStyle = computed<CSSProperties>(() => ({
-  left: `${Math.round(((hsl.value.h / 360) * 100))}%`
-}))
+	left: `${Math.round((hsl.value.h / 360) * 100)}%`,
+}));
 
 const initMouse$ = () => {
-  if (!hueRef.value) return
+	if (!hueRef.value) return;
 
-  const mousedown = (e: MouseEvent) => {
-    isDragging.value = true
-    setHue(e)
-  }
+	const mousedown = (e: MouseEvent) => {
+		isDragging.value = true;
+		setHue(e);
+	};
 
-  const mousemove = (e: MouseEvent) => {
-    if (!isDragging.value) return
-    setHue(e)
-  }
+	const mousemove = (e: MouseEvent) => {
+		if (!isDragging.value) return;
+		setHue(e);
+	};
 
-  mouse$.value = getMouse$({
-    hueRef: {
-      el: hueRef.value,
-      mousedown,
-      mousemove,
-      mouseup: e => setHue(e)
-    },
-    doc: {
-      el: document,
-      mousemove,
-      mouseup: () => isDragging.value = false
-    }
-  }).subscribe()
-}
+	mouse$.value = getMouse$({
+		hueRef: {
+			el: hueRef.value,
+			mousedown,
+			mousemove,
+			mouseup: (e) => setHue(e),
+		},
+		doc: {
+			el: document,
+			mousemove,
+			mouseup: () => {
+				isDragging.value = false;
+			},
+		},
+	}).subscribe();
+};
 
 const setHue = (e: MouseEvent) => {
-  if (hueRef.value) {
-    const ctx = palette.value?.getContext('2d')
+	if (hueRef.value) {
+		const ctx = palette.value?.getContext("2d");
 
-    if (ctx) {
-      const hue = calculateHue(e, hueRef.value)
-      const newHSL = { ...hsl.value, h: hue }
-      colorPickerStore.setHSL(newHSL)
-      colorPickerStore.setRGB(hslToRgb(newHSL))
-      drawHSLPalette(ctx, hue)
-    } 
-  }
-}
+		if (ctx) {
+			const hue = calculateHue(e, hueRef.value);
+			const newHSL = { ...hsl.value, h: hue };
+			colorPickerStore.setHSL(newHSL);
+			colorPickerStore.setRGB(hslToRgb(newHSL));
+			drawHSLPalette(ctx, hue);
+		}
+	}
+};
 </script>
 <template>
   <div class="hue" ref="hue">

@@ -1,105 +1,115 @@
-import { watch, ref } from 'vue'
-import { merge, Subscription, tap, throttleTime } from 'rxjs'
-import { storeToRefs } from 'pinia'
-import { useCanvasStore, useConfigStore } from '@/store'
-import { CanvasType, Position, ToolTypeEnum } from '@/types'
-import { getPixelPosition } from '@/utils'
-import { useHoverPixel } from './useHover'
+import { useCanvasStore, useConfigStore } from "@/store";
+import { type CanvasType, type Position, ToolTypeEnum } from "@/types";
+import { getPixelPosition } from "@/utils";
+import { storeToRefs } from "pinia";
+import { type Subscription, merge, tap, throttleTime } from "rxjs";
+import { ref, watch } from "vue";
+import { useHoverPixel } from "./useHover";
 
 export function useSquareTool() {
-  const isDrawingSquare = ref(false)
-  const squareStartPosition = ref<Position | null>()
-  const squareEndPosition = ref<Position | null>()
-  const square$ = ref<Subscription>()
+	const isDrawingSquare = ref(false);
+	const squareStartPosition = ref<Position | null>();
+	const squareEndPosition = ref<Position | null>();
+	const square$ = ref<Subscription>();
 
-  const configTool = useConfigStore()
-  const canvasStore = useCanvasStore()
-  const { drawHoverPixel, setHoveredPixel } = useHoverPixel()
+	const configTool = useConfigStore();
+	const canvasStore = useCanvasStore();
+	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
-  const { toolType } = storeToRefs(configTool)
-  const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$} = storeToRefs(canvasStore)
+	const { toolType } = storeToRefs(configTool);
+	const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$ } =
+		storeToRefs(canvasStore);
 
-  watch(toolType, type => {
-    if (type === ToolTypeEnum.Square) {
-      initSquare()
-    } else {
-      disposeSquare()
-    }
-  })
+	watch(toolType, (type) => {
+		if (type === ToolTypeEnum.Square) {
+			initSquare();
+		} else {
+			disposeSquare();
+		}
+	});
 
-  const disposeSquare = () => square$.value?.unsubscribe()
+	const disposeSquare = () => square$.value?.unsubscribe();
 
-  const initSquare = () => {
-    square$.value = merge(
-      mouseDown$.value!.pipe(
-        tap((event: MouseEvent) => {
-          isDrawingSquare.value = true
-          drawSquareStart(event)
-        })
-      ),
-      mouseMove$.value!.pipe(
-        throttleTime(16),
-        tap((event: MouseEvent) => {
-          if (isDrawingSquare.value) {
-            drawSquareEnd(event)
-          } else {
-            drawHoverPixel(event)
-          }
-        })
-      ),
-      mouseUp$.value!.pipe(tap(() => onMouseUpHandler())),
-      mouseLeave$.value!.pipe(tap(() => setHoveredPixel(null))),
-      globalMouseUp$.value!.pipe(tap(() => onMouseUpHandler()))
-    ).subscribe()
-  }
+	const initSquare = () => {
+		if (
+			!mouseDown$.value ||
+			!mouseMove$.value ||
+			!mouseUp$.value ||
+			!mouseLeave$.value
+		) {
+			return;
+		}
 
-  const onMouseUpHandler = () => {
-    drawSquare('main')
-    canvasStore.clearAllPixels('preview')
-    isDrawingSquare.value = false
-    squareStartPosition.value = null
-    squareEndPosition.value = null
-  }
+		square$.value = merge(
+			mouseDown$.value.pipe(
+				tap((event: MouseEvent) => {
+					isDrawingSquare.value = true;
+					drawSquareStart(event);
+				}),
+			),
+			mouseMove$.value.pipe(
+				throttleTime(16),
+				tap((event: MouseEvent) => {
+					if (isDrawingSquare.value) {
+						drawSquareEnd(event);
+					} else {
+						drawHoverPixel(event);
+					}
+				}),
+			),
+			mouseUp$.value.pipe(tap(() => onMouseUpHandler())),
+			mouseLeave$.value.pipe(tap(() => setHoveredPixel(null))),
+			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
+		).subscribe();
+	};
 
-  const drawSquareStart = (event: MouseEvent) => {
-    const canvas = canvasStore.getCanvas('preview')
+	const onMouseUpHandler = () => {
+		drawSquare("main");
+		canvasStore.clearAllPixels("preview");
+		isDrawingSquare.value = false;
+		squareStartPosition.value = null;
+		squareEndPosition.value = null;
+	};
 
-    if (canvas) {
-      const position = getPixelPosition(canvas, event)
-      squareStartPosition.value = position
-      squareEndPosition.value = position
-    }
-  }
+	const drawSquareStart = (event: MouseEvent) => {
+		const canvas = canvasStore.getCanvas("preview");
 
-  const drawSquareEnd = (event: MouseEvent) => {
-    const context = canvasStore.getCanvasContext('preview')
+		if (canvas) {
+			const position = getPixelPosition(canvas, event);
+			squareStartPosition.value = position;
+			squareEndPosition.value = position;
+		}
+	};
 
-    if (!squareStartPosition.value) return
+	const drawSquareEnd = (event: MouseEvent) => {
+		const context = canvasStore.getCanvasContext("preview");
 
-    if (context) {
-      canvasStore.clearAllPixels('preview')
-      squareEndPosition.value = getPixelPosition(context.canvas, event)
+		if (!squareStartPosition.value) return;
 
-      drawSquare('preview')
-    }
-  }
+		if (context) {
+			canvasStore.clearAllPixels("preview");
+			squareEndPosition.value = getPixelPosition(context.canvas, event);
 
-  const drawSquare = (canvasType: CanvasType) => {
-    if (!squareStartPosition.value || !squareEndPosition.value) {
-      return
-    }
+			drawSquare("preview");
+		}
+	};
 
-    if (squareStartPosition.value.x === squareEndPosition.value.x) {
-      canvasStore.fillRect({
-        position: squareStartPosition.value,
-        canvasType
-      })
-    } else {
-      canvasStore.strokeRect({
-        position: squareStartPosition.value,
-        canvasType,
-        endPosition: squareEndPosition.value
-      })
-    }
-  }
+	const drawSquare = (canvasType: CanvasType) => {
+		if (!squareStartPosition.value || !squareEndPosition.value) {
+			return;
+		}
+
+		if (squareStartPosition.value.x === squareEndPosition.value.x) {
+			canvasStore.fillRect({
+				position: squareStartPosition.value,
+				canvasType,
+			});
+		} else {
+			canvasStore.strokeRect({
+				position: squareStartPosition.value,
+				canvasType,
+				endPosition: squareEndPosition.value,
+			});
+		}
+	};
 }

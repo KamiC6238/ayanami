@@ -1,28 +1,28 @@
-import { DEFAULT_PIXEL_SIZE } from '@/constants'
-import type { Position } from '@/types'
+import { DEFAULT_PIXEL_SIZE } from "@/constants";
+import type { Position } from "@/types";
 
 export function makePixelPositionKey({ x, y }: Position) {
-  return `${x}-${y}`
+	return `${x}-${y}`;
 }
 
 export function isPixelPositionChanged(
-  prePosition: Position,
-  curPosition: Position,
+	prePosition: Position,
+	curPosition: Position,
 ) {
-  const prePosKey = makePixelPositionKey(prePosition)
-  const curPosKey = makePixelPositionKey(curPosition)
+	const prePosKey = makePixelPositionKey(prePosition);
+	const curPosKey = makePixelPositionKey(curPosition);
 
-  return prePosKey !== curPosKey
+	return prePosKey !== curPosKey;
 }
 
 export function getPixelPosition(
-  canvas: HTMLCanvasElement,
-  event: MouseEvent,
-  pixelSize: number = DEFAULT_PIXEL_SIZE
+	canvas: HTMLCanvasElement,
+	event: MouseEvent,
+	pixelSize: number = DEFAULT_PIXEL_SIZE,
 ): Position {
-  const rect = canvas.getBoundingClientRect()
-  const x = Math.floor((event.clientX - rect.left) / pixelSize) * pixelSize
-  const y = Math.floor((event.clientY - rect.top) / pixelSize) * pixelSize
+	const rect = canvas.getBoundingClientRect();
+	const x = Math.floor((event.clientX - rect.left) / pixelSize) * pixelSize;
+	const y = Math.floor((event.clientY - rect.top) / pixelSize) * pixelSize;
 
-  return { x, y };
-};
+	return { x, y };
+}

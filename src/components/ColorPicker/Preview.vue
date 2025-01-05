@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useColorPickerStore } from '@/store';
+import { useColorPickerStore } from "@/store";
+import { storeToRefs } from "pinia";
 
-const colorPickerStore = useColorPickerStore()
-const { previewColor } = storeToRefs(colorPickerStore)
+const colorPickerStore = useColorPickerStore();
+const { previewColor } = storeToRefs(colorPickerStore);
 </script>
 <template>
   <div class="preview-container">

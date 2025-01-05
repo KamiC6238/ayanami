@@ -1,169 +1,152 @@
-import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
-import { type Observable, fromEvent } from 'rxjs';
-import type { Position, CanvasType, InitCanvasConfig, RectConfig, SquareRectConfig } from '@/types'
-import { DEFAULT_HOVERED_PIXEL_COLOR } from '@/constants';
-import { scaleCanvasByDPR, drawGrid } from '@/utils'
-import { useConfigStore } from './config';
+import { DEFAULT_HOVERED_PIXEL_COLOR } from "@/constants";
+import type {
+	CanvasType,
+	InitCanvasConfig,
+	Position,
+	RectConfig,
+	SquareRectConfig,
+} from "@/types";
+import { drawGrid, scaleCanvasByDPR } from "@/utils";
+import { defineStore } from "pinia";
+import { type Observable, fromEvent } from "rxjs";
+import { computed, ref } from "vue";
+import { useConfigStore } from "./config";
 
-export const useCanvasStore = defineStore('canvas', () => {
-  const canvas = ref<HTMLCanvasElement  | null>(null)
-  const gridCanvas = ref<HTMLCanvasElement  | null>(null)
-  const previewCanvas = ref<HTMLCanvasElement  | null>(null)
+export const useCanvasStore = defineStore("canvas", () => {
+	const canvas = ref<HTMLCanvasElement | null>(null);
+	const gridCanvas = ref<HTMLCanvasElement | null>(null);
+	const previewCanvas = ref<HTMLCanvasElement | null>(null);
 
-  const mouseDown$ = ref<Observable<MouseEvent>>()
-  const mouseMove$ = ref<Observable<MouseEvent>>()
-  const mouseUp$ = ref<Observable<MouseEvent>>()
-  const mouseLeave$ = ref<Observable<MouseEvent>>()
-  const globalMouseUp$ = ref<Observable<MouseEvent>>(
-    fromEvent<MouseEvent>(document, 'mouseup')
-  )
+	const mouseDown$ = ref<Observable<MouseEvent>>();
+	const mouseMove$ = ref<Observable<MouseEvent>>();
+	const mouseUp$ = ref<Observable<MouseEvent>>();
+	const mouseLeave$ = ref<Observable<MouseEvent>>();
+	const globalMouseUp$ = ref<Observable<MouseEvent>>(
+		fromEvent<MouseEvent>(document, "mouseup"),
+	);
 
-  const configStore = useConfigStore()
+	const configStore = useConfigStore();
 
-  const canvasMap = computed<Record<CanvasType, HTMLCanvasElement | null>>(() => ({
-    main: canvas.value,
-    grid: gridCanvas.value,
-    preview: previewCanvas.value,
-  }))
+	const canvasMap = computed<Record<CanvasType, HTMLCanvasElement | null>>(
+		() => ({
+			main: canvas.value,
+			grid: gridCanvas.value,
+			preview: previewCanvas.value,
+		}),
+	);
 
-  const getCanvas = (canvasType: CanvasType) => {
-    return canvasMap.value[canvasType]
-  }
+	const getCanvas = (canvasType: CanvasType) => {
+		return canvasMap.value[canvasType];
+	};
 
-  const getCanvasContext = (canvasType: CanvasType) => {
-    return getCanvas(canvasType)?.getContext('2d')
-  }
+	const getCanvasContext = (canvasType: CanvasType) => {
+		return getCanvas(canvasType)?.getContext("2d");
+	};
 
-  const initCanvas = (_canvas: HTMLCanvasElement, config: InitCanvasConfig) => {
-    switch (config.type) {
-      case 'main':
-        canvas.value = _canvas
-        break
-      case 'preview':
-        previewCanvas.value = _canvas
-        initCanvasMouse$(_canvas)
-        break
-      case 'grid':
-        gridCanvas.value = _canvas
-        break
-    }
-    
-    scaleCanvasByDPR(_canvas)
+	const initCanvas = (_canvas: HTMLCanvasElement, config: InitCanvasConfig) => {
+		switch (config.type) {
+			case "main":
+				canvas.value = _canvas;
+				break;
+			case "preview":
+				previewCanvas.value = _canvas;
+				initCanvasMouse$(_canvas);
+				break;
+			case "grid":
+				gridCanvas.value = _canvas;
+				break;
+		}
 
-    if (config.type === 'grid') {
-      drawGrid(_canvas)
-    }
-  }
+		scaleCanvasByDPR(_canvas);
 
-  const initCanvasMouse$ = (canvas: HTMLCanvasElement) => {
-    mouseDown$.value = fromEvent<MouseEvent>(canvas, 'mousedown')
-    mouseMove$.value = fromEvent<MouseEvent>(canvas, 'mousemove');
-    mouseUp$.value = fromEvent<MouseEvent>(canvas, 'mouseup');
-    mouseLeave$.value = fromEvent<MouseEvent>(canvas, 'mouseleave');
-  }
+		if (config.type === "grid") {
+			drawGrid(_canvas);
+		}
+	};
 
-  const strokeRect = (config: SquareRectConfig) => {
-    const context = getCanvasContext(config.canvasType)
+	const initCanvasMouse$ = (canvas: HTMLCanvasElement) => {
+		mouseDown$.value = fromEvent<MouseEvent>(canvas, "mousedown");
+		mouseMove$.value = fromEvent<MouseEvent>(canvas, "mousemove");
+		mouseUp$.value = fromEvent<MouseEvent>(canvas, "mouseup");
+		mouseLeave$.value = fromEvent<MouseEvent>(canvas, "mouseleave");
+	};
 
-    if (context) {
-      const { x: startX, y: startY } = config.position
-      const { x: endX, y: endY } = config.endPosition
+	const strokeRect = (config: SquareRectConfig) => {
+		const context = getCanvasContext(config.canvasType);
 
-      context.strokeStyle = configStore.pixelColor
-      context.lineWidth = configStore.pixelSize
+		if (context) {
+			const { x: startX, y: startY } = config.position;
+			const { x: endX, y: endY } = config.endPosition;
 
-      const offset = configStore.pixelSize / 2
+			context.strokeStyle = configStore.pixelColor;
+			context.lineWidth = configStore.pixelSize;
 
-      context.strokeRect(
-        startX + offset,
-        startY + offset,
-        endX - startX,
-        endY - startY
-      )
-    }
-  }
+			const offset = configStore.pixelSize / 2;
 
-  const fillRect = (config: RectConfig) => {
-    const { x, y } = config.position
-    const context = getCanvasContext(config.canvasType)
+			context.strokeRect(
+				startX + offset,
+				startY + offset,
+				endX - startX,
+				endY - startY,
+			);
+		}
+	};
 
-    if (context) {
-      context.fillStyle = configStore.pixelColor
-      context.fillRect(
-        x,
-        y,
-        configStore.pixelSize,
-        configStore.pixelSize
-      )
-    }
-  }
+	const fillRect = (config: RectConfig) => {
+		const { x, y } = config.position;
+		const context = getCanvasContext(config.canvasType);
 
-  const clearRect = (config: RectConfig) => {
-    const { x, y } = config.position
-    const context = getCanvasContext(config.canvasType)
+		if (context) {
+			context.fillStyle = configStore.pixelColor;
+			context.fillRect(x, y, configStore.pixelSize, configStore.pixelSize);
+		}
+	};
 
-    context?.clearRect(
-      x,
-      y,
-      configStore.pixelSize,
-      configStore.pixelSize
-    )
-  }
+	const clearRect = (config: RectConfig) => {
+		const { x, y } = config.position;
+		const context = getCanvasContext(config.canvasType);
 
-  const fillHoverRect = ({ x, y }: Position) => {
-    const context = getCanvasContext('preview')
+		context?.clearRect(x, y, configStore.pixelSize, configStore.pixelSize);
+	};
 
-    if (context) {
-      context.fillStyle = DEFAULT_HOVERED_PIXEL_COLOR
-      context.fillRect(
-        x,
-        y,
-        configStore.pixelSize,
-        configStore.pixelSize
-      )
-    }
-  }
+	const fillHoverRect = ({ x, y }: Position) => {
+		const context = getCanvasContext("preview");
 
-  const clearHoverRect = ({ x, y }: Position) => {
-    const context = getCanvasContext('preview')
+		if (context) {
+			context.fillStyle = DEFAULT_HOVERED_PIXEL_COLOR;
+			context.fillRect(x, y, configStore.pixelSize, configStore.pixelSize);
+		}
+	};
 
-    if (context) {
-      context.clearRect(
-        x,
-        y,
-        configStore.pixelSize,
-        configStore.pixelSize
-      )
-    }
-  }
+	const clearHoverRect = ({ x, y }: Position) => {
+		const context = getCanvasContext("preview");
 
-  const clearAllPixels = (canvasType: CanvasType) => {
-    const context = getCanvasContext(canvasType)
+		if (context) {
+			context.clearRect(x, y, configStore.pixelSize, configStore.pixelSize);
+		}
+	};
 
-    context?.clearRect(
-      0,
-      0,
-      context.canvas.width,
-      context.canvas.height
-    )
-  }
+	const clearAllPixels = (canvasType: CanvasType) => {
+		const context = getCanvasContext(canvasType);
 
-  return {
-    getCanvas,
-    getCanvasContext,
-    initCanvas,
-    strokeRect,
-    fillRect,
-    clearRect,
-    fillHoverRect,
-    clearHoverRect,
-    clearAllPixels,
+		context?.clearRect(0, 0, context.canvas.width, context.canvas.height);
+	};
 
-    mouseDown$,
-    mouseMove$,
-    mouseUp$,
-    mouseLeave$,
-    globalMouseUp$,
-  }
-})
+	return {
+		getCanvas,
+		getCanvasContext,
+		initCanvas,
+		strokeRect,
+		fillRect,
+		clearRect,
+		fillHoverRect,
+		clearHoverRect,
+		clearAllPixels,
+
+		mouseDown$,
+		mouseMove$,
+		mouseUp$,
+		mouseLeave$,
+		globalMouseUp$,
+	};
+});

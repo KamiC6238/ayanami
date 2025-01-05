@@ -1,16 +1,16 @@
-import { Position } from './common'
+import type { Position } from "./common";
 
-export type CanvasType = 'main' | 'preview' | 'grid'
+export type CanvasType = "main" | "preview" | "grid";
 
 export interface InitCanvasConfig {
-  type: CanvasType
+	type: CanvasType;
 }
 
 export interface RectConfig {
-  position: Position
-  canvasType: CanvasType
+	position: Position;
+	canvasType: CanvasType;
 }
 
 export type SquareRectConfig = RectConfig & {
-  endPosition: Position
-}
+	endPosition: Position;
+};

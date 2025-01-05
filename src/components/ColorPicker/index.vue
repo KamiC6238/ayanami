@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Palette from './Palette.vue';
-import Hue from './Hue.vue'
-import Alpha from './Alpha.vue';
-import Preview from './Preview.vue';
+import Alpha from "./Alpha.vue";
+import Hue from "./Hue.vue";
+import Palette from "./Palette.vue";
+import Preview from "./Preview.vue";
 </script>
 <template>
   <div class="color-picker">

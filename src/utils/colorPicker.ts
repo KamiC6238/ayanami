@@ -1,6 +1,5 @@
 import { fromEvent, merge, Observable, tap, throttleTime, noop } from 'rxjs'
 import type { HSL, RGBA } from '@/types'
-import { getMouseDirection } from './common'
 
 export const rgbToHsl = (rgb: RGBA) => {
   let { r, g, b } = rgb
@@ -139,32 +138,22 @@ export const calculateAlpha = (e: MouseEvent, el: HTMLDivElement) => {
 }
 
 export const calculateRGB = (e: MouseEvent, el: HTMLCanvasElement) => {
-  const rect = el.getBoundingClientRect()
-  const { inTopSide, inRightSide, inBottomSide } = getMouseDirection(e, el)
+  const rect = el.getBoundingClientRect();
 
   const getRGB = (x: number, y: number) => {
-    x = Math.abs(x) * (el.width / rect.width)
-    y = Math.abs(y) * (el.height / rect.height)
+    x = Math.max(0, Math.min(x * (el.width / rect.width), el.width - 1));
+    y = Math.max(0, Math.min(y * (el.height / rect.height), el.height - 1));
 
-    const ctx = el.getContext("2d")
-    const [r, g, b] = ctx!.getImageData(x, y, 1, 1).data
-    return { r, g, b }
-  }
+    const ctx = el.getContext("2d");
+    const [r, g, b] = ctx!.getImageData(x, y, 1, 1).data;
+    return { r, g, b };
+  };
 
-  if (inTopSide && inRightSide) {
-    return getRGB(e.clientX - rect.width, e.clientY - rect.top)
-  }
+  const relativeX = e.clientX - rect.left;
+  const relativeY = e.clientY - rect.top;
 
-  if (inBottomSide && inRightSide) {
-    return getRGB(e.clientX - rect.width, e.clientY - rect.height)
-  }
-
-  if (inRightSide && !inTopSide && !inBottomSide) {
-    return getRGB(e.clientX - rect.width, e.clientY - rect.top)
-  }
-
-  return getRGB(e.clientX - rect.left, e.clientY - rect.top)
-}
+  return getRGB(relativeX, relativeY);
+};
 
 interface Mouse$ {
   [key: string]: {

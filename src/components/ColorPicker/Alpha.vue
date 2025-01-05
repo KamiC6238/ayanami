@@ -86,7 +86,7 @@ const setAlpha = (e: MouseEvent) => {
 <style scoped>
 .alpha-container {
   position: relative;
-  width: 100px;
+  width: 100%;
   margin-top: 5px;
   margin-bottom: 5px;
 }

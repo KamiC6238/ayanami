@@ -116,7 +116,7 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
 .palette {
   display: flex;
   flex-direction: column;
-  width: 100px;
+  width: 100%;
   height: 100px;
   cursor: pointer;
 }

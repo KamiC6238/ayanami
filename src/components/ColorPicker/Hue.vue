@@ -80,7 +80,7 @@ const setHue = (e: MouseEvent) => {
 <style scoped>
 .hue {
   position: relative;
-  width: 100px;
+  width: 100%;
   height: 15px;
   cursor: pointer;
   background: linear-gradient(

@@ -15,17 +15,17 @@ const { previewColor } = storeToRefs(colorPickerStore);
 <style scoped>
 .preview-container {
   position: relative;
-  width: 100px;
+  width: 100%;
 }
 .preview-background {
   position: absolute;
-  width: 100px;
+  width: 100%;
   height: 100%;
   background-image: url('@/assets/alpha-background.svg');
   z-index: -1;
 }
 .preview-color {
-  width: 100;
+  width: 100%;
   height: 20px;
   box-sizing: border-box;
   border: 2px solid black;

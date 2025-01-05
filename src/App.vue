@@ -66,20 +66,6 @@ const onCircleTypeChange = (e: Event) => {
 <template>
   <div class="container">
     <div style="display: flex; flex-direction: column; margin-right: 20px;">
-      <div style='display: flex; flex-direction: column; width: 100px;'>
-        <button
-          v-for="toolType of tools"
-          style='width: 100px; margin-bottom: 10px;'
-          @click="() => configStore.setToolType(toolType)"
-        >
-          {{ toolType }}
-        </button>
-        <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
-           <option :value="perfectCircle">圆形</option>
-           <option :value="ellipseCircle">椭圆</option>
-         </select>
-        <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
-      </div>
       <ColorPicker />
       <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
         <span>pixel size {{ configStore.pixelSize }}: </span>
@@ -98,6 +84,22 @@ const onCircleTypeChange = (e: Event) => {
       <canvas ref="canvas" :style="canvasStyle" class="canvas" />
       <canvas ref="previewCanvas" :style="canvasStyle" class="preview-canvas" />
       <canvas ref="gridCanvas" :style="canvasStyle" class="grid-canvas" />
+    </div>
+    <div style="display: flex; flex-direction: column; margin-left: 20px;">
+      <div style='display: flex; flex-direction: column; width: 100px;'>
+        <button
+          v-for="toolType of tools"
+          style='width: 100px; margin-bottom: 10px;'
+          @click="() => configStore.setToolType(toolType)"
+        >
+          {{ toolType }}
+        </button>
+        <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
+            <option :value="perfectCircle">圆形</option>
+            <option :value="ellipseCircle">椭圆</option>
+          </select>
+        <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
+      </div>
     </div>
   </div>
 </template>

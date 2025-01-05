@@ -1,23 +1,22 @@
 import { fromEvent, merge, Observable, tap, throttleTime, noop } from 'rxjs'
-import type { HSL, RGB } from '@/types'
+import type { HSL, RGBA } from '@/types'
+import { getMouseDirection } from './common'
 
-export const rgbToHsl = (rgb: RGB) => {
+export const rgbToHsl = (rgb: RGBA) => {
   let { r, g, b } = rgb
-  r = r / 255
-  g = g / 255
-  b = b / 255
-
-  let h = 0
-  let s = 0
-  let l = 0
+  r /= 255
+  g /= 255
+  b /= 255
 
   const max = Math.max(r, g, b)
   const min = Math.min(r, g, b)
   const diff = max - min
   const sum = max + min
 
-  l = sum / 2
-  
+  let h = 0
+  let s = 0
+  const l = sum / 2
+
   if (diff) {
     s = l > 0.5 ? diff / (2 - sum) : diff / sum
     switch (max) {
@@ -31,7 +30,7 @@ export const rgbToHsl = (rgb: RGB) => {
         h = (r - g) / diff + 4
         break
     }
-    h = h / 6
+    h /= 6
   }
 
   return {
@@ -83,7 +82,7 @@ export const hslToRgb = (hsl: HSL) => {
   }
 }
 
-export const makeRGB = (rgb: RGB) => `
+export const makeRGBA = (rgb: RGBA) => `
   rgba(
     ${rgb.r},
     ${rgb.g},
@@ -117,13 +116,14 @@ export const drawHSLPalette = (ctx: CanvasRenderingContext2D, hue: number) => {
 
 export const calculateHue = (e: MouseEvent, el: HTMLDivElement) => {
   const rect = el.getBoundingClientRect()
-  const hue = Math.round((e.clientX - rect.left) / rect.width * 360)
+  const hue = Math.round(Math.abs(e.clientX - rect.left) / rect.width * 360)
 
-  return hue > 360
-    ? 360
-    : hue < 0
-    ? 0
-    : hue
+  const inLeftSide = e.clientX - rect.left < 0
+  const inRightSide = e.clientX > rect.left && e.clientX - rect.left > rect.width
+
+  if (inLeftSide) return 0
+  if (inRightSide) return 360
+  return hue
 }
 
 export const calculateAlpha = (e: MouseEvent, el: HTMLDivElement) => {
@@ -140,9 +140,7 @@ export const calculateAlpha = (e: MouseEvent, el: HTMLDivElement) => {
 
 export const calculateRGB = (e: MouseEvent, el: HTMLCanvasElement) => {
   const rect = el.getBoundingClientRect()
-  const inTopSide = e.clientY < rect.top
-  const inRightSide = e.clientX > rect.left && e.clientX - rect.left > rect.width
-  const inBottomSide = e.clientY > rect.top && e.clientY - rect.top > rect.height
+  const { inTopSide, inRightSide, inBottomSide } = getMouseDirection(e, el)
 
   const getRGB = (x: number, y: number) => {
     x = Math.abs(x) * (el.width / rect.width)

@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef, ref, onBeforeUnmount } from 'vue'
+import { onMounted, useTemplateRef, ref, onBeforeUnmount, computed, CSSProperties, watch } from 'vue'
 import { Subscription } from 'rxjs'
-import { calculateRGB, hslToRgb, drawHSLPalette, getMouse$ } from '@/utils'
+import { calculateRGB, hslToRgb, drawHSLPalette, getMouse$, calculateMousePosition, rgbToHsl } from '@/utils'
 import { useColorPickerStore } from '@/store'
+import { storeToRefs } from 'pinia'
 
+const mousePos = ref({ x: 100, y: 0 })
 const isDragging = ref(false)
 const mouse$ = ref<Subscription | null>(null)
 
 const paletteRef = useTemplateRef('paletteRef')
 
 const colorPickerStore = useColorPickerStore()
+const { hsl } = storeToRefs(colorPickerStore)
 
 onMounted(() => {
   const canvas = paletteRef.value
@@ -23,6 +26,15 @@ onMounted(() => {
 
 onBeforeUnmount(() => mouse$.value?.unsubscribe())
 
+watch(() => hsl.value, (val) => {
+  colorPickerStore.setRGB(hslToRgb(val))
+})
+
+const paletteIndicatorStyle = computed<CSSProperties>(() => ({
+  left: `${mousePos.value.x}%`,
+  top: `${mousePos.value.y}%`
+}))
+
 const initPalette = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')
 
@@ -33,14 +45,24 @@ const initPalette = (canvas: HTMLCanvasElement) => {
 }
 
 const initMouse$ = (canvas: HTMLCanvasElement) => {
+  const update = (e: MouseEvent) => {
+    const rgb = calculateRGB(e, canvas)
+    colorPickerStore.setRGB(rgb)
+    colorPickerStore.setHSL({
+      ...rgbToHsl(rgb),
+      h: hsl.value.h
+    })
+    mousePos.value = calculateMousePosition(e, canvas)
+  }
+
   const mousedown = (e: MouseEvent) => {
     isDragging.value = true
-    colorPickerStore.setRGB(calculateRGB(e, canvas))
+    update(e)
   }
 
   const mousemove = (e: MouseEvent) => {
     if (!isDragging.value) return
-    colorPickerStore.setRGB(calculateRGB(e, canvas))
+    update(e)
   }
 
   mouse$.value = getMouse$({
@@ -48,7 +70,7 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
       el: canvas,
       mousedown,
       mousemove,
-      mouseup: (e) => colorPickerStore.setRGB(calculateRGB(e, canvas))
+      mouseup: (e) => update(e)
     },
     doc: {
       el: document,
@@ -59,17 +81,30 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
 }
 </script>
 <template>
-  <canvas class="palette" ref="paletteRef" />
+  <div class="palette-container">
+    <canvas class="palette" ref="paletteRef"></canvas>
+    <div class="palette-indicator" :style="paletteIndicatorStyle" />
+  </div>
 </template>
 <style scoped>
+.palette-container {
+  position: relative;
+}
 .palette {
   display: flex;
   flex-direction: column;
   width: 100px;
   height: 100px;
+  cursor: pointer;
 }
-.color-preview {
-  width: 100px;
-  height: 40px;
+.palette-indicator {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 2px solid black;
+  border-radius: 100%;
+  transform: translate(-53%, -50%);
+  cursor: pointer;
+  z-index: 1;
 }
 </style>

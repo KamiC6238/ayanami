@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useColorPickerStore } from '@/store';
-import { makeRGB } from '@/utils';
 
 const colorPickerStore = useColorPickerStore()
-const { rgb, alpha } = storeToRefs(colorPickerStore)
+const { previewColor } = storeToRefs(colorPickerStore)
 </script>
 <template>
   <div class="preview-container">
     <div class="preview-background"></div>
-    <div class="preview-color" :style="{ background: makeRGB({...rgb, a: alpha }) }">
+    <div class="preview-color" :style="{ background: previewColor }">
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef, onBeforeUnmount } from 'vue';
+import { ref, onMounted, useTemplateRef, onBeforeUnmount, computed, CSSProperties } from 'vue';
 import { Subscription } from 'rxjs'
 import { storeToRefs } from 'pinia';
 import { useColorPickerStore } from '@/store';
@@ -8,10 +8,25 @@ import { getMouse$, calculateAlpha } from '@/utils';
 const isDragging = ref(false)
 const mouse$ = ref<Subscription | null>(null)
 
-const alphaRef = useTemplateRef('alpha')
+const alphaRef = useTemplateRef('alphaRef')
 
 const colorPickerStore = useColorPickerStore()
-const { rgb } = storeToRefs(colorPickerStore)
+const { rgb, alpha } = storeToRefs(colorPickerStore)
+
+const indicatorStyle = computed<CSSProperties>(() => {
+  return {
+    left: `${alpha.value * 100}%`
+  }
+})
+
+const alphaGradientStyle = computed<CSSProperties>(() => {
+  const { r, g, b } = rgb.value
+  const tmp = `${r}, ${g}, ${b}`
+
+  return {
+    background: `linear-gradient(90deg, rgba(${tmp}, 0), rgb(${tmp}))`
+  }
+})
 
 onMounted(() => initMouse$())
 
@@ -47,21 +62,17 @@ const initMouse$ = () => {
 
 const setAlpha = (e: MouseEvent) => {
   if (alphaRef.value) {
-    const alpha = calculateAlpha(e, alphaRef.value)
-    colorPickerStore.setAlpha(alpha)
+    colorPickerStore.setAlpha(
+      calculateAlpha(e, alphaRef.value)
+    )
   }
 }
 </script>
 <template>
   <div class="alpha-container">
     <div class="alpha-background"></div>
-    <div
-      class="alpha-gradient"
-      ref="alpha"
-      :style="{
-        background: `linear-gradient(90deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1))`
-      }"
-    >
+    <div class="alpha-gradient" ref="alphaRef" :style="alphaGradientStyle">
+      <div class="alpha-indicator" :style="indicatorStyle" />
     </div>
   </div>
 </template>
@@ -76,6 +87,7 @@ const setAlpha = (e: MouseEvent) => {
   border: 2px solid black;
   box-sizing: border-box;
   height: 20px;
+  cursor: pointer;
 }
 .alpha-background {
   position: absolute;
@@ -83,5 +95,15 @@ const setAlpha = (e: MouseEvent) => {
   height: 20px;
   background-image: url('@/assets/alpha-background.svg');
   z-index: -1;
+}
+.alpha-indicator {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 2px solid black;
+  border-radius: 100%;
+  top: 50%;
+  transform: translate(-53%, -50%);
+  cursor: pointer;
 }
 </style>

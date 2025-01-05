@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef, onBeforeUnmount } from 'vue'
+import { ref, onMounted, useTemplateRef, onBeforeUnmount, computed, CSSProperties } from 'vue'
 import { Subscription } from 'rxjs'
 import { storeToRefs } from 'pinia';
-import { drawHSLPalette, hslToRgb, getMouse$, calculateHue } from '@/utils';
+import { drawHSLPalette, getMouse$, calculateHue, hslToRgb } from '@/utils';
 import { useColorPickerStore } from '@/store';
 
 const isDragging = ref(false)
@@ -16,6 +16,10 @@ const { palette, hsl } = storeToRefs(colorPickerStore)
 onMounted(() => initMouse$())
 
 onBeforeUnmount(() => mouse$.value?.unsubscribe())
+
+const hueIndicatorStyle = computed<CSSProperties>(() => ({
+  left: `${Math.round(((hsl.value.h / 360) * 100))}%`
+}))
 
 const initMouse$ = () => {
   if (!hueRef.value) return
@@ -51,20 +55,25 @@ const setHue = (e: MouseEvent) => {
 
     if (ctx) {
       const hue = calculateHue(e, hueRef.value)
-
-      colorPickerStore.setRGB(hslToRgb({ ...hsl.value, h: hue }))
+      const newHSL = { ...hsl.value, h: hue }
+      colorPickerStore.setHSL(newHSL)
+      colorPickerStore.setRGB(hslToRgb(newHSL))
       drawHSLPalette(ctx, hue)
     } 
   }
 }
 </script>
 <template>
-  <div class="hue" ref="hue" />
+  <div class="hue" ref="hue">
+    <div class="hue-indicator" :style="hueIndicatorStyle" />
+  </div>
 </template>
 <style scoped>
 .hue {
+  position: relative;
   width: 100px;
-  height: 10px;
+  height: 15px;
+  cursor: pointer;
   background: linear-gradient(
     to right,
     hsl(0,100%,50%),
@@ -75,5 +84,15 @@ const setHue = (e: MouseEvent) => {
     hsl(300,100%,50%),
     hsl(360,100%,50%)
   )
+}
+.hue-indicator {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 2px solid black;
+  border-radius: 100%;
+  top: 50%;
+  transform: translate(-53%, -50%);
+  cursor: pointer;
 }
 </style>

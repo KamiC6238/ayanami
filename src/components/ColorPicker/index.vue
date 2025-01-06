@@ -14,6 +14,6 @@ import Preview from "./Preview.vue";
 </template>
 <style scoped>
 .color-picker {
-  width: 100px;
+  width: 190px;
 }
 </style>

@@ -65,21 +65,7 @@ const onCircleTypeChange = (e: Event) => {
 
 <template>
   <div class="container">
-    <div style="display: flex; flex-direction: column; margin-right: 20px;">
-      <ColorPicker />
-      <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
-        <span>pixel size {{ configStore.pixelSize }}: </span>
-        <input
-          type="range"
-          id='pixelSize'
-          min="10"
-          max="100"
-          value="10"
-          step="10"
-          @input="onPixelSizeChange"
-        />
-      </div>
-    </div>
+    <ColorPicker style="margin-right: 20px;" />
     <div class="canvas-wrapper">
       <canvas ref="canvas" :style="canvasStyle" class="canvas" />
       <canvas ref="previewCanvas" :style="canvasStyle" class="preview-canvas" />
@@ -99,6 +85,18 @@ const onCircleTypeChange = (e: Event) => {
             <option :value="ellipseCircle">椭圆</option>
           </select>
         <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
+      </div>
+      <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
+        <span>pixel size {{ configStore.pixelSize }}: </span>
+        <input
+          type="range"
+          id='pixelSize'
+          min="10"
+          max="100"
+          value="10"
+          step="10"
+          @input="onPixelSizeChange"
+        />
       </div>
     </div>
   </div>

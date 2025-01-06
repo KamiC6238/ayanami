@@ -48,10 +48,17 @@ watch(
 	},
 );
 
-const paletteIndicatorStyle = computed<CSSProperties>(() => ({
-	left: `${mousePos.value.x}%`,
-	top: `${mousePos.value.y}%`,
-}));
+const paletteIndicatorStyle = computed<CSSProperties>(() => {
+	if (paletteRef.value) {
+		const { width, height } = paletteRef.value.getBoundingClientRect();
+
+		return {
+			left: `${(Math.round(mousePos.value.x) / width) * 100}%`,
+			top: `${(Math.round(mousePos.value.y) / height) * 100}%`,
+		};
+	}
+	return {};
+});
 
 const initPalette = (canvas: HTMLCanvasElement) => {
 	const ctx = canvas.getContext("2d");

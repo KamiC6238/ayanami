@@ -28,12 +28,7 @@
 		"vue-tsc": "^2.0.29"
 	},
 	"lint-staged": {
-		"src/**/*.{ts,vue,json}": [
-			"biome format --write",
-			"biome lint --write",
-			"biome check --write"
-		],
-		"*.{json}": ["biome format --write", "biome lint --write"],
+		"src/**/*.{ts,vue,json}": ["biome check --write"],
 		"*": ["biome check --no-errors-on-unmatched --files-ignore-unknown=true"]
 	}
 }

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import Alpha from "./Alpha.vue";
+import HSLPalette from "./HSLPalette.vue";
 import Hue from "./Hue.vue";
-import Palette from "./Palette.vue";
 import Preview from "./Preview.vue";
 </script>
 <template>
   <div class="color-picker">
-    <Palette />
+    <HSLPalette />
     <Hue />
     <Alpha />
     <Preview />

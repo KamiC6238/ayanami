@@ -6,28 +6,28 @@ const colorPickerStore = useColorPickerStore();
 const { previewColor } = storeToRefs(colorPickerStore);
 </script>
 <template>
-  <div class="preview-container">
-    <div class="preview-background"></div>
-    <div class="preview-color" :style="{ background: previewColor }">
+  <div class="color-preview">
+    <div class="color-preview__background"></div>
+    <div class="color-preview__color" :style="{ background: previewColor }">
     </div>
   </div>
 </template>
-<style scoped>
-.preview-container {
+<style lang="scss" scoped>
+.color-preview {
   position: relative;
   width: 100%;
-}
-.preview-background {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-image: url('@/assets/alpha-background.svg');
-  z-index: -1;
-}
-.preview-color {
-  width: 100%;
-  height: 20px;
-  box-sizing: border-box;
-  border: 2px solid black;
+  &__background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('@/assets/alpha-background.svg');
+    z-index: -1;
+  }
+  &__color {
+    width: 100%;
+    height: 20px;
+    box-sizing: border-box;
+    border: 2px solid black;
+  }
 }
 </style>

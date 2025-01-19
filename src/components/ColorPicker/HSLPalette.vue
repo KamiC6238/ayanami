@@ -113,30 +113,30 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
 };
 </script>
 <template>
-  <div class="palette-container">
-    <canvas class="palette" ref="paletteRef"></canvas>
-    <div class="palette-indicator" :style="paletteIndicatorStyle" />
+  <div class="hsl-palette">
+    <canvas class="hsl-palette__canvas" ref="paletteRef"></canvas>
+    <div class="hsl-palette__indicator" :style="paletteIndicatorStyle" />
   </div>
 </template>
-<style scoped>
-.palette-container {
+<style lang="scss">
+.hsl-palette {
   position: relative;
-}
-.palette {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100px;
-  cursor: pointer;
-}
-.palette-indicator {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border: 2px solid black;
-  border-radius: 100%;
-  transform: translate(-53%, -50%);
-  cursor: pointer;
-  z-index: 1;
+  &__canvas {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100px;
+    cursor: pointer;
+  }
+  &__indicator {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border: 2px solid black;
+    border-radius: 100%;
+    transform: translate(-53%, -50%);
+    cursor: pointer;
+    z-index: 1;
+  }
 }
 </style>

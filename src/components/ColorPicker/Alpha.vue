@@ -76,41 +76,41 @@ const setAlpha = (e: MouseEvent) => {
 };
 </script>
 <template>
-  <div class="alpha-container">
-    <div class="alpha-background"></div>
-    <div class="alpha-gradient" ref="alphaRef" :style="alphaGradientStyle">
-      <div class="alpha-indicator" :style="indicatorStyle" />
+  <div class="alpha">
+    <div class="alpha__background"></div>
+    <div class="alpha__gradient" ref="alphaRef" :style="alphaGradientStyle">
+      <div class="alpha__indicator" :style="indicatorStyle" />
     </div>
   </div>
 </template>
-<style scoped>
-.alpha-container {
+<style lang="scss" scoped>
+.alpha {
   position: relative;
   width: 100%;
   margin-top: 5px;
   margin-bottom: 5px;
-}
-.alpha-gradient {
-  border: 2px solid black;
-  box-sizing: border-box;
-  height: 20px;
-  cursor: pointer;
-}
-.alpha-background {
-  position: absolute;
-  width: 100%;
-  height: 20px;
-  background-image: url('@/assets/alpha-background.svg');
-  z-index: -1;
-}
-.alpha-indicator {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border: 2px solid black;
-  border-radius: 100%;
-  top: 50%;
-  transform: translate(-53%, -50%);
-  cursor: pointer;
+  &__background {
+    position: absolute;
+    width: 100%;
+    height: 20px;
+    background-image: url('@/assets/alpha-background.svg');
+    z-index: -1;
+  }
+  &__gradient {
+    border: 2px solid black;
+    box-sizing: border-box;
+    height: 20px;
+    cursor: pointer;
+  }
+  &__indicator {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border: 2px solid black;
+    border-radius: 100%;
+    top: 50%;
+    transform: translate(-53%, -50%);
+    cursor: pointer;
+  }
 }
 </style>

@@ -20,7 +20,7 @@ import {
 	watch,
 } from "vue";
 
-const mousePos = ref({ x: 100, y: 0 });
+const mousePos = ref({ x: 200, y: 0 });
 const isDragging = ref(false);
 const mouse$ = ref<Subscription | null>(null);
 
@@ -51,6 +51,8 @@ watch(
 const paletteIndicatorStyle = computed<CSSProperties>(() => {
 	if (paletteRef.value) {
 		const { width, height } = paletteRef.value.getBoundingClientRect();
+
+		console.log(width);
 
 		return {
 			left: `${(Math.round(mousePos.value.x) / width) * 100}%`,

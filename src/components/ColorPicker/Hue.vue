@@ -18,7 +18,7 @@ const mouse$ = ref<Subscription | null>(null);
 const hueRef = useTemplateRef("hue");
 
 const colorPickerStore = useColorPickerStore();
-const { palette, hsl } = storeToRefs(colorPickerStore);
+const { palette, hsl, previewColor } = storeToRefs(colorPickerStore);
 
 onMounted(() => initMouse$());
 
@@ -26,6 +26,7 @@ onBeforeUnmount(() => mouse$.value?.unsubscribe());
 
 const hueIndicatorStyle = computed<CSSProperties>(() => ({
 	left: `${Math.round((hsl.value.h / 360) * 100)}%`,
+	background: previewColor.value,
 }));
 
 const initMouse$ = () => {
@@ -97,7 +98,7 @@ const setHue = (e: MouseEvent) => {
     position: absolute;
     width: 5px;
     height: 5px;
-    border: 2px solid black;
+    border: 1px solid white;
     border-radius: 100%;
     top: 50%;
     transform: translate(-53%, -50%);

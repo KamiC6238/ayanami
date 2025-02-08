@@ -6,6 +6,7 @@ import { computed, ref } from "vue";
 const INIT_RGB = { r: 255, g: 0, b: 0 };
 
 export const useColorPickerStore = defineStore("colorPicker", () => {
+	const pickedPalette = ref<Map<string, boolean>>(new Map());
 	const palette = ref<HTMLCanvasElement | null>(null);
 	const rgb = ref<RGBA>(INIT_RGB);
 	const hsl = ref<HSL>(rgbToHsl(INIT_RGB));
@@ -31,6 +32,12 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		alpha.value = val;
 	};
 
+	const setPickedPalette = (val: string) => {
+		if (!pickedPalette.value.has(val)) {
+			pickedPalette.value.set(val, true);
+		}
+	};
+
 	return {
 		previewColor,
 		palette,
@@ -41,5 +48,7 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		setRGB,
 		hsl,
 		setHSL,
+		pickedPalette,
+		setPickedPalette,
 	};
 });

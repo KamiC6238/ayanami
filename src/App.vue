@@ -9,6 +9,7 @@ import {
 import { useCanvasStore, useConfigStore } from "@/store";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
 import { type CSSProperties, onMounted, ref, useTemplateRef } from "vue";
+import { DEFAULT_PIXEL_SIZE } from "./constants";
 import { useCircleTool } from "./hooks/useCircleTool";
 
 const tools = [
@@ -44,9 +45,9 @@ const { setCircleType } = useCircleTool();
 
 onMounted(() => {
 	if (canvas.value && previewCanvas.value && gridCanvas.value) {
-		initCanvas(gridCanvas.value, { type: "grid" });
-		initCanvas(canvas.value, { type: "main" });
-		initCanvas(previewCanvas.value, { type: "preview" });
+		initCanvas(gridCanvas.value as HTMLCanvasElement, { type: "grid" });
+		initCanvas(canvas.value as HTMLCanvasElement, { type: "main" });
+		initCanvas(previewCanvas.value as HTMLCanvasElement, { type: "preview" });
 		configStore.setToolType(ToolTypeEnum.Pencil);
 	}
 });
@@ -65,13 +66,7 @@ const onCircleTypeChange = (e: Event) => {
 
 <template>
   <div class="container">
-    <ColorPicker style="margin-right: 20px;" />
-    <div class="canvas-wrapper">
-      <canvas ref="canvas" :style="canvasStyle" class="canvas" />
-      <canvas ref="previewCanvas" :style="canvasStyle" class="preview-canvas" />
-      <canvas ref="gridCanvas" :style="canvasStyle" class="grid-canvas" />
-    </div>
-    <div style="display: flex; flex-direction: column; margin-left: 20px;">
+    <div style="display: flex; flex-direction: column; margin-right: 20px;">
       <div style='display: flex; flex-direction: column; width: 100px;'>
         <button
           v-for="toolType of tools"
@@ -91,14 +86,20 @@ const onCircleTypeChange = (e: Event) => {
         <input
           type="range"
           id='pixelSize'
-          min="10"
+          :min="configStore.pixelSize"
           max="100"
-          value="10"
-          step="10"
+          :value="configStore.pixelSize"
+          :step="DEFAULT_PIXEL_SIZE"
           @input="onPixelSizeChange"
         />
       </div>
     </div>
+    <div class="canvas-wrapper">
+      <canvas ref="canvas" :style="canvasStyle" class="canvas" />
+      <canvas ref="previewCanvas" :style="canvasStyle" class="preview-canvas" />
+      <canvas ref="gridCanvas" :style="canvasStyle" class="grid-canvas" />
+    </div>
+    <ColorPicker style="margin-left: 20px;" />
   </div>
 </template>
 <style>

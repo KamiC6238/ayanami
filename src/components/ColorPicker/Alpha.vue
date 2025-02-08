@@ -54,7 +54,7 @@ const initMouse$ = () => {
 
 	mouse$.value = getMouse$({
 		alphaRef: {
-			el: alphaRef.value,
+			el: alphaRef.value as HTMLDivElement,
 			mousedown,
 			mousemove,
 			mouseup: (e) => setAlpha(e),
@@ -71,7 +71,9 @@ const initMouse$ = () => {
 
 const setAlpha = (e: MouseEvent) => {
 	if (alphaRef.value) {
-		colorPickerStore.setAlpha(calculateAlpha(e, alphaRef.value));
+		colorPickerStore.setAlpha(
+			calculateAlpha(e, alphaRef.value as HTMLDivElement),
+		);
 	}
 };
 </script>

@@ -30,7 +30,7 @@ const colorPickerStore = useColorPickerStore();
 const { hsl } = storeToRefs(colorPickerStore);
 
 onMounted(() => {
-	const canvas = paletteRef.value;
+	const canvas = paletteRef.value as HTMLCanvasElement;
 
 	if (canvas) {
 		colorPickerStore.setPalette(canvas);
@@ -50,9 +50,9 @@ watch(
 
 const paletteIndicatorStyle = computed<CSSProperties>(() => {
 	if (paletteRef.value) {
-		const { width, height } = paletteRef.value.getBoundingClientRect();
-
-		console.log(width);
+		const { width, height } = (
+			paletteRef.value as HTMLCanvasElement
+		).getBoundingClientRect();
 
 		return {
 			left: `${(Math.round(mousePos.value.x) / width) * 100}%`,

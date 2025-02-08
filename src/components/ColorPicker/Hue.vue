@@ -43,7 +43,7 @@ const initMouse$ = () => {
 
 	mouse$.value = getMouse$({
 		hueRef: {
-			el: hueRef.value,
+			el: hueRef.value as HTMLDivElement,
 			mousedown,
 			mousemove,
 			mouseup: (e) => setHue(e),
@@ -63,7 +63,7 @@ const setHue = (e: MouseEvent) => {
 		const ctx = palette.value?.getContext("2d");
 
 		if (ctx) {
-			const hue = calculateHue(e, hueRef.value);
+			const hue = calculateHue(e, hueRef.value as HTMLDivElement);
 			const newHSL = { ...hsl.value, h: hue };
 			colorPickerStore.setHSL(newHSL);
 			colorPickerStore.setRGB(hslToRgb(newHSL));

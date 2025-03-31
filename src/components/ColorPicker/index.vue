@@ -12,7 +12,7 @@ import Preview from "./Preview.vue";
     <Preview />
   </div>
 </template>
-<style lang="scss" scoped>
+<style   scoped>
 .color-picker {
   width: 200px;
 }

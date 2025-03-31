@@ -12,7 +12,7 @@ const { previewColor } = storeToRefs(colorPickerStore);
     </div>
   </div>
 </template>
-<style lang="scss" scoped>
+<style scoped>
 .color-preview {
   position: relative;
   width: 100%;

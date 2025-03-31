@@ -78,7 +78,7 @@ const setHue = (e: MouseEvent) => {
     <div class="hue__indicator" :style="hueIndicatorStyle" />
   </div>
 </template>
-<style lang="scss" scoped>
+<style scoped>
 .hue {
   position: relative;
   width: 100%;
@@ -94,15 +94,15 @@ const setHue = (e: MouseEvent) => {
     hsl(300,100%,50%),
     hsl(360,100%,50%)
   );
-  &__indicator {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    border: 1px solid white;
-    border-radius: 100%;
-    top: 50%;
-    transform: translate(-53%, -50%);
-    cursor: pointer;
-  }
+}
+.hue__indicator {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 1px solid white;
+  border-radius: 100%;
+  top: 50%;
+  transform: translate(-53%, -50%);
+  cursor: pointer;
 }
 </style>

@@ -62,7 +62,7 @@ const onCircleTypeChange = (e: Event) => {
       <input
         type="range"
         id='pixelSize'
-        :min="configStore.pixelSize"
+        :min="DEFAULT_PIXEL_SIZE"
         max="100"
         :value="configStore.pixelSize"
         :step="DEFAULT_PIXEL_SIZE"

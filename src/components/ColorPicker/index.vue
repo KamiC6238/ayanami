@@ -2,18 +2,11 @@
 import Alpha from "./Alpha.vue";
 import HSLPalette from "./HSLPalette.vue";
 import Hue from "./Hue.vue";
-import Preview from "./Preview.vue";
 </script>
 <template>
-  <div class="color-picker">
-    <HSLPalette />
+  <div class="w-full h-full flex flex-col ">
+    <HSLPalette class='flex-1' />
     <Hue />
     <Alpha />
-    <Preview />
   </div>
 </template>
-<style   scoped>
-.color-picker {
-  width: 200px;
-}
-</style>

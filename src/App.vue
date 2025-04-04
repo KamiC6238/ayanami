@@ -1,149 +1,25 @@
 <script setup lang="ts">
-import ColorPicker from "@/components/ColorPicker/index.vue";
-import {
-	useEraserTool,
-	useLineTool,
-	usePencilTool,
-	useSquareTool,
-} from "@/hooks";
-import { useCanvasStore, useConfigStore } from "@/store";
-import { CircleTypeEnum, ToolTypeEnum } from "@/types";
-import { type CSSProperties, onMounted, ref, useTemplateRef } from "vue";
-import { DEFAULT_PIXEL_SIZE } from "./constants";
-import { useCircleTool } from "./hooks/useCircleTool";
-
-const tools = [
-	ToolTypeEnum.Pencil,
-	ToolTypeEnum.Eraser,
-	ToolTypeEnum.Line,
-	ToolTypeEnum.Square,
-	ToolTypeEnum.Circle,
-];
-const perfectCircle = CircleTypeEnum.Circle;
-const ellipseCircle = CircleTypeEnum.Ellipse;
-
-const canvas = useTemplateRef("canvas");
-const previewCanvas = useTemplateRef("previewCanvas");
-const gridCanvas = useTemplateRef("gridCanvas");
-const canvasStyle = ref<CSSProperties>({
-	width: "500px",
-	height: "500px",
-	borderWidth: "1px",
-	borderStyle: "solid",
-	borderColor: "rgba(0,0,0,0.02)",
-	imageRendering: "pixelated",
-});
-
-const configStore = useConfigStore();
-const { initCanvas, clearAllPixels } = useCanvasStore();
-
-usePencilTool();
-useEraserTool();
-useLineTool();
-useSquareTool();
-const { setCircleType } = useCircleTool();
-
-onMounted(() => {
-	if (canvas.value && previewCanvas.value && gridCanvas.value) {
-		initCanvas(gridCanvas.value as HTMLCanvasElement, { type: "grid" });
-		initCanvas(canvas.value as HTMLCanvasElement, { type: "main" });
-		initCanvas(previewCanvas.value as HTMLCanvasElement, { type: "preview" });
-		configStore.setToolType(ToolTypeEnum.Pencil);
-	}
-});
-
-const onPixelSizeChange = (e: Event) => {
-	configStore.setPixelSize(Number((e.target as HTMLInputElement).value));
-};
-
-const onCircleTypeChange = (e: Event) => {
-	if (e.target) {
-		const target = e.target as HTMLSelectElement;
-		setCircleType(target.value as CircleTypeEnum);
-	}
-};
+import { Canvas, ColorPicker, Palette, Toolbar } from "@/components";
+import { ColumnResizer, VerticalResizer } from "./layout";
 </script>
 
 <template>
-  <div class="container">
-    <div style="display: flex; flex-direction: column; margin-right: 20px;">
-      <div style='display: flex; flex-direction: column; width: 100px;'>
-        <button
-          v-for="toolType of tools"
-          style='width: 100px; margin-bottom: 10px;'
-          @click="() => configStore.setToolType(toolType)"
-        >
-          {{ toolType }}
-        </button>
-        <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
-            <option :value="perfectCircle">圆形</option>
-            <option :value="ellipseCircle">椭圆</option>
-          </select>
-        <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
-      </div>
-      <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
-        <span>pixel size {{ configStore.pixelSize }}: </span>
-        <input
-          type="range"
-          id='pixelSize'
-          :min="configStore.pixelSize"
-          max="100"
-          :value="configStore.pixelSize"
-          :step="DEFAULT_PIXEL_SIZE"
-          @input="onPixelSizeChange"
-        />
-      </div>
-    </div>
-    <div class="canvas-wrapper">
-      <canvas ref="canvas" :style="canvasStyle" class="canvas" />
-      <canvas ref="previewCanvas" :style="canvasStyle" class="preview-canvas" />
-      <canvas ref="gridCanvas" :style="canvasStyle" class="grid-canvas" />
-    </div>
-    <ColorPicker style="margin-left: 20px;" />
+  <div class="flex items-content justify-content w-full h-full border-10 border-solid border-[#7d929e]">
+    <ColumnResizer class='w-full'>
+      <template v-slot:left>
+        <VerticalResizer class='h-full'>
+          <template v-slot:top>
+            <Palette />
+          </template>
+          <template v-slot:bottom>
+            <ColorPicker />
+          </template>
+        </VerticalResizer>
+      </template>
+      <template v-slot:right>
+        <Canvas />
+      </template>
+    </ColumnResizer>
+    <Toolbar />
   </div>
 </template>
-<style>
-@font-face {
-  font-family: 'pixel-font';
-  src: url('@/assets/pixel.ttf');
-}
-</style>
-<style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-.canvas-wrapper {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-.canvas,
-.preview-canvas {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-.grid-canvas {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-.canvas {
-  z-index: 9;
-}
-.preview-canvas {
-  z-index: 10;
-}
-.grid-canvas {
-  z-index: 8;
-}
-</style>

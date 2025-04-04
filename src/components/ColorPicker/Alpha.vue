@@ -90,20 +90,18 @@ const setAlpha = (e: MouseEvent) => {
 .alpha {
   position: relative;
   width: 100%;
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 .alpha__background {
   position: absolute;
   width: 100%;
-  height: 20px;
+  height: 15px;
   background-image: url('@/assets/alpha-background.svg');
   z-index: -1;
 }
 .alpha__gradient {
-  border: 2px solid black;
+  /* border: 2px solid black; */
   box-sizing: border-box;
-  height: 20px;
+  height: 15px;
   cursor: pointer;
 }
 .alpha__indicator {

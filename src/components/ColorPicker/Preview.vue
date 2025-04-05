@@ -16,6 +16,6 @@ const { pickedColor } = storeToRefs(colorPickerStore);
       >
       </div>
     </div>
-    <AddIcon @click='colorPickerStore.setPickedPalette(pickedColor)' class='w-6 h-6' />
+    <AddIcon @click='() => colorPickerStore.setPickedPalette(pickedColor)' class='w-6 h-6 cursor-pointer' />
   </div>
 </template>

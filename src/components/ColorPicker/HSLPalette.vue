@@ -20,14 +20,14 @@ import {
 	watch,
 } from "vue";
 
-const mousePos = ref({ x: 200, y: 0 });
 const isDragging = ref(false);
 const mouse$ = ref<Subscription | null>(null);
 
 const paletteRef = useTemplateRef("paletteRef");
 
 const colorPickerStore = useColorPickerStore();
-const { hsl, pickedColor } = storeToRefs(colorPickerStore);
+const { hsl, pickedColor, mousePosOnHSLPalette } =
+	storeToRefs(colorPickerStore);
 
 onMounted(() => {
 	const canvas = paletteRef.value as HTMLCanvasElement;
@@ -55,8 +55,8 @@ const paletteIndicatorStyle = computed<CSSProperties>(() => {
 		).getBoundingClientRect();
 
 		return {
-			left: `${(Math.round(mousePos.value.x) / width) * 100}%`,
-			top: `${(Math.round(mousePos.value.y) / height) * 100}%`,
+			left: `${(Math.round(mousePosOnHSLPalette.value.x) / width) * 100}%`,
+			top: `${(Math.round(mousePosOnHSLPalette.value.y) / height) * 100}%`,
 			background: pickedColor.value,
 		};
 	}
@@ -83,7 +83,7 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
 				h: hsl.value.h,
 			});
 		}
-		mousePos.value = calculateMousePosition(e, canvas);
+		colorPickerStore.setMousePosOnHSLPalette(calculateMousePosition(e, canvas));
 	};
 
 	const mousedown = (e: MouseEvent) => {

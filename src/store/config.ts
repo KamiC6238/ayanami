@@ -10,9 +10,9 @@ export const useConfigStore = defineStore("config", () => {
 	const pixelColor = ref(DEFAULT_PIXEL_COLOR);
 
 	const colorPickerStore = useColorPickerStore();
-	const { previewColor } = storeToRefs(colorPickerStore);
+	const { pickedColor } = storeToRefs(colorPickerStore);
 
-	watch(previewColor, (val) => {
+	watch(pickedColor, (val) => {
 		setPixelColor(val);
 	});
 

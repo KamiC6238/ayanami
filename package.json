@@ -29,6 +29,7 @@
 		"lint-staged": "^15.3.0",
 		"typescript": "^5.5.3",
 		"vite": "^5.4.1",
+		"vite-svg-loader": "^5.1.0",
 		"vue-tsc": "^2.0.29"
 	},
 	"lint-staged": {

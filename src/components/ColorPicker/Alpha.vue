@@ -18,12 +18,12 @@ const mouse$ = ref<Subscription | null>(null);
 const alphaRef = useTemplateRef("alphaRef");
 
 const colorPickerStore = useColorPickerStore();
-const { rgb, alpha, previewColor } = storeToRefs(colorPickerStore);
+const { rgb, alpha, pickedColor } = storeToRefs(colorPickerStore);
 
 const indicatorStyle = computed<CSSProperties>(() => {
 	return {
 		left: `${alpha.value * 100}%`,
-		background: previewColor.value,
+		background: pickedColor.value,
 	};
 });
 

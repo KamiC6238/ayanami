@@ -27,7 +27,7 @@ const mouse$ = ref<Subscription | null>(null);
 const paletteRef = useTemplateRef("paletteRef");
 
 const colorPickerStore = useColorPickerStore();
-const { hsl, previewColor } = storeToRefs(colorPickerStore);
+const { hsl, pickedColor } = storeToRefs(colorPickerStore);
 
 onMounted(() => {
 	const canvas = paletteRef.value as HTMLCanvasElement;
@@ -57,7 +57,7 @@ const paletteIndicatorStyle = computed<CSSProperties>(() => {
 		return {
 			left: `${(Math.round(mousePos.value.x) / width) * 100}%`,
 			top: `${(Math.round(mousePos.value.y) / height) * 100}%`,
-			background: previewColor.value,
+			background: pickedColor.value,
 		};
 	}
 	return {};

@@ -197,3 +197,11 @@ export const getMouse$ = (props: Mouse$) => {
 
 	return merge(...streams);
 };
+
+export const rgbToHex = (rgba: RGBA) => {
+	const { r, g, b, a } = rgba;
+	const alpha = Math.round(a ?? 1 * 255);
+	const toHex = (n: number) => n.toString(16).padStart(2, "0");
+
+	return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alpha)}`;
+};

@@ -12,8 +12,17 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 	const hsl = ref<HSL>(rgbToHsl(INIT_RGB));
 	const alpha = ref(1);
 
-	const previewColor = computed(() => {
+	const pickedColor = computed(() => {
 		return `${makeRGBA({ ...rgb.value, a: alpha.value })}`;
+	});
+
+	const pickedColorHex = computed(() => {
+		const { r, g, b } = rgb.value;
+		const _alpha = Math.round(alpha.value * 255);
+		const toHex = (n: number) => n.toString(16).padStart(2, "0");
+		const withoutAlpha = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+
+		return _alpha === 255 ? withoutAlpha : `${withoutAlpha}${toHex(_alpha)}`;
 	});
 
 	const setPalette = (canvas: HTMLCanvasElement) => {
@@ -39,7 +48,8 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 	};
 
 	return {
-		previewColor,
+		pickedColor,
+		pickedColorHex,
 		palette,
 		setPalette,
 		alpha,

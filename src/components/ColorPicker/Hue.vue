@@ -74,16 +74,15 @@ const setHue = (e: MouseEvent) => {
 };
 </script>
 <template>
-  <div class="hue" ref="hue">
-    <div class="hue__indicator" :style="hueIndicatorStyle" />
+  <div class="hue relative w-full min-h-[15px] cursor-pointer" ref="hue">
+    <div
+      class="hue__indicator absolute w-[5px] h-[5px] border-1 border-solid border-white rounded-full cursor-pointer"
+      :style="hueIndicatorStyle"
+    />
   </div>
 </template>
 <style scoped>
 .hue {
-  position: relative;
-  width: 100%;
-  min-height: 15px;
-  cursor: pointer;
   background: linear-gradient(
     to right,
     hsl(0,100%,50%),
@@ -96,13 +95,7 @@ const setHue = (e: MouseEvent) => {
   );
 }
 .hue__indicator {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border: 1px solid white;
-  border-radius: 100%;
   top: 50%;
   transform: translate(-53%, -50%);
-  cursor: pointer;
 }
 </style>

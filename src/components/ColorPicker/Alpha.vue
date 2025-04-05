@@ -79,39 +79,19 @@ const setAlpha = (e: MouseEvent) => {
 };
 </script>
 <template>
-  <div class="alpha">
-    <div class="alpha__background"></div>
-    <div class="alpha__gradient" ref="alphaRef" :style="alphaGradientStyle">
-      <div class="alpha__indicator" :style="indicatorStyle" />
+  <div class="relative w-full">
+    <div class="absolute w-full h-[15px] bg-[url(@/assets/alpha-background.png)] bg-cover z-[-1]"></div>
+    <div class="box-border h-[15px] cursor-pointer" ref="alphaRef" :style="alphaGradientStyle">
+      <div
+        class="alpha__indicator absolute w-[5px] h-[5px] border-1 border-solid border-white rounded-full cursor-pointer"
+        :style="indicatorStyle"
+      />
     </div>
   </div>
 </template>
 <style scoped>
-.alpha {
-  position: relative;
-  width: 100%;
-}
-.alpha__background {
-  position: absolute;
-  width: 100%;
-  height: 15px;
-  background-image: url('@/assets/alpha-background.svg');
-  z-index: -1;
-}
-.alpha__gradient {
-  /* border: 2px solid black; */
-  box-sizing: border-box;
-  height: 15px;
-  cursor: pointer;
-}
 .alpha__indicator {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border: 1px solid white;
-  border-radius: 100%;
   top: 50%;
   transform: translate(-53%, -50%);
-  cursor: pointer;
 }
 </style>

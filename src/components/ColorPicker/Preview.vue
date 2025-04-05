@@ -6,28 +6,13 @@ const colorPickerStore = useColorPickerStore();
 const { previewColor } = storeToRefs(colorPickerStore);
 </script>
 <template>
-  <div class="color-preview">
-    <div class="color-preview__background"></div>
-    <div class="color-preview__color" :style="{ background: previewColor }">
+  <div class="relative w-full mt-2">
+    <div class="absolute w-full h-full z-[-1] bg-[url(@/assets/alpha-background.png)] bg-cover"></div>
+    <div
+      :style='{ background: previewColor }'
+      class="w-full h-[20px] box-border border-2 border-solid border-black"
+    >
     </div>
   </div>
+  <button @click='colorPickerStore.setPickedPalette(previewColor)'>add</button>
 </template>
-<style scoped>
-.color-preview {
-  position: relative;
-  width: 100%;
-  &__background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: url('@/assets/alpha-background.svg');
-    z-index: -1;
-  }
-  &__color {
-    width: 100%;
-    height: 20px;
-    box-sizing: border-box;
-    border: 2px solid black;
-  }
-}
-</style>

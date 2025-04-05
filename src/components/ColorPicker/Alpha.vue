@@ -83,7 +83,7 @@ const setAlpha = (e: MouseEvent) => {
     <div class="absolute w-full h-[15px] bg-[url(@/assets/alpha-background.png)] bg-cover z-[-1]"></div>
     <div class="box-border h-[15px] cursor-pointer" ref="alphaRef" :style="alphaGradientStyle">
       <div
-        class="alpha__indicator absolute w-[5px] h-[5px] border-1 border-solid border-white rounded-full cursor-pointer"
+        class="alpha__indicator absolute w-[10px] h-[10px] border-2 border-solid border-white rounded-full cursor-pointer"
         :style="indicatorStyle"
       />
     </div>

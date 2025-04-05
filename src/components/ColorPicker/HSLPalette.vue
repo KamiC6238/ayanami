@@ -117,7 +117,7 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
   <div class="relative flex-1">
     <canvas class="absolute flex flex-col w-full h-full cursor-pointer" ref="paletteRef"></canvas>
     <div
-      class="absolute w-[5px] h-[5px] rounded-full cursor-pointer z-1 border border-white border-solid -translate-x-[53%] -translate-y-[50%]"
+      class="absolute w-[10px] h-[10px] rounded-full cursor-pointer z-1 border-2 border-white border-solid -translate-x-[53%] -translate-y-[50%]"
       :style="paletteIndicatorStyle"
     />
   </div>

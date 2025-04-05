@@ -76,7 +76,7 @@ const setHue = (e: MouseEvent) => {
 <template>
   <div class="hue relative w-full min-h-[15px] cursor-pointer" ref="hue">
     <div
-      class="hue__indicator absolute w-[5px] h-[5px] border-1 border-solid border-white rounded-full cursor-pointer"
+      class="hue__indicator absolute w-[10px] h-[10px] border-2 border-solid border-white rounded-full cursor-pointer"
       :style="hueIndicatorStyle"
     />
   </div>

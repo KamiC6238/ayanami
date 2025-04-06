@@ -1,3 +1,5 @@
+import type { Position } from "./common";
+
 export interface RGBA {
 	r: number;
 	g: number;
@@ -10,3 +12,5 @@ export interface HSL {
 	s: number;
 	l: number;
 }
+
+export type PickedPalette = Record<string, Position>;

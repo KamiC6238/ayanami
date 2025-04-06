@@ -19,6 +19,6 @@ const { pickedColor } = storeToRefs(colorPickerStore);
         <div class="!w-full !h-[25px] bg-[url(@/assets/alpha-background.png)] bg-cover"></div>
       </PixelBorderPrimary>
     </div>
-    <AddIcon @click='() => colorPickerStore.setPickedPalette(pickedColor)' class='w-6 h-6 cursor-pointer' />
+    <AddIcon @click='() => colorPickerStore.updatePickedPalette(pickedColor)' class='w-6 h-6 cursor-pointer' />
   </div>
 </template>

@@ -1,18 +1,25 @@
-import type { HSL, Position, RGBA } from "@/types";
+import { STORAGE_KEY_FOR_COLOR_PALETTE } from "@/constants";
+import type { HSL, PickedPalette, Position, RGBA } from "@/types";
 import { makeRGBA, rgbToHsl } from "@/utils";
+import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 
 const INIT_RGB = { r: 255, g: 0, b: 0 };
 
 export const useColorPickerStore = defineStore("colorPicker", () => {
-	const pickedPalette = ref<Map<string, Position>>(new Map());
+	const pickedPalette = ref<PickedPalette>({});
 	const palette = ref<HTMLCanvasElement | null>(null);
 	const rgb = ref<RGBA>(INIT_RGB);
 	const hsl = ref<HSL>(rgbToHsl(INIT_RGB));
 	const alpha = ref(1);
 	const pickedColor = ref<string>("");
 	const mousePosOnHSLPalette = ref({ x: 200, y: 0 });
+
+	const storage = useLocalStorage(
+		STORAGE_KEY_FOR_COLOR_PALETTE,
+		pickedPalette.value,
+	);
 
 	watch([() => rgb.value, () => alpha.value], ([rgb, alpha]) => {
 		setPickedColor(`${makeRGBA({ ...rgb, a: alpha })}`);
@@ -47,10 +54,18 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		pickedColor.value = value;
 	};
 
-	const setPickedPalette = (val: string) => {
-		if (!pickedPalette.value.has(val)) {
-			pickedPalette.value.set(val, mousePosOnHSLPalette.value);
+	const setPickedPalette = (val: PickedPalette) => {
+		pickedPalette.value = val;
+	};
+
+	const updatePickedPalette = (val: string, type: "add" | "delete" = "add") => {
+		if (type === "delete") {
+			delete pickedPalette.value[val];
+		} else if (!pickedPalette.value[val]) {
+			pickedPalette.value[val] = mousePosOnHSLPalette.value;
 		}
+
+		storage.value = pickedPalette.value;
 	};
 
 	const setMousePosOnHSLPalette = (position: Position) => {
@@ -71,6 +86,7 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		setHSL,
 		pickedPalette,
 		setPickedPalette,
+		updatePickedPalette,
 		mousePosOnHSLPalette,
 		setMousePosOnHSLPalette,
 	};

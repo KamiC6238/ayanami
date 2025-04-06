@@ -54,11 +54,14 @@ const paletteIndicatorStyle = computed<CSSProperties>(() => {
 			paletteRef.value as HTMLCanvasElement
 		).getBoundingClientRect();
 
-		const left = (Math.round(mousePosOnHSLPalette.value.x) / width) * 100;
+		const _left = (Math.round(mousePosOnHSLPalette.value.x) / width) * 100;
+		const left = _left > 100 ? 100 - (_left - 100) : _left;
+		const _top = (Math.round(mousePosOnHSLPalette.value.y) / height) * 100;
+		const top = _top > 100 ? 100 - (_top - 100) : _top;
 
 		return {
-			left: `${left > 100 ? 100 : left}%`,
-			top: `${(Math.round(mousePosOnHSLPalette.value.y) / height) * 100}%`,
+			left: `${left}%`,
+			top: `${top}%`,
 			background: pickedColor.value,
 		};
 	}

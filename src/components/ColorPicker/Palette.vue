@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PixelBorder } from "@/components";
 import { useColorPickerStore } from "@/store";
 import type { Position } from "@/types";
 import { drawHSLPalette, rgbToHsl } from "@/utils";
@@ -30,7 +31,7 @@ const onPicked = (pickedColor: string, position: Position) => {
 };
 </script>
 <template>
-  <div class="bg-[#7d929e] w-full h-full">
+  <PixelBorder class="bg-[#7d929e] !w-full !h-full">
     <div class='bg-[#635561] w-full h-full  flex flex-wrap content-start'>
       <div class='relative' v-for='[pickedColor, position] of pickedPalette'>
         <div
@@ -45,5 +46,5 @@ const onPicked = (pickedColor: string, position: Position) => {
         </div>
       </div>
     </div>
-  </div>
+  </PixelBorder>
 </template>

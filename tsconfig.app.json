@@ -5,6 +5,7 @@
 		"module": "ESNext",
 		"lib": ["ES2020", "DOM", "DOM.Iterable"],
 		"skipLibCheck": true,
+		"allowJs": true,
 
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
@@ -21,5 +22,10 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/**/*.vue",
+		"src/utils/pixelBorder.js"
+	]
 }

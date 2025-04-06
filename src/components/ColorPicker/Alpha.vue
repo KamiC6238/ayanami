@@ -80,8 +80,8 @@ const setAlpha = (e: MouseEvent) => {
 </script>
 <template>
   <div class="relative w-full">
-    <div class="absolute w-full h-[15px] bg-[url(@/assets/alpha-background.png)] bg-cover z-[-1]"></div>
-    <div class="box-border h-[15px] cursor-pointer" ref="alphaRef" :style="alphaGradientStyle">
+    <div class="absolute w-full h-[18px] bg-[url(@/assets/alpha-background.png)] bg-cover z-[-1]"></div>
+    <div class="box-border h-[18px] cursor-pointer" ref="alphaRef" :style="alphaGradientStyle">
       <div
         class="alpha__indicator absolute w-[10px] h-[10px] border-2 border-solid border-white rounded-full cursor-pointer"
         :style="indicatorStyle"
@@ -92,6 +92,6 @@ const setAlpha = (e: MouseEvent) => {
 <style scoped>
 .alpha__indicator {
   top: 50%;
-  transform: translate(-53%, -50%);
+  transform: translate(-53%, -67%);
 }
 </style>

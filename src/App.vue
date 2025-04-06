@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Canvas, ColorPicker, Palette, Toolbar } from "@/components";
+import { generatePixelBorder } from "@/utils";
 import { ColumnResizer, VerticalResizer } from "./layout";
+
+generatePixelBorder(4, 3);
 </script>
 
 <template>

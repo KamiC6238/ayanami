@@ -54,8 +54,10 @@ const paletteIndicatorStyle = computed<CSSProperties>(() => {
 			paletteRef.value as HTMLCanvasElement
 		).getBoundingClientRect();
 
+		const left = (Math.round(mousePosOnHSLPalette.value.x) / width) * 100;
+
 		return {
-			left: `${(Math.round(mousePosOnHSLPalette.value.x) / width) * 100}%`,
+			left: `${left > 100 ? 100 : left}%`,
 			top: `${(Math.round(mousePosOnHSLPalette.value.y) / height) * 100}%`,
 			background: pickedColor.value,
 		};
@@ -115,7 +117,7 @@ const initMouse$ = (canvas: HTMLCanvasElement) => {
 </script>
 <template>
   <div class="relative flex-1">
-    <canvas class="absolute flex flex-col w-full h-full cursor-pointer" ref="paletteRef"></canvas>
+    <canvas class="absolute w-full h-full cursor-pointer" ref="paletteRef"></canvas>
     <div
       class="absolute w-[10px] h-[10px] rounded-full cursor-pointer z-1 border-2 border-white border-solid -translate-x-[53%] -translate-y-[50%]"
       :style="paletteIndicatorStyle"

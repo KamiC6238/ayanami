@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PixelBorder } from "@/components";
+import { PixelBorderPrimary, PixelBorderSecondary } from "@/components";
 import { useColorPickerStore } from "@/store";
 import type { Position } from "@/types";
 import { drawHSLPalette, rgbToHsl } from "@/utils";
@@ -31,20 +31,20 @@ const onPicked = (pickedColor: string, position: Position) => {
 };
 </script>
 <template>
-  <PixelBorder class="bg-[#7d929e] !w-full !h-full">
-    <div class='bg-[#635561] w-full h-full  flex flex-wrap content-start'>
-      <div class='relative' v-for='[pickedColor, position] of pickedPalette'>
-        <div
-          class="absolute inset-0 bg-[url(@/assets/alpha-background.png)] bg-cover z-0 pointer-events-none"
-        ></div>
-        <div
-          class="relative w-7.5 h-7.5 border-1 border-solid border-black cursor-pointer"
-          :key="pickedColor"
-          :style="{ background: pickedColor }"
-          @click="() => onPicked(pickedColor, position)"
-        >
-        </div>
+  <PixelBorderSecondary content-cls='flex flex-wrap content-start'>
+    <PixelBorderPrimary
+      class='relative mr-[3px] mb-[3px]'
+      v-for='[pickedColor, position] of pickedPalette'
+      :key='pickedColor'
+    >
+      <div class="absolute inset-0 bg-[url(@/assets/alpha-background.png)] bg-cover z-0 pointer-events-none" />
+      <div
+        class="relative w-7.5 h-7.5 border-1 border-solid border-black cursor-pointer"
+        :key="pickedColor"
+        :style="{ background: pickedColor }"
+        @click="() => onPicked(pickedColor, position)"
+      >
       </div>
-    </div>
-  </PixelBorder>
+    </PixelBorderPrimary>
+  </PixelBorderSecondary>
 </template>

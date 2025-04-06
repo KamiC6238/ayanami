@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AddIcon from "@/assets/icons/add.svg";
-import { PixelBorder } from "@/components";
+import { PixelBorderPrimary } from "@/components";
 import { useColorPickerStore } from "@/store";
 import { storeToRefs } from "pinia";
 
@@ -10,14 +10,14 @@ const { pickedColor } = storeToRefs(colorPickerStore);
 <template>
   <div class='flex items-center mt-2'>
     <div class="relative w-full h-full">
-      <PixelBorder
+      <PixelBorderPrimary
         :style='{ background: pickedColor }'
         class='!absolute inset-0 !w-full !h-[25px] z-2'
       >
-      </PixelBorder>
-      <PixelBorder class='!absolute inset-0 !w-full !h-[25px] z-1'>
+      </PixelBorderPrimary>
+      <PixelBorderPrimary class='!absolute inset-0 !w-full !h-[25px] z-1'>
         <div class="!w-full !h-[25px] bg-[url(@/assets/alpha-background.png)] bg-cover"></div>
-      </PixelBorder>
+      </PixelBorderPrimary>
     </div>
     <AddIcon @click='() => colorPickerStore.setPickedPalette(pickedColor)' class='w-6 h-6 cursor-pointer' />
   </div>

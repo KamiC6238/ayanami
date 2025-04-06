@@ -7,9 +7,9 @@ generatePixelBorder(4, 3);
 </script>
 
 <template>
-  <div class='relative w-full h-full'>
+  <div class='relative w-full h-full flex items-center justify-center'>
     <div class="absolute w-full h-full bg-[#7d929e] z-[-2]"></div>
-    <div class='flex w-full h-full border-10 border-solid border-[#7d929e]'>
+    <div class='flex border-10 border-solid border-[#7d929e] w-[1000px] h-[600px]'>
       <ColumnResizer class='w-full'>
         <template v-slot:left>
           <VerticalResizer class='h-full'>

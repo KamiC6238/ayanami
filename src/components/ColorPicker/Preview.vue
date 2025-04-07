@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import AddIcon from "@/assets/icons/add.svg";
-import { PixelBorderPrimary } from "@/components";
+import { PixelBorderPrimary, PixelBorderTertiary } from "@/components";
 import { useColorPickerStore } from "@/store";
 import { storeToRefs } from "pinia";
 
 const colorPickerStore = useColorPickerStore();
-const { pickedColor } = storeToRefs(colorPickerStore);
+const { pickedColor, tintAndShade } = storeToRefs(colorPickerStore);
 </script>
 <template>
   <div class='flex items-center mt-2'>
     <div class="relative w-full h-full">
-      <PixelBorderPrimary
+      <PixelBorderTertiary
         :style='{ background: pickedColor }'
+        :border-left-top-color='tintAndShade.tint'
+        :border-right-bottom-color='tintAndShade.shade'
         class='!absolute inset-0 !w-full !h-[25px] z-2'
       >
-      </PixelBorderPrimary>
+      </PixelBorderTertiary>
       <PixelBorderPrimary class='!absolute inset-0 !w-full !h-[25px] z-1'>
         <div class="!w-full !h-[25px] bg-[url(@/assets/alpha-background.png)] bg-cover"></div>
       </PixelBorderPrimary>

@@ -59,8 +59,6 @@ const paletteIndicatorStyle = computed<CSSProperties>(() => {
 		const _top = (Math.round(mousePosOnHSLPalette.value.y) / height) * 100;
 		const top = _top > 100 ? 100 - (_top - 100) : _top;
 
-		console.log(_left, mousePosOnHSLPalette.value.x, width);
-
 		return {
 			left: `${left}%`,
 			top: `${top}%`,

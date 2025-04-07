@@ -13,4 +13,11 @@ export interface HSL {
 	l: number;
 }
 
-export type PickedPalette = Record<string, Position>;
+export type PickedPalette = Record<
+	string,
+	{
+		pos: Position;
+		tint: string;
+		shade: string;
+	}
+>;

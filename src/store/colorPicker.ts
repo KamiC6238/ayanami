@@ -1,6 +1,6 @@
 import { STORAGE_KEY_FOR_COLOR_PALETTE } from "@/constants";
 import type { HSL, PickedPalette, Position, RGBA } from "@/types";
-import { makeRGBA, rgbToHsl } from "@/utils";
+import { generateTintAndShade, makeRGBA, rgbToHsl } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
@@ -23,6 +23,14 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 
 	watch([() => rgb.value, () => alpha.value], ([rgb, alpha]) => {
 		setPickedColor(`${makeRGBA({ ...rgb, a: alpha })}`);
+	});
+
+	const tintAndShade = computed(() => {
+		const { tint, shade } = generateTintAndShade(hsl.value);
+		return {
+			tint: makeRGBA({ ...tint, a: alpha.value }),
+			shade: makeRGBA({ ...shade, a: alpha.value }),
+		};
 	});
 
 	const pickedColorHex = computed(() => {
@@ -62,7 +70,13 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		if (type === "delete") {
 			delete pickedPalette.value[val];
 		} else if (!pickedPalette.value[val]) {
-			pickedPalette.value[val] = mousePosOnHSLPalette.value;
+			const { tint, shade } = generateTintAndShade(hsl.value);
+
+			pickedPalette.value[val] = {
+				pos: mousePosOnHSLPalette.value,
+				tint: makeRGBA({ ...tint, a: alpha.value }),
+				shade: makeRGBA({ ...shade, a: alpha.value }),
+			};
 		}
 
 		storage.value = pickedPalette.value;
@@ -73,6 +87,7 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 	};
 
 	return {
+		tintAndShade,
 		pickedColor,
 		setPickedColor,
 		pickedColorHex,

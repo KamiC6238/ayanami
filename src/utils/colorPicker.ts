@@ -203,3 +203,18 @@ export const rgbToHex = (rgba: RGBA) => {
 
 	return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alpha)}`;
 };
+
+export const generateTintAndShade = (hsl: HSL): { tint: RGBA; shade: RGBA } => {
+	const { h, s, l } = hsl;
+
+	const tintLightness = Math.min(l + (100 - l) * 0.2, 100);
+	const tint: HSL = { h, s, l: Math.round(tintLightness) };
+
+	const shadeLightness = Math.max(l - l * 0.2, 0);
+	const shade: HSL = { h, s, l: Math.round(shadeLightness) };
+
+	return {
+		tint: hslToRgb(tint),
+		shade: hslToRgb(shade),
+	};
+};

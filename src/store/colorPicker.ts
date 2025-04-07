@@ -14,7 +14,7 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 	const hsl = ref<HSL>(rgbToHsl(INIT_RGB));
 	const alpha = ref(1);
 	const pickedColor = ref<string>("");
-	const mousePosOnHSLPalette = ref({ x: 200, y: 0 });
+	const mousePosOnHSLPalette = ref({ x: 187, y: 0 });
 
 	const storage = useLocalStorage(
 		STORAGE_KEY_FOR_COLOR_PALETTE,

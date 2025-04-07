@@ -59,6 +59,8 @@ const paletteIndicatorStyle = computed<CSSProperties>(() => {
 		const _top = (Math.round(mousePosOnHSLPalette.value.y) / height) * 100;
 		const top = _top > 100 ? 100 - (_top - 100) : _top;
 
+		console.log(_left, mousePosOnHSLPalette.value.x, width);
+
 		return {
 			left: `${left}%`,
 			top: `${top}%`,
@@ -80,14 +82,20 @@ const initPalette = (canvas: HTMLCanvasElement) => {
 const initMouse$ = (canvas: HTMLCanvasElement) => {
 	const update = (e: MouseEvent) => {
 		const rgb = calculateRGB(e, canvas);
+		const { x, y } = calculateMousePosition(e, canvas);
+		const { s, l } = rgbToHsl(rgb);
+		const isLeftTop = x === 0 && y === 0;
 
-		if (rgb) {
-			colorPickerStore.setRGB(rgb);
-			colorPickerStore.setHSL({
-				...rgbToHsl(rgb),
-				h: hsl.value.h,
-			});
-		}
+		colorPickerStore.setRGB({
+			r: isLeftTop ? 255 : rgb.r,
+			g: isLeftTop ? 255 : rgb.g,
+			b: isLeftTop ? 255 : rgb.b,
+		});
+		colorPickerStore.setHSL({
+			h: hsl.value.h,
+			s: isLeftTop ? 0 : s,
+			l: isLeftTop ? 100 : l,
+		});
 		colorPickerStore.setMousePosOnHSLPalette(calculateMousePosition(e, canvas));
 	};
 

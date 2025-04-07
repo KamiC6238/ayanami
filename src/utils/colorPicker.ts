@@ -159,10 +159,8 @@ export const calculateRGB = (e: MouseEvent, el: HTMLCanvasElement) => {
 
 	const ctx = el.getContext("2d");
 
-	if (ctx) {
-		const [r, g, b] = ctx.getImageData(x, y, 1, 1).data;
-		return { r, g, b };
-	}
+	const [r, g, b] = ctx?.getImageData(x, y, 1, 1).data ?? [0, 0, 0];
+	return { r, g, b };
 };
 
 interface Mouse$ {

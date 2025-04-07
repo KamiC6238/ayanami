@@ -6,8 +6,10 @@ import type { Position } from "@/types";
 import { drawHSLPalette, rgbToHsl } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import PixelBorderTertiary from "../PixelBorder/PixelBorderTertiary.vue";
+
+const hoveredColor = ref("");
 
 const colorPickerStore = useColorPickerStore();
 const {
@@ -39,22 +41,32 @@ const onPicked = (pickedColor: string, position: Position) => {
 	colorPickerStore.setPickedColor(pickedColor);
 	ctx && drawHSLPalette(ctx, hsl.h);
 };
+
+const getTintOrShade = (color: string, type: "tint" | "shade") => {
+	return pickedPalette.value[color][type];
+};
 </script>
 <template>
   <PixelBorderSecondary content-cls='flex flex-wrap content-start'>
     <PixelBorderTertiary
       class='relative mr-[3px] mb-[3px] !w-8 !h-8'
-      v-for='pickedColor of Object.keys(pickedPalette)'
-      :key='pickedColor'
-      :border-left-top-color='pickedPalette[pickedColor].tint'
-      :border-right-bottom-color='pickedPalette[pickedColor].shade'
+      v-for='color of Object.keys(pickedPalette)'
+      :key='color'
+      :border-left-top-color="hoveredColor === color
+        ? getTintOrShade(color, 'shade')
+        : getTintOrShade(color, 'tint')"
+      :border-right-bottom-color="hoveredColor === color
+        ? getTintOrShade(color, 'tint')
+        : getTintOrShade(color, 'shade')"
+      @mouseover='hoveredColor = color'
+      @mouseleave='hoveredColor = ""'
     >
       <div class="absolute w-[31px] h-[31px] left-[-5.5px] top-[-5.5px] bg-[url(@/assets/alpha-background.png)] bg-cover z-[-2] pointer-events-none" />
       <div
         class="relative w-[20.4px] h-[20.4px] border-solid border-black cursor-pointer"
-        :key="pickedColor"
-        :style="{ background: pickedColor }"
-        @click="() => onPicked(pickedColor, pickedPalette[pickedColor].pos)"
+        :key="color"
+        :style="{ background: color }"
+        @click="() => onPicked(color, pickedPalette[color].pos)"
       >
       </div>
     </PixelBorderTertiary>

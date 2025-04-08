@@ -5,6 +5,7 @@ import {
 	Palette,
 	PixelBorderSecondary,
 	Toolbar,
+	TrafficLights,
 } from "@/components";
 import { generatePixelBorder } from "@/utils";
 import { ColumnResizer, VerticalResizer } from "./layout";
@@ -16,6 +17,7 @@ generatePixelBorder(4, 3);
   <div class='relative w-full h-full flex items-center justify-center'>
     <div class="absolute w-full h-full bg-[#7d929e] z-[-2] bg-[#d4cbbe]"></div>
     <div class='flex w-[1000px] h-[600px]'>
+      <TrafficLights />
       <PixelBorderSecondary content-cls='bg-[#7d929e] p-2.5 flex' background='bg-[#7d929e]'>
         <ColumnResizer class='w-full'>
           <template v-slot:left>

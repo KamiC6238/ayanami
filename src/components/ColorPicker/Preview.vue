@@ -11,9 +11,11 @@ const { pickedColor, tintAndShade } = storeToRefs(colorPickerStore);
   <div class='flex items-center mt-2'>
     <div class="relative w-full h-full">
       <PixelBorderTertiary
+        :color='pickedColor'
         :style='{ background: pickedColor }'
-        :border-left-top-color='tintAndShade.tint'
-        :border-right-bottom-color='tintAndShade.shade'
+        :tint='tintAndShade.tint'
+        :shade='tintAndShade.shade'
+        :dont-reverse='true'
         class='!absolute inset-0 !w-full !h-[25px] z-2'
       >
       </PixelBorderTertiary>

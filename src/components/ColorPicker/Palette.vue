@@ -6,10 +6,8 @@ import type { Position } from "@/types";
 import { drawHSLPalette, rgbToHsl } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import PixelBorderTertiary from "../PixelBorder/PixelBorderTertiary.vue";
-
-const hoveredColor = ref("");
 
 const colorPickerStore = useColorPickerStore();
 const {
@@ -49,21 +47,16 @@ const getTintOrShade = (color: string, type: "tint" | "shade") => {
 <template>
   <PixelBorderSecondary content-cls='flex flex-wrap content-start'>
     <PixelBorderTertiary
-      class='relative mr-[3px] mb-[3px] !w-8 !h-8'
+      class='relative cursor-pointer mr-[3px] mb-[3px] !w-8 !h-8'
       v-for='color of Object.keys(pickedPalette)'
       :key='color'
-      :border-left-top-color="hoveredColor === color
-        ? getTintOrShade(color, 'shade')
-        : getTintOrShade(color, 'tint')"
-      :border-right-bottom-color="hoveredColor === color
-        ? getTintOrShade(color, 'tint')
-        : getTintOrShade(color, 'shade')"
-      @mouseover='hoveredColor = color'
-      @mouseleave='hoveredColor = ""'
+      :color='color'
+      :tint="getTintOrShade(color, 'tint')"
+      :shade="getTintOrShade(color, 'shade')"
     >
       <div class="absolute w-full h-full bg-[url(@/assets/alpha-background.png)] bg-cover z-[-2] pointer-events-none" />
       <div
-        class="cursor-pointer h-full"
+        class="h-full"
         :key="color"
         :style="{ background: color }"
         @click="() => onPicked(color, pickedPalette[color].pos)"

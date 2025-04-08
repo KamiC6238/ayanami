@@ -61,9 +61,9 @@ const getTintOrShade = (color: string, type: "tint" | "shade") => {
       @mouseover='hoveredColor = color'
       @mouseleave='hoveredColor = ""'
     >
-      <div class="absolute w-[31px] h-[31px] left-[-5.5px] top-[-5.5px] bg-[url(@/assets/alpha-background.png)] bg-cover z-[-2] pointer-events-none" />
+      <div class="absolute w-full h-full bg-[url(@/assets/alpha-background.png)] bg-cover z-[-2] pointer-events-none" />
       <div
-        class="relative w-[20.4px] h-[20.4px] border-solid border-black cursor-pointer"
+        class="cursor-pointer h-full"
         :key="color"
         :style="{ background: color }"
         @click="() => onPicked(color, pickedPalette[color].pos)"

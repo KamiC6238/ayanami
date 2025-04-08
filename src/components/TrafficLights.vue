@@ -45,11 +45,11 @@ const trafficLights = [
     <PixelBorderTertiary
       v-for='({ color, tint, shade }, index) of trafficLights'
       :key='index'
-      class='mr-2'
+      class='mr-2 !w-5 !h-5'
       :border-left-top-color="tint"
       :border-right-bottom-color="shade"
     >
-      <div class='w-4 h-4' :style='{ background: color }'></div>
+      <div class='h-full' :style='{ background: color }'></div>
     </PixelBorderTertiary>
   </div>
 </template>

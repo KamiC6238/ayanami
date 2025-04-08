@@ -12,7 +12,7 @@ defineProps<Props>();
 <template>
   <PixelBorderPrimary>
     <div
-      class='relative left-[3px] top-[3px] w-[calc(100%-6px)] h-[calc(100%-6px)]'
+      class="relative w-[calc(100%-6px)] h-[calc(100%-6px)] left-[3px] top-[3px]"
       :style="{
         borderLeftColor: borderLeftTopColor,
         borderTopColor: borderLeftTopColor,

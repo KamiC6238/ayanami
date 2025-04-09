@@ -18,7 +18,9 @@ generatePixelBorder(4, 3);
     <div class="absolute w-full h-full bg-[#7d929e] z-[-2] bg-[#d4cbbe]"></div>
     <div class='w-[1000px] h-[600px]'>
       <PixelBorderSecondary content-cls='bg-[#7d929e] p-2.5 flex flex-col justify-between' background='bg-[#7d929e]'>
-        <TrafficLights />
+        <div class='border-b-3 border-solid border-black pb-[13px]'>
+          <TrafficLights />
+        </div>
         <ColumnResizer class='w-full'>
           <template v-slot:left>
             <VerticalResizer class='h-full'>

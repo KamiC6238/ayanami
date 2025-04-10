@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PixelBorderPrimary from "./PixelBorderPrimary.vue";
 interface Props {
+	wrapperHeight?: string;
 	contentCls?: string;
 	background?: string;
 }
@@ -8,9 +9,18 @@ interface Props {
 defineProps<Props>();
 </script>
 <template>
-  <div class="relative !w-full !h-full">
+  <div :class="`relative !w-full ${wrapperHeight ?? '!h-full'}`">
     <PixelBorderPrimary class='!absolute inset-0 z-0 !w-full !h-full bg-black' />
-    <PixelBorderPrimary :class="`!w-[calc(100%-7px)] !h-[calc(100%-7px)] !absolute inset-0 z-1 ${background ?? 'bg-[#635561]'}`" />
+    <PixelBorderPrimary
+      :class="`
+        !w-[calc(100%-7px)]
+        !h-[calc(100%-7px)]
+        !absolute
+        inset-0
+        z-1
+        ${background ?? 'bg-[#635561]'}
+      `"
+    />
     <div :class="`
       slot-wrapper
       absolute

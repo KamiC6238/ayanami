@@ -45,7 +45,10 @@ const getTintOrShade = (color: string, type: "tint" | "shade") => {
 };
 </script>
 <template>
-  <PixelBorderSecondary content-cls='flex flex-wrap content-start'>
+  <PixelBorderSecondary
+    wrapper-height="!h-[calc(100%-40px)]"
+    content-cls='flex flex-wrap content-start'
+  >
     <PixelBorderTertiary
       class='relative cursor-pointer mr-[3px] mb-[3px] !w-8 !h-8'
       v-for='color of Object.keys(pickedPalette)'

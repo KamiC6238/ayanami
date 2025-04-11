@@ -52,9 +52,9 @@ const onCircleTypeChange = (e: Event) => {
         {{ toolType }}
       </button>
       <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
-          <option :value="perfectCircle">圆形</option>
-          <option :value="ellipseCircle">椭圆</option>
-        </select>
+        <option :value="perfectCircle">圆形</option>
+        <option :value="ellipseCircle">椭圆</option>
+      </select>
       <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
     </div>
     <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >

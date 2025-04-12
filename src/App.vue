@@ -40,13 +40,15 @@ generatePixelBorder(4, 3);
           </template>
           <template v-slot:right>
             <div class='w-10 h-10 pt-2.5 pb-2.5'></div>
-            <PixelBorderSecondary wrapper-height="!h-[calc(100%-40px)]">
-              <Canvas />
-            </PixelBorderSecondary>
+            <div class='flex w-full h-full'>
+              <PixelBorderSecondary wrapper-height="!h-[calc(100%-40px)]">
+                <Canvas />
+              </PixelBorderSecondary>
+              <Toolbar />
+            </div>
           </template>
         </ColumnResizer>
       </PixelBorderSecondary>
-      <Toolbar />
     </div>
   </div>
 </template>

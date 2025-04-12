@@ -42,8 +42,8 @@ const onCircleTypeChange = (e: Event) => {
 };
 </script>
 <template>
-  <div style="display: flex; flex-direction: column; margin-right: 20px;">
-    <div style='display: flex; flex-direction: column; width: 100px;'>
+  <div>
+    <div class='flex flex-col w-full'>
       <button
         v-for="toolType of tools"
         style='width: 100px; margin-bottom: 10px;'

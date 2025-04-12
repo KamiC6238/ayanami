@@ -4,6 +4,7 @@ import {
 	ColorPicker,
 	Palette,
 	PixelBorderSecondary,
+	SocialMedia,
 	Toolbar,
 	TrafficLights,
 } from "@/components";
@@ -21,8 +22,9 @@ generatePixelBorder(4, 3);
         content-cls='bg-[#7d929e] p-2.5 flex flex-col justify-between'
         background='bg-[#7d929e]'
       >
-        <div class='border-b-3 border-solid border-black pb-2.5'>
+        <div class='flex justify-between border-b-3 border-solid border-black pb-2.5'>
           <TrafficLights />
+          <SocialMedia />
         </div>
         <ColumnResizer class='w-full flex-1'>
           <template v-slot:left>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9" class="pixelicon-github">
+	<path fill="#EBEAF7" d="M6,6H8V3H7V1H6V2H3V1H2V3H1V6H3V7H2V8H3V9H6z"/>
+	<path fill="#343341" d="M2,0V1H3V2H6V1H7V0z"/>
+	<path fill="#343341" d="M2,1H1V2H0V7H1V8H2V7H3V6H1V3H2z"/>
+	<path fill="#343341" d="M9,2H8V1H7V3H8V6H6V9H7V8H8V7H9z"/>
+	<rect fill="#343341" x="2" y="8" width="1" height="1"/>
+</svg>

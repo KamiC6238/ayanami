@@ -1,4 +1,7 @@
-import { STORAGE_KEY_FOR_COLOR_PALETTE } from "@/constants";
+import {
+	STORAGE_KEY_FOR_COLOR_PALETTE,
+	STORAGE_KEY_FOR_LAST_PICKED_COLOR,
+} from "@/constants";
 import type { HSL, PickedPalette, Position, RGBA } from "@/types";
 import { generateTintAndShade, makeRGBA, rgbToHsl } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
@@ -20,6 +23,13 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		STORAGE_KEY_FOR_COLOR_PALETTE,
 		pickedPalette.value,
 	);
+
+	const storageForLPC = useLocalStorage(STORAGE_KEY_FOR_LAST_PICKED_COLOR, {
+		hslPalettePos: mousePosOnHSLPalette.value,
+		hsl: hsl.value,
+		alpha: 1,
+		pickedColor: pickedColor.value,
+	});
 
 	watch([() => rgb.value, () => alpha.value], ([rgb, alpha]) => {
 		setPickedColor(`${makeRGBA({ ...rgb, a: alpha })}`);
@@ -52,14 +62,17 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 
 	const setHSL = (val: HSL) => {
 		hsl.value = val;
+		storageForLPC.value.hsl = val;
 	};
 
 	const setAlpha = (val: number) => {
 		alpha.value = val;
+		storageForLPC.value.alpha = val;
 	};
 
 	const setPickedColor = (value: string) => {
 		pickedColor.value = value;
+		storageForLPC.value.pickedColor = value;
 	};
 
 	const setPickedPalette = (val: PickedPalette) => {
@@ -84,6 +97,7 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 
 	const setMousePosOnHSLPalette = (position: Position) => {
 		mousePosOnHSLPalette.value = position;
+		storageForLPC.value.hslPalettePos = position;
 	};
 
 	return {

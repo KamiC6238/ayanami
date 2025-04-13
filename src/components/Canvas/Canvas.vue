@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCanvasStore, useConfigStore } from "@/store";
 import { ToolTypeEnum } from "@/types";
+import { cn } from "@/utils";
 import { type CSSProperties, onMounted, ref, useTemplateRef } from "vue";
 
 const canvas = useTemplateRef("canvas");
@@ -18,6 +19,9 @@ const canvasStyle = ref<CSSProperties>({
 const { initCanvas } = useCanvasStore();
 const configStore = useConfigStore();
 
+const getCanvasCls = (zIndex: number) =>
+	cn(`absolute top-0 bottom-0 left-0 z-${zIndex}`);
+
 onMounted(() => {
 	if (canvas.value && previewCanvas.value && gridCanvas.value) {
 		initCanvas(gridCanvas.value as HTMLCanvasElement, { type: "grid" });
@@ -30,9 +34,9 @@ onMounted(() => {
 <template>
   <div class="w-full h-full bg-[#635561] flex items-center justify-center">
     <div class="relative w-[202px] h-[202px]">
-      <canvas ref="canvas" :style="canvasStyle" class="absolute top-0 bottom-0 left-0 right-0 z-9" />
-      <canvas ref="previewCanvas" :style="canvasStyle" class="absolute top-0 bottom-0 left-0 right-0 z-10" />
-      <canvas ref="gridCanvas" :style="canvasStyle" class="absolute top-0 bottom-0 left-0 right-0 z-8" />
+      <canvas ref="canvas" :style="canvasStyle" :class="getCanvasCls(9)" />
+      <canvas ref="previewCanvas" :style="canvasStyle" :class="getCanvasCls(10)" />
+      <canvas ref="gridCanvas" :style="canvasStyle" :class="getCanvasCls(8)" />
     </div>
   </div>
 </template>

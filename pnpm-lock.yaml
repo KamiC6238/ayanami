@@ -7,12 +7,18 @@ dependencies:
   '@vueuse/core':
     specifier: ^13.0.0
     version: 13.0.0(vue@3.5.13)
+  clsx:
+    specifier: ^2.1.1
+    version: 2.1.1
   pinia:
     specifier: ^2.2.6
     version: 2.2.6(typescript@5.5.3)(vue@3.5.13)
   rxjs:
     specifier: ^7.8.1
     version: 7.8.1
+  tailwind-merge:
+    specifier: ^3.2.0
+    version: 3.2.0
   tailwindcss:
     specifier: ^4.0.4
     version: 4.0.4
@@ -905,6 +911,11 @@ packages:
       string-width: 7.2.0
     dev: true
 
+  /clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
+    dev: false
+
   /colorette@2.0.20:
     resolution: {integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==}
     dev: true
@@ -1610,6 +1621,10 @@ packages:
       csso: 5.0.5
       picocolors: 1.1.1
     dev: true
+
+  /tailwind-merge@3.2.0:
+    resolution: {integrity: sha512-FQT/OVqCD+7edmmJpsgCsY820RTD5AkBryuG5IUqR5YQZSdj5xlH5nLgH7YPths7WsLPSpSBNneJdM8aS8aeFA==}
+    dev: false
 
   /tailwindcss@4.0.4:
     resolution: {integrity: sha512-/ezDLEkOLf1lXkr9F2iI5BHJbexJpty5zkV2B8bGHCqAdbc9vk85Jgdkq+ZOvNkNPa3yAaqJ8DjRt584Bc84kw==}

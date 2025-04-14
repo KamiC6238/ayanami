@@ -38,8 +38,7 @@ export function useLineTool() {
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType, pixelSize } = storeToRefs(configStore);
-	const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$ } =
-		storeToRefs(canvasStore);
+	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
 		if (type === ToolTypeEnum.Line) {
@@ -52,23 +51,20 @@ export function useLineTool() {
 	const disposeLineTool = () => line$.value?.unsubscribe();
 
 	const initLineTool = () => {
-		if (
-			!mouseDown$.value ||
-			!mouseMove$.value ||
-			!mouseUp$.value ||
-			!mouseLeave$.value
-		) {
+		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;
+
+		if (!mouseDown$ || !mouseMove$ || !mouseUp$ || !mouseLeave$) {
 			return;
 		}
 
 		line$.value = merge(
-			mouseDown$.value.pipe(
+			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
 					isDrawingLine.value = true;
 					drawLineStart(event);
 				}),
 			),
-			mouseMove$.value.pipe(
+			mouseMove$.pipe(
 				throttleTime(16),
 				tap((event: MouseEvent) => {
 					if (isDrawingLine.value) {
@@ -78,8 +74,8 @@ export function useLineTool() {
 					}
 				}),
 			),
-			mouseUp$.value.pipe(tap(() => tap(() => onMouseUpHandler()))),
-			mouseLeave$.value.pipe(tap(() => setHoveredPixel(null))),
+			mouseUp$.pipe(tap(() => tap(() => onMouseUpHandler()))),
+			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
 	};

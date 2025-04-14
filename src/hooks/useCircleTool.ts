@@ -24,8 +24,7 @@ export function useCircleTool() {
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configStore);
-	const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$ } =
-		storeToRefs(canvasStore);
+	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
 		if (type === ToolTypeEnum.Circle) {
@@ -38,23 +37,20 @@ export function useCircleTool() {
 	const disposeCircle = () => circle$.value?.unsubscribe();
 
 	const initCircle = () => {
-		if (
-			!mouseDown$.value ||
-			!mouseMove$.value ||
-			!mouseUp$.value ||
-			!mouseLeave$.value
-		) {
+		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;
+
+		if (!mouseDown$ || !mouseMove$ || !mouseUp$ || !mouseLeave$) {
 			return;
 		}
 
 		circle$.value = merge(
-			mouseDown$.value.pipe(
+			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
 					isDrawingCircle.value = true;
 					drawCircleStart(event);
 				}),
 			),
-			mouseMove$.value.pipe(
+			mouseMove$.pipe(
 				throttleTime(16),
 				tap((event: MouseEvent) => {
 					if (isDrawingCircle.value) {
@@ -64,8 +60,8 @@ export function useCircleTool() {
 					}
 				}),
 			),
-			mouseUp$.value.pipe(tap(() => onMouseUpHandler())),
-			mouseLeave$.value.pipe(tap(() => setHoveredPixel(null))),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
+			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
 	};

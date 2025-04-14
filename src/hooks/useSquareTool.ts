@@ -17,8 +17,7 @@ export function useSquareTool() {
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configTool);
-	const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$ } =
-		storeToRefs(canvasStore);
+	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
 		if (type === ToolTypeEnum.Square) {
@@ -31,23 +30,20 @@ export function useSquareTool() {
 	const disposeSquare = () => square$.value?.unsubscribe();
 
 	const initSquare = () => {
-		if (
-			!mouseDown$.value ||
-			!mouseMove$.value ||
-			!mouseUp$.value ||
-			!mouseLeave$.value
-		) {
+		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;
+
+		if (!mouseDown$ || !mouseMove$ || !mouseUp$ || !mouseLeave$) {
 			return;
 		}
 
 		square$.value = merge(
-			mouseDown$.value.pipe(
+			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
 					isDrawingSquare.value = true;
 					drawSquareStart(event);
 				}),
 			),
-			mouseMove$.value.pipe(
+			mouseMove$.pipe(
 				throttleTime(16),
 				tap((event: MouseEvent) => {
 					if (isDrawingSquare.value) {
@@ -57,8 +53,8 @@ export function useSquareTool() {
 					}
 				}),
 			),
-			mouseUp$.value.pipe(tap(() => onMouseUpHandler())),
-			mouseLeave$.value.pipe(tap(() => setHoveredPixel(null))),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
+			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
 	};

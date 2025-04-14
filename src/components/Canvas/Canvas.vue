@@ -24,9 +24,12 @@ const getCanvasCls = (zIndex: number) =>
 
 onMounted(() => {
 	if (canvas.value && previewCanvas.value && gridCanvas.value) {
-		initCanvas(gridCanvas.value as HTMLCanvasElement, { type: "grid" });
-		initCanvas(canvas.value as HTMLCanvasElement, { type: "main" });
-		initCanvas(previewCanvas.value as HTMLCanvasElement, { type: "preview" });
+		initCanvas(
+			gridCanvas.value as HTMLCanvasElement,
+			canvas.value as HTMLCanvasElement,
+			previewCanvas.value as HTMLCanvasElement,
+		);
+
 		configStore.setToolType(ToolTypeEnum.Pencil);
 	}
 });
@@ -34,9 +37,9 @@ onMounted(() => {
 <template>
   <div class="w-full h-full bg-[#635561] flex items-center justify-center">
     <div class="relative w-[202px] h-[202px]">
+      <canvas ref="gridCanvas" :style="canvasStyle" :class="getCanvasCls(8)" />
       <canvas ref="canvas" :style="canvasStyle" :class="getCanvasCls(9)" />
       <canvas ref="previewCanvas" :style="canvasStyle" :class="getCanvasCls(10)" />
-      <canvas ref="gridCanvas" :style="canvasStyle" :class="getCanvasCls(8)" />
     </div>
   </div>
 </template>

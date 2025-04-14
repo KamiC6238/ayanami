@@ -1,7 +1,7 @@
 import { DEFAULT_HOVERED_PIXEL_COLOR } from "@/constants";
 import type {
+	CanvasMap,
 	CanvasType,
-	InitCanvasConfig,
 	Position,
 	RectConfig,
 	SquareRectConfig,
@@ -9,31 +9,43 @@ import type {
 import { drawGrid, scaleCanvasByDPR } from "@/utils";
 import { defineStore } from "pinia";
 import { type Observable, fromEvent } from "rxjs";
+import { v4 as uuidV4 } from "uuid";
 import { computed, ref } from "vue";
 import { useConfigStore } from "./config";
 
 export const useCanvasStore = defineStore("canvas", () => {
-	const canvas = ref<HTMLCanvasElement | null>(null);
-	const gridCanvas = ref<HTMLCanvasElement | null>(null);
-	const previewCanvas = ref<HTMLCanvasElement | null>(null);
-
-	const mouseDown$ = ref<Observable<MouseEvent>>();
-	const mouseMove$ = ref<Observable<MouseEvent>>();
-	const mouseUp$ = ref<Observable<MouseEvent>>();
-	const mouseLeave$ = ref<Observable<MouseEvent>>();
+	const tabs = ref<Record<string, CanvasMap>>({});
+	const currentTabId = ref("");
 	const globalMouseUp$ = ref<Observable<MouseEvent>>(
 		fromEvent<MouseEvent>(document, "mouseup"),
 	);
 
 	const configStore = useConfigStore();
 
-	const canvasMap = computed<Record<CanvasType, HTMLCanvasElement | null>>(
-		() => ({
-			main: canvas.value,
-			grid: gridCanvas.value,
-			preview: previewCanvas.value,
-		}),
-	);
+	const canvasMap = computed(() => {
+		const _ = tabs.value[currentTabId.value];
+
+		return {
+			main: _.main,
+			grid: _.grid,
+			preview: _.preview,
+		};
+	});
+
+	const mouse$ = computed(() => {
+		const _ = tabs.value[currentTabId.value];
+
+		return {
+			mouseDown$: _?.mouseDown$ ?? null,
+			mouseMove$: _?.mouseMove$ ?? null,
+			mouseUp$: _?.mouseUp$ ?? null,
+			mouseLeave$: _?.mouseLeave$ ?? null,
+		};
+	});
+
+	const setTabId = (tabId: string) => {
+		currentTabId.value = tabId;
+	};
 
 	const getCanvas = (canvasType: CanvasType) => {
 		return canvasMap.value[canvasType];
@@ -43,32 +55,45 @@ export const useCanvasStore = defineStore("canvas", () => {
 		return getCanvas(canvasType)?.getContext("2d");
 	};
 
-	const initCanvas = (_canvas: HTMLCanvasElement, config: InitCanvasConfig) => {
-		switch (config.type) {
-			case "main":
-				canvas.value = _canvas;
-				break;
-			case "preview":
-				previewCanvas.value = _canvas;
-				initCanvasMouse$(_canvas);
-				break;
-			case "grid":
-				gridCanvas.value = _canvas;
-				break;
+	const initCanvas = (
+		gridCanvas: HTMLCanvasElement,
+		mainCanvas: HTMLCanvasElement,
+		previewCanvas: HTMLCanvasElement,
+	) => {
+		const tabId = uuidV4();
+		setTabId(tabId);
+
+		if (!tabs.value[tabId]) {
+			tabs.value[tabId] = {
+				main: mainCanvas,
+				preview: previewCanvas,
+				grid: gridCanvas,
+				mouseDown$: null,
+				mouseMove$: null,
+				mouseUp$: null,
+				mouseLeave$: null,
+			};
 		}
 
-		scaleCanvasByDPR(_canvas);
+		initCanvasMouse$(previewCanvas);
 
-		if (config.type === "grid") {
-			drawGrid(_canvas);
-		}
+		scaleCanvasByDPR(gridCanvas);
+		scaleCanvasByDPR(mainCanvas);
+		scaleCanvasByDPR(previewCanvas);
+
+		drawGrid(gridCanvas);
 	};
 
 	const initCanvasMouse$ = (canvas: HTMLCanvasElement) => {
-		mouseDown$.value = fromEvent<MouseEvent>(canvas, "mousedown");
-		mouseMove$.value = fromEvent<MouseEvent>(canvas, "mousemove");
-		mouseUp$.value = fromEvent<MouseEvent>(canvas, "mouseup");
-		mouseLeave$.value = fromEvent<MouseEvent>(canvas, "mouseleave");
+		if (!currentTabId.value) return;
+
+		tabs.value[currentTabId.value] = {
+			...tabs.value[currentTabId.value],
+			mouseDown$: fromEvent<MouseEvent>(canvas, "mousedown"),
+			mouseMove$: fromEvent<MouseEvent>(canvas, "mousemove"),
+			mouseUp$: fromEvent<MouseEvent>(canvas, "mouseup"),
+			mouseLeave$: fromEvent<MouseEvent>(canvas, "mouseleave"),
+		};
 	};
 
 	const strokeRect = (config: SquareRectConfig) => {
@@ -142,11 +167,10 @@ export const useCanvasStore = defineStore("canvas", () => {
 		fillHoverRect,
 		clearHoverRect,
 		clearAllPixels,
-
-		mouseDown$,
-		mouseMove$,
-		mouseUp$,
-		mouseLeave$,
 		globalMouseUp$,
+		mouse$,
+		tabs,
+		currentTabId,
+		setTabId,
 	};
 });

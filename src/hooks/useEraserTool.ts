@@ -15,8 +15,7 @@ export function useEraserTool() {
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configTool);
-	const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$ } =
-		storeToRefs(canvasStore);
+	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
 		if (type === ToolTypeEnum.Eraser) {
@@ -29,23 +28,20 @@ export function useEraserTool() {
 	const disposeEraser = () => erase$.value?.unsubscribe();
 
 	const initEraser = () => {
-		if (
-			!mouseDown$.value ||
-			!mouseMove$.value ||
-			!mouseUp$.value ||
-			!mouseLeave$.value
-		) {
+		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;
+
+		if (!mouseDown$ || !mouseMove$ || !mouseUp$ || !mouseLeave$) {
 			return;
 		}
 
 		erase$.value = merge(
-			mouseDown$.value.pipe(
+			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
 					isErasing.value = true;
 					erasePixel(event);
 				}),
 			),
-			mouseMove$.value.pipe(
+			mouseMove$.pipe(
 				tap((event: MouseEvent) => {
 					if (isErasing.value) {
 						erasePixel(event);
@@ -53,12 +49,12 @@ export function useEraserTool() {
 					drawHoverPixel(event);
 				}),
 			),
-			mouseUp$.value.pipe(
+			mouseUp$.pipe(
 				tap(() => {
 					isErasing.value = false;
 				}),
 			),
-			mouseLeave$.value.pipe(tap(() => setHoveredPixel(null))),
+			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(
 				tap(() => {
 					isErasing.value = false;

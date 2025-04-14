@@ -15,8 +15,7 @@ export function usePencilTool() {
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configTool);
-	const { mouseDown$, mouseLeave$, mouseMove$, mouseUp$, globalMouseUp$ } =
-		storeToRefs(canvasStore);
+	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
 		if (type === ToolTypeEnum.Pencil) {
@@ -29,23 +28,20 @@ export function usePencilTool() {
 	const disposePencil = () => draw$.value?.unsubscribe();
 
 	const initPencil = () => {
-		if (
-			!mouseDown$.value ||
-			!mouseMove$.value ||
-			!mouseUp$.value ||
-			!mouseLeave$.value
-		) {
+		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;
+
+		if (!mouseDown$ || !mouseMove$ || !mouseUp$ || !mouseLeave$) {
 			return;
 		}
 
 		draw$.value = merge(
-			mouseDown$.value.pipe(
+			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
 					isDrawing.value = true;
 					drawPixel(event);
 				}),
 			),
-			mouseMove$.value.pipe(
+			mouseMove$.pipe(
 				tap((event: MouseEvent) => {
 					if (isDrawing.value) {
 						drawPixel(event);
@@ -54,12 +50,12 @@ export function usePencilTool() {
 					}
 				}),
 			),
-			mouseUp$.value.pipe(
+			mouseUp$.pipe(
 				tap(() => {
 					isDrawing.value = false;
 				}),
 			),
-			mouseLeave$.value.pipe(tap(() => setHoveredPixel(null))),
+			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(
 				tap(() => {
 					isDrawing.value = false;

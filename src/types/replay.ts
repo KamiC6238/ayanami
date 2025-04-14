@@ -1,41 +1,41 @@
 import type { Position } from "./common";
 import type { CircleTypeEnum, ToolTypeEnum } from "./config";
 
-export interface ReplayCommonConfig {
+export interface RecordCommonConfig {
 	type: ToolTypeEnum;
 	color: string;
 	size: number;
 }
 
-export type ReplayPencil = ReplayCommonConfig & {
+export type PencilRecord = RecordCommonConfig & {
 	pos: Position;
 };
 
-export interface ReplayEraser {
+export interface EraserRecord {
 	type: ToolTypeEnum;
 	pos: Position;
 	size: number;
 }
 
-export type ReplayLine = ReplayCommonConfig & {
+export type LineRecord = RecordCommonConfig & {
 	from: Position;
 	to: Position;
 };
 
-export type ReplaySquare = ReplayCommonConfig & {
+export type SquareRecord = RecordCommonConfig & {
 	from: Position;
 	to: Position;
 };
 
-export type ReplayCircle = ReplayCommonConfig & {
+export type CircleRecord = RecordCommonConfig & {
 	subType: CircleTypeEnum;
 	center: Position;
 	radius: Position;
 };
 
-export type ReplayConfig =
-	| ReplayPencil
-	| ReplayEraser
-	| ReplayLine
-	| ReplaySquare
-	| ReplayCircle;
+export type RecordConfig =
+	| PencilRecord
+	| EraserRecord
+	| LineRecord
+	| SquareRecord
+	| CircleRecord;

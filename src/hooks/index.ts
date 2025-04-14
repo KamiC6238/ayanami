@@ -3,3 +3,4 @@ export * from "./useEraserTool";
 export * from "./useLineTool";
 export * from "./useSquareTool";
 export * from "./useCircleTool";
+export * from "./useRecord";

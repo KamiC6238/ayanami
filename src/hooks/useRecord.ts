@@ -1,13 +1,13 @@
 import { useCanvasStore, useColorPickerStore, useConfigStore } from "@/store";
 import {
-	type ReplayCommonConfig,
-	type ReplayConfig,
+	type RecordCommonConfig,
+	type RecordConfig,
 	ToolTypeEnum,
 } from "@/types";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
-export function useReplayer() {
+export function useRecord() {
 	const configStore = useConfigStore();
 	const canvasStore = useCanvasStore();
 	const colorPickerStore = useColorPickerStore();
@@ -15,13 +15,13 @@ export function useReplayer() {
 	const { pixelColor, pixelSize, toolType } = storeToRefs(configStore);
 	const { pickedColorHex } = storeToRefs(colorPickerStore);
 
-	const replayCommonOperation = computed<ReplayCommonConfig>(() => ({
+	const commonRecordConfig = computed<RecordCommonConfig>(() => ({
 		type: toolType.value,
 		color: pickedColorHex.value,
 		size: pixelSize.value,
 	}));
 
-	const record = (toolType: ToolTypeEnum, config: ReplayConfig) => {
+	const record = (toolType: ToolTypeEnum, config: RecordConfig) => {
 		switch (toolType) {
 			case ToolTypeEnum.Pencil:
 				break;

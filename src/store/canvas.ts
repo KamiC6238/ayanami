@@ -68,32 +68,18 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
-				mouseDown$: null,
-				mouseMove$: null,
-				mouseUp$: null,
-				mouseLeave$: null,
+				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
+				mouseMove$: fromEvent<MouseEvent>(previewCanvas, "mousemove"),
+				mouseUp$: fromEvent<MouseEvent>(previewCanvas, "mouseup"),
+				mouseLeave$: fromEvent<MouseEvent>(previewCanvas, "mouseleave"),
 			};
 		}
-
-		initCanvasMouse$(previewCanvas);
 
 		scaleCanvasByDPR(gridCanvas);
 		scaleCanvasByDPR(mainCanvas);
 		scaleCanvasByDPR(previewCanvas);
 
 		drawGrid(gridCanvas);
-	};
-
-	const initCanvasMouse$ = (canvas: HTMLCanvasElement) => {
-		if (!currentTabId.value) return;
-
-		tabs.value[currentTabId.value] = {
-			...tabs.value[currentTabId.value],
-			mouseDown$: fromEvent<MouseEvent>(canvas, "mousedown"),
-			mouseMove$: fromEvent<MouseEvent>(canvas, "mousemove"),
-			mouseUp$: fromEvent<MouseEvent>(canvas, "mouseup"),
-			mouseLeave$: fromEvent<MouseEvent>(canvas, "mouseleave"),
-		};
 	};
 
 	const strokeRect = (config: SquareRectConfig) => {

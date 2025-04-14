@@ -39,3 +39,11 @@ export type RecordConfig =
 	| LineRecord
 	| SquareRecord
 	| CircleRecord;
+
+export interface RecordMap {
+	[ToolTypeEnum.Pencil]: PencilRecord;
+	[ToolTypeEnum.Eraser]: EraserRecord;
+	[ToolTypeEnum.Line]: LineRecord;
+	[ToolTypeEnum.Square]: SquareRecord;
+	[ToolTypeEnum.Circle]: CircleRecord;
+}

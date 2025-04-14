@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useCanvasStore } from "@/store";
+import { useCanvasStore, useConfigStore } from "@/store";
+import { ToolTypeEnum } from "@/types";
 import { cn } from "@/utils";
 import { type CSSProperties, onMounted, ref, useTemplateRef } from "vue";
 
@@ -16,6 +17,7 @@ const canvasStyle = ref<CSSProperties>({
 });
 
 const { initCanvas } = useCanvasStore();
+const configStore = useConfigStore();
 
 const getCanvasCls = (zIndex: number) =>
 	cn(`absolute top-0 bottom-0 left-0 z-${zIndex}`);
@@ -27,6 +29,10 @@ onMounted(() => {
 			canvas.value as HTMLCanvasElement,
 			previewCanvas.value as HTMLCanvasElement,
 		);
+
+		if (configStore.toolType === ToolTypeEnum.Unknown) {
+			configStore.setToolType(ToolTypeEnum.Pencil);
+		}
 	}
 });
 </script>

@@ -1,4 +1,4 @@
-import { useCanvasStore, useConfigStore } from "@/store";
+import { useCanvasStore, useConfigStore, useRecordsStore } from "@/store";
 import { ToolTypeEnum } from "@/types";
 import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
@@ -10,6 +10,7 @@ export function usePencilTool() {
 	const isDrawing = ref(false);
 	const draw$ = ref<Subscription>();
 
+	const recrodStore = useRecordsStore();
 	const configTool = useConfigStore();
 	const canvasStore = useCanvasStore();
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
@@ -68,10 +69,13 @@ export function usePencilTool() {
 		const canvas = canvasStore.getCanvas("preview");
 
 		if (canvas) {
+			const position = getPixelPosition(canvas, event);
+
 			canvasStore.fillRect({
-				position: getPixelPosition(canvas, event),
+				position,
 				canvasType: "main",
 			});
+			recrodStore.setRecord({ position });
 		}
 	};
 }

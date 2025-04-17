@@ -1,41 +1,23 @@
-import type { Position } from "./common";
-import type { CircleTypeEnum, ToolTypeEnum } from "./config";
+import type { ToolTypeEnum } from "./config";
 
-export interface RecordCommonConfig {
-	type: ToolTypeEnum;
-	color: string;
-	size: number;
+type PencilRecords = [
+	ToolTypeEnum,
+	/** pixel color */
+	string,
+	/** pixel size */
+	number,
+	Array<
+		[
+			/** x */
+			number,
+			/** y */
+			number,
+			/** draw counts at point(x, y) */
+			number,
+		]
+	>,
+];
+
+export interface Records {
+	[tabId: string]: PencilRecords[];
 }
-
-export type PencilRecord = RecordCommonConfig & {
-	pos: Position;
-};
-
-export interface EraserRecord {
-	type: ToolTypeEnum;
-	pos: Position;
-	size: number;
-}
-
-export type LineRecord = RecordCommonConfig & {
-	from: Position;
-	to: Position;
-};
-
-export type SquareRecord = RecordCommonConfig & {
-	from: Position;
-	to: Position;
-};
-
-export type CircleRecord = RecordCommonConfig & {
-	subType: CircleTypeEnum;
-	center: Position;
-	radius: Position;
-};
-
-export type RecordConfig =
-	| PencilRecord
-	| EraserRecord
-	| LineRecord
-	| SquareRecord
-	| CircleRecord;

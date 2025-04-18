@@ -1,6 +1,6 @@
 import type { ToolTypeEnum } from "./config";
 
-type PencilRecords = [
+export type PencilRecord = [
 	ToolTypeEnum,
 	/** pixel color */
 	string,
@@ -18,6 +18,8 @@ type PencilRecords = [
 	>,
 ];
 
+export type Record = PencilRecord;
+
 export interface Records {
-	[tabId: string]: PencilRecords[];
+	[tabId: string]: Record[];
 }

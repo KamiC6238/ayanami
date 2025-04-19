@@ -44,3 +44,53 @@ export const calculateMousePosition = (e: MouseEvent, el: HTMLElement) => {
 		y: Math.round(y),
 	};
 };
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export const roughSizeOfObject = (object: any) => {
+	const seen = new WeakSet();
+
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const sizeOf = (obj: any) => {
+		if (obj === null) return 0;
+
+		const objType = typeof obj;
+
+		if (objType === "boolean") return 4;
+		if (objType === "number") return 8;
+		if (objType === "string") return (obj as string).length * 2;
+		if (objType === "symbol") return 0;
+		if (objType === "function") return 0;
+		if (objType === "undefined") return 0;
+
+		if (seen.has(obj)) return 0;
+		seen.add(obj);
+
+		let bytes = 0;
+
+		if (Array.isArray(obj)) {
+			for (let i = 0; i < obj.length; i++) {
+				bytes += sizeOf(obj[i]);
+			}
+		} else if (objType === "object") {
+			for (const key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) {
+					bytes += sizeOf(key);
+					bytes += sizeOf(obj[key]);
+				}
+			}
+		}
+
+		return bytes;
+	};
+
+	const formatSize = (bytes: number) => {
+		if (bytes < 1024) return `${bytes} B`;
+		if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KB`;
+		if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+		return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
+	};
+
+	return formatSize(sizeOf(object));
+};
+
+console.log(roughSizeOfObject);

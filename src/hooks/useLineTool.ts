@@ -101,7 +101,7 @@ export function useLineTool() {
 			return;
 		}
 
-		const worker = canvasStore.getWorker();
+		const worker = canvasStore.getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({

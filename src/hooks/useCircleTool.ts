@@ -108,7 +108,7 @@ export function useCircleTool() {
 			return;
 		}
 
-		const worker = canvasStore.getWorker();
+		const worker = canvasStore.getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({

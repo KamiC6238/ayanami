@@ -48,8 +48,8 @@ export const useCanvasStore = defineStore("canvas", () => {
 		currentTabId.value = tabId;
 	};
 
-	const getWorker = () => {
-		return tabs.value[currentTabId.value].worker;
+	const getRenderWorker = () => {
+		return tabs.value[currentTabId.value].renderWorker;
 	};
 
 	const getCanvas = (canvasType: CanvasType) => {
@@ -94,7 +94,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
-				worker: initOffScreenCanvas([mainCanvas, previewCanvas]),
+				renderWorker: initOffScreenCanvas([mainCanvas, previewCanvas]),
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
 				mouseMove$: fromEvent<MouseEvent>(previewCanvas, "mousemove"),
 				mouseUp$: fromEvent<MouseEvent>(previewCanvas, "mouseup"),
@@ -104,7 +104,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const strokeRect = (config: SquareRectConfig) => {
-		const worker = getWorker();
+		const worker = getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({
@@ -120,7 +120,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const fillRect = (config: RectConfig) => {
-		const worker = getWorker();
+		const worker = getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({
@@ -135,7 +135,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const clearRect = (config: RectConfig) => {
-		const worker = getWorker();
+		const worker = getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({
@@ -149,7 +149,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const fillHoverRect = (position: Position) => {
-		const worker = getWorker();
+		const worker = getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({
@@ -164,7 +164,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const clearHoverRect = (position: Position) => {
-		const worker = getWorker();
+		const worker = getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({
@@ -178,7 +178,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const clearAllPixels = (canvasType: CanvasType) => {
-		const worker = getWorker();
+		const worker = getRenderWorker();
 		if (!worker) return;
 
 		worker.postMessage({
@@ -190,7 +190,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	return {
-		getWorker,
+		getRenderWorker,
 		getCanvas,
 		initCanvas,
 		strokeRect,

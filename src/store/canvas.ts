@@ -56,11 +56,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 		return canvasMap.value[canvasType];
 	};
 
-	/** @deprecated */
-	const getCanvasContext = (canvasType: CanvasType) => {
-		return getCanvas(canvasType)?.getContext("2d");
-	};
-
 	const initOffScreenCanvas = (canvasList: HTMLCanvasElement[]) => {
 		const worker = new OffscreenCanvasWorker();
 		const offscreens = canvasList.map((canvas) =>
@@ -197,7 +192,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 	return {
 		getWorker,
 		getCanvas,
-		getCanvasContext,
 		initCanvas,
 		strokeRect,
 		fillRect,

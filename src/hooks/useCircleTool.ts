@@ -97,9 +97,6 @@ export function useCircleTool() {
 	};
 
 	const drawPixel = (x: number, y: number, canvasType: CanvasType) => {
-		const context = canvasStore.getCanvasContext(canvasType);
-		if (!context) return;
-
 		canvasStore.fillRect({
 			position: {
 				x: x * GRID_SIZE,

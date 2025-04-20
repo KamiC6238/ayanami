@@ -162,10 +162,6 @@ const drawBresenhamLine = (payload: LineMessagePayload) => {
 		clearAllPixels({ canvasType });
 	}
 
-	if (!lineStartPosition || !lineEndPosition) {
-		return;
-	}
-
 	let { startX, startY, endX, endY } = getAlignedStartAndEndPosition(
 		lineStartPosition,
 		lineEndPosition,

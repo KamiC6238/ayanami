@@ -79,6 +79,8 @@ export function useLineTool() {
 	const drawLineEnd = (event: MouseEvent) => {
 		const canvas = canvasStore.getCanvas("preview");
 
+		if (!lineStartPosition.value) return;
+
 		if (canvas) {
 			const newLineEndPosition = getPixelPosition(canvas, event);
 
@@ -95,6 +97,10 @@ export function useLineTool() {
 	};
 
 	const drawBresenhamLine = (canvasType: CanvasType) => {
+		if (!lineStartPosition.value || !lineEndPosition.value) {
+			return;
+		}
+
 		const worker = canvasStore.getWorker();
 		if (!worker) return;
 

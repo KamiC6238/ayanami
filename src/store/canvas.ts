@@ -56,6 +56,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		return canvasMap.value[canvasType];
 	};
 
+	/** @deprecated */
 	const getCanvasContext = (canvasType: CanvasType) => {
 		return getCanvas(canvasType)?.getContext("2d");
 	};

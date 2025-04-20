@@ -89,14 +89,8 @@ export const hslToRgb = (hsl: HSL) => {
 	};
 };
 
-export const makeRGBA = (rgb: RGBA) => `
-  rgba(
-    ${rgb.r},
-    ${rgb.g},
-    ${rgb.b},
-    ${rgb?.a ?? 1}
-  )
-`;
+export const makeRGBA = (rgb: RGBA) =>
+	`rgba(${rgb.r},${rgb.g},${rgb.b},${rgb?.a ?? 1})`;
 
 export const drawHSLPalette = (ctx: CanvasRenderingContext2D, hue: number) => {
 	const draw = (direction: "row" | "column") => {

@@ -92,5 +92,3 @@ export const roughSizeOfObject = (object: any) => {
 
 	return formatSize(sizeOf(object));
 };
-
-console.log(roughSizeOfObject);

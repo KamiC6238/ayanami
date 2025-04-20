@@ -46,7 +46,7 @@ export function useHoverPixel() {
 		}
 
 		if (!position && hoveredPixel.value) {
-			canvasStore.clearHoverRect(hoveredPixel.value);
+			canvasStore.clearHoverRect({ ...hoveredPixel.value });
 			hoveredPixel.value = null;
 		}
 	};

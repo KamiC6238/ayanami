@@ -4,3 +4,4 @@ export * from "./canvas";
 export * from "./colorPicker";
 export * from "./common";
 export * from "./record";
+export * from "./offscreenCanvas";

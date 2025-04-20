@@ -78,14 +78,21 @@ export function useSquareTool() {
 	};
 
 	const drawSquareEnd = (event: MouseEvent) => {
-		const context = canvasStore.getCanvasContext("preview");
+		const canvas = canvasStore.getCanvas("preview");
 
 		if (!squareStartPosition.value) return;
 
-		if (context) {
-			canvasStore.clearAllPixels("preview");
-			squareEndPosition.value = getPixelPosition(context.canvas, event);
+		if (canvas) {
+			const newSqureEndPosition = getPixelPosition(canvas, event);
 
+			if (
+				newSqureEndPosition.x === squareEndPosition.value?.x &&
+				newSqureEndPosition.y === squareEndPosition.value?.y
+			) {
+				return;
+			}
+
+			squareEndPosition.value = newSqureEndPosition;
 			drawSquare("preview");
 		}
 	};
@@ -97,14 +104,14 @@ export function useSquareTool() {
 
 		if (squareStartPosition.value.x === squareEndPosition.value.x) {
 			canvasStore.fillRect({
-				position: squareStartPosition.value,
+				position: { ...squareStartPosition.value },
 				canvasType,
 			});
 		} else {
 			canvasStore.strokeRect({
-				position: squareStartPosition.value,
+				position: { ...squareStartPosition.value },
 				canvasType,
-				endPosition: squareEndPosition.value,
+				endPosition: { ...squareEndPosition.value },
 			});
 		}
 	};

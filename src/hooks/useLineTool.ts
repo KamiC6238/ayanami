@@ -6,27 +6,6 @@ import { type Subscription, merge, tap, throttleTime } from "rxjs";
 import { ref, watch } from "vue";
 import { useHoverPixel } from "./useHover";
 
-const getAlignedStartAndEndPosition = (
-	lineStartPosition: Position,
-	lineEndPosition: Position,
-	pixelSize: number,
-) => {
-	let { x: startX, y: startY } = lineStartPosition;
-	let { x: endX, y: endY } = lineEndPosition;
-
-	startX = Math.floor(startX / pixelSize) * pixelSize;
-	startY = Math.floor(startY / pixelSize) * pixelSize;
-	endX = Math.floor(endX / pixelSize) * pixelSize;
-	endY = Math.floor(endY / pixelSize) * pixelSize;
-
-	return {
-		startX,
-		startY,
-		endX,
-		endY,
-	};
-};
-
 export function useLineTool() {
 	const isDrawingLine = ref(false);
 	const lineStartPosition = ref<Position | null>(null);
@@ -37,7 +16,7 @@ export function useLineTool() {
 	const canvasStore = useCanvasStore();
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
-	const { toolType, pixelSize } = storeToRefs(configStore);
+	const { toolType, pixelSize, pixelColor } = storeToRefs(configStore);
 	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
@@ -82,7 +61,6 @@ export function useLineTool() {
 
 	const onMouseUpHandler = () => {
 		drawBresenhamLine("main");
-		canvasStore.clearAllPixels("preview");
 		isDrawingLine.value = false;
 		lineStartPosition.value = null;
 		lineEndPosition.value = null;
@@ -102,49 +80,33 @@ export function useLineTool() {
 		const canvas = canvasStore.getCanvas("preview");
 
 		if (canvas) {
-			lineEndPosition.value = getPixelPosition(canvas, event);
-			canvasStore.clearAllPixels("preview");
+			const newLineEndPosition = getPixelPosition(canvas, event);
+
+			if (
+				newLineEndPosition.x === lineEndPosition.value?.x &&
+				newLineEndPosition.y === lineEndPosition.value?.y
+			) {
+				return;
+			}
+
+			lineEndPosition.value = newLineEndPosition;
 			drawBresenhamLine("preview");
 		}
 	};
 
 	const drawBresenhamLine = (canvasType: CanvasType) => {
-		if (!lineStartPosition.value || !lineEndPosition.value) {
-			return;
-		}
+		const worker = canvasStore.getWorker();
+		if (!worker) return;
 
-		let { startX, startY, endX, endY } = getAlignedStartAndEndPosition(
-			lineStartPosition.value,
-			lineEndPosition.value,
-			pixelSize.value,
-		);
-
-		const dx = Math.abs(endX - startX);
-		const dy = Math.abs(endY - startY);
-		const sx = startX < endX ? pixelSize.value : -pixelSize.value;
-		const sy = startY < endY ? pixelSize.value : -pixelSize.value;
-		let err = dx - dy;
-
-		while (true) {
-			canvasStore.fillRect({
-				position: { x: startX, y: startY },
+		worker.postMessage({
+			type: "drawBresenhamLine",
+			payload: {
 				canvasType,
-			});
-
-			if (startX === endX && startY === endY) {
-				break;
-			}
-
-			const e2 = err * 2;
-
-			if (e2 > -dy) {
-				err -= dy;
-				startX += sx;
-			}
-			if (e2 < dx) {
-				err += dx;
-				startY += sy;
-			}
-		}
+				lineStartPosition: { ...lineStartPosition.value },
+				lineEndPosition: { ...lineEndPosition.value },
+				pixelSize: pixelSize.value,
+				pixelColor: pixelColor.value,
+			},
+		});
 	};
 }

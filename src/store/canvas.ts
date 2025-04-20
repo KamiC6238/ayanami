@@ -194,6 +194,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	return {
+		getWorker,
 		getCanvas,
 		getCanvasContext,
 		initCanvas,

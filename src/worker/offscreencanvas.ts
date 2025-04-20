@@ -6,9 +6,11 @@ import type {
 	FillHoverRectMessagePayload,
 	FillRectMessagePayload,
 	InitMessagePayload,
+	LineMessagePayload,
 	OffscreenCanvasWorkerMessage,
 	StrokeRectMessagePayload,
 } from "@/types";
+import { getAlignedStartAndEndPosition } from "@/utils";
 
 let mainCanvas: HTMLCanvasElement | null = null;
 let previewCanvas: HTMLCanvasElement | null = null;
@@ -25,6 +27,9 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "fillHoverRect":
 			fillHoverRect(payload as FillHoverRectMessagePayload);
+			break;
+		case "drawBresenhamLine":
+			drawBresenhamLine(payload as LineMessagePayload);
 			break;
 		case "strokeRect":
 			strokeRect(payload as StrokeRectMessagePayload);
@@ -69,6 +74,10 @@ const fillRect = (payload: FillRectMessagePayload) => {
 	const { x, y } = position;
 	context.fillStyle = pixelColor;
 	context.fillRect(x, y, pixelSize, pixelSize);
+
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+	}
 };
 
 const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
@@ -106,6 +115,10 @@ const strokeRect = (payload: StrokeRectMessagePayload) => {
 		endX - startX,
 		endY - startY,
 	);
+
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+	}
 };
 
 const clearRect = (payload: ClearRectMessagePayload) => {
@@ -134,4 +147,62 @@ const clearAllPixels = (payload: ClearAllPixelsMessagePayload) => {
 
 	if (!context) return;
 	context?.clearRect(0, 0, context.canvas.width, context.canvas.height);
+};
+
+const drawBresenhamLine = (payload: LineMessagePayload) => {
+	const {
+		canvasType,
+		lineStartPosition,
+		lineEndPosition,
+		pixelColor,
+		pixelSize,
+	} = payload;
+
+	if (canvasType === "preview") {
+		clearAllPixels({ canvasType });
+	}
+
+	if (!lineStartPosition || !lineEndPosition) {
+		return;
+	}
+
+	let { startX, startY, endX, endY } = getAlignedStartAndEndPosition(
+		lineStartPosition,
+		lineEndPosition,
+		pixelSize,
+	);
+
+	const dx = Math.abs(endX - startX);
+	const dy = Math.abs(endY - startY);
+	const sx = startX < endX ? pixelSize : -pixelSize;
+	const sy = startY < endY ? pixelSize : -pixelSize;
+	let err = dx - dy;
+
+	while (true) {
+		fillRect({
+			position: { x: startX, y: startY },
+			canvasType,
+			pixelSize,
+			pixelColor,
+		});
+
+		if (startX === endX && startY === endY) {
+			break;
+		}
+
+		const e2 = err * 2;
+
+		if (e2 > -dy) {
+			err -= dy;
+			startX += sx;
+		}
+		if (e2 < dx) {
+			err += dx;
+			startY += sy;
+		}
+	}
+
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+	}
 };

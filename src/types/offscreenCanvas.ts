@@ -5,6 +5,7 @@ export type MessageType =
 	| "init"
 	| "fillRect"
 	| "fillHoverRect"
+	| "drawBresenhamLine"
 	| "strokeRect"
 	| "clearRect"
 	| "clearHoverRect"
@@ -30,6 +31,14 @@ export interface StrokeRectMessagePayload {
 	pixelColor: string;
 	pixelSize: number;
 	endPosition: Position;
+}
+
+export interface LineMessagePayload {
+	canvasType: CanvasType;
+	lineStartPosition: Position;
+	lineEndPosition: Position;
+	pixelSize: number;
+	pixelColor: string;
 }
 
 export interface ClearHoverRectMessagePayload {
@@ -61,6 +70,7 @@ export interface OffscreenCanvasWorkerMessage {
 		| InitMessagePayload
 		| FillRectMessagePayload
 		| FillHoverRectMessagePayload
+		| LineMessagePayload
 		| StrokeRectMessagePayload
 		| ClearRectMessagePayload
 		| ClearHoverRectMessagePayload

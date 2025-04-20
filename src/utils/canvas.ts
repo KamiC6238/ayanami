@@ -1,5 +1,5 @@
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
-// import type { Record } from '@/types';
+import type { Position } from "@/types";
 
 export function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 	const dpr = Math.floor(window.devicePixelRatio) || 1;
@@ -33,6 +33,28 @@ export function drawGrid(canvas: HTMLCanvasElement) {
 		}
 	}
 }
+
+// for line tool
+export const getAlignedStartAndEndPosition = (
+	lineStartPosition: Position,
+	lineEndPosition: Position,
+	pixelSize: number,
+) => {
+	let { x: startX, y: startY } = lineStartPosition;
+	let { x: endX, y: endY } = lineEndPosition;
+
+	startX = Math.floor(startX / pixelSize) * pixelSize;
+	startY = Math.floor(startY / pixelSize) * pixelSize;
+	endX = Math.floor(endX / pixelSize) * pixelSize;
+	endY = Math.floor(endY / pixelSize) * pixelSize;
+
+	return {
+		startX,
+		startY,
+		endX,
+		endY,
+	};
+};
 
 // export function applyRecords(canvas: HTMLCanvasElement, records: Record[]) {
 //   const context = canvas.getContext("2d");

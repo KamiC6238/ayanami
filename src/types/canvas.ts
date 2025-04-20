@@ -18,6 +18,4 @@ export type SquareRectConfig = RectConfig & {
 };
 
 export type CanvasMap = Record<CanvasType, HTMLCanvasElement | null> &
-	Record<CanvasMouseEventType, Observable<MouseEvent> | null> & {
-		renderWorker: Worker | null;
-	};
+	Record<CanvasMouseEventType, Observable<MouseEvent> | null>;

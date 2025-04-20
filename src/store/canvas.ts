@@ -11,17 +11,30 @@ import OffscreenCanvasWorker from "@/worker/offscreencanvas.ts?worker";
 import { defineStore } from "pinia";
 import { type Observable, fromEvent } from "rxjs";
 import { v4 as uuidV4 } from "uuid";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useConfigStore } from "./config";
 
 export const useCanvasStore = defineStore("canvas", () => {
 	const tabs = ref<Record<string, CanvasMap>>({});
+	const renderWorker = ref<Worker | null>(null);
 	const currentTabId = ref("");
 	const globalMouseUp$ = ref<Observable<MouseEvent>>(
 		fromEvent<MouseEvent>(document, "mouseup"),
 	);
 
 	const configStore = useConfigStore();
+
+	watch(
+		() => currentTabId.value,
+		(tabId) => {
+			const { main: mainCanvas, preview: previewCanvas } = tabs.value[tabId];
+
+			if (!mainCanvas || !previewCanvas) return;
+
+			renderWorker.value?.terminate();
+			renderWorker.value = initOffScreenCanvas([mainCanvas, previewCanvas]);
+		},
+	);
 
 	const canvasMap = computed(() => {
 		const _ = tabs.value[currentTabId.value];
@@ -49,7 +62,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const getRenderWorker = () => {
-		return tabs.value[currentTabId.value].renderWorker;
+		return renderWorker.value;
 	};
 
 	const getCanvas = (canvasType: CanvasType) => {
@@ -84,7 +97,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 		previewCanvas: HTMLCanvasElement,
 	) => {
 		const tabId = uuidV4();
-		setTabId(tabId);
 
 		scaleCanvasByDPR(gridCanvas);
 		drawGrid(gridCanvas);
@@ -94,13 +106,14 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
-				renderWorker: initOffScreenCanvas([mainCanvas, previewCanvas]),
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
 				mouseMove$: fromEvent<MouseEvent>(previewCanvas, "mousemove"),
 				mouseUp$: fromEvent<MouseEvent>(previewCanvas, "mouseup"),
 				mouseLeave$: fromEvent<MouseEvent>(previewCanvas, "mouseleave"),
 			};
 		}
+
+		setTabId(tabId);
 	};
 
 	const strokeRect = (config: SquareRectConfig) => {

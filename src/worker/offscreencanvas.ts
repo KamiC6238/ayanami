@@ -1,14 +1,17 @@
-import type {
-	CanvasType,
-	ClearAllPixelsMessagePayload,
-	ClearHoverRectMessagePayload,
-	ClearRectMessagePayload,
-	FillHoverRectMessagePayload,
-	FillRectMessagePayload,
-	InitMessagePayload,
-	LineMessagePayload,
-	OffscreenCanvasWorkerMessage,
-	StrokeRectMessagePayload,
+import { GRID_SIZE } from "@/constants";
+import {
+	type CanvasType,
+	type CircleMessagePayload,
+	CircleTypeEnum,
+	type ClearAllPixelsMessagePayload,
+	type ClearHoverRectMessagePayload,
+	type ClearRectMessagePayload,
+	type FillHoverRectMessagePayload,
+	type FillRectMessagePayload,
+	type InitMessagePayload,
+	type LineMessagePayload,
+	type OffscreenCanvasWorkerMessage,
+	type StrokeRectMessagePayload,
 } from "@/types";
 import { getAlignedStartAndEndPosition } from "@/utils";
 
@@ -30,6 +33,9 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "drawBresenhamLine":
 			drawBresenhamLine(payload as LineMessagePayload);
+			break;
+		case "drawCircle":
+			drawCircle(payload as CircleMessagePayload);
 			break;
 		case "strokeRect":
 			strokeRect(payload as StrokeRectMessagePayload);
@@ -196,6 +202,152 @@ const drawBresenhamLine = (payload: LineMessagePayload) => {
 			err += dx;
 			startY += sy;
 		}
+	}
+
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+	}
+};
+
+const drawCircle = (payload: CircleMessagePayload) => {
+	const {
+		canvasType,
+		circleStartPosition,
+		circleEndPosition,
+		circleType,
+		pixelSize,
+		pixelColor,
+	} = payload;
+
+	if (canvasType === "preview") {
+		clearAllPixels({ canvasType });
+	}
+
+	const { x: endX, y: endY } = circleEndPosition;
+	const { x: startX, y: startY } = circleStartPosition;
+
+	const centerX = Math.floor((endX + startX) / 2);
+	const centerY = Math.floor((endY + startY) / 2);
+
+	const radiusX = Math.floor(Math.abs(endX - startX) / 2);
+	const radiusY = Math.floor(Math.abs(endY - startY) / 2);
+
+	const drawPixel = (x: number, y: number, canvasType: CanvasType) => {
+		fillRect({
+			position: {
+				x: x * GRID_SIZE,
+				y: y * GRID_SIZE,
+			},
+			canvasType,
+			pixelSize,
+			pixelColor,
+		});
+	};
+
+	const drawPerfectCircle = (
+		centerX: number,
+		centerY: number,
+		radius: number,
+		canvasType: CanvasType,
+	) => {
+		const pixelCenterX = Math.floor(centerX / GRID_SIZE);
+		const pixelCenterY = Math.floor(centerY / GRID_SIZE);
+		const pixelRadius = Math.floor(radius / GRID_SIZE);
+
+		let x = 0;
+		let y = pixelRadius;
+		let d = 1 - pixelRadius;
+
+		const plotCirclePoints = (x: number, y: number) => {
+			drawPixel(pixelCenterX + x, pixelCenterY + y, canvasType);
+			drawPixel(pixelCenterX + x, pixelCenterY - y, canvasType);
+			drawPixel(pixelCenterX - x, pixelCenterY + y, canvasType);
+			drawPixel(pixelCenterX - x, pixelCenterY - y, canvasType);
+			drawPixel(pixelCenterX + y, pixelCenterY + x, canvasType);
+			drawPixel(pixelCenterX + y, pixelCenterY - x, canvasType);
+			drawPixel(pixelCenterX - y, pixelCenterY + x, canvasType);
+			drawPixel(pixelCenterX - y, pixelCenterY - x, canvasType);
+		};
+
+		plotCirclePoints(x, y);
+
+		while (y > x) {
+			if (d < 0) {
+				d += 2 * x + 3;
+			} else {
+				d += 2 * (x - y) + 5;
+				y--;
+			}
+			x++;
+			plotCirclePoints(x, y);
+		}
+	};
+
+	const drawEllipseCircle = (
+		centerX: number,
+		centerY: number,
+		radiusX: number,
+		radiusY: number,
+		canvasType: CanvasType,
+	) => {
+		const pixelCenterX = Math.floor(centerX / GRID_SIZE);
+		const pixelCenterY = Math.floor(centerY / GRID_SIZE);
+		const pixelRadiusX = Math.floor(radiusX / GRID_SIZE);
+		const pixelRadiusY = Math.floor(radiusY / GRID_SIZE);
+
+		let x = 0;
+		let y = pixelRadiusY;
+		let d1 =
+			pixelRadiusY * pixelRadiusY -
+			pixelRadiusX * pixelRadiusX * pixelRadiusY +
+			0.25 * pixelRadiusX * pixelRadiusX;
+
+		let dx = 2 * pixelRadiusY * pixelRadiusY * x;
+		let dy = 2 * pixelRadiusX * pixelRadiusX * y;
+
+		const plotEllipsePoints = (x: number, y: number) => {
+			drawPixel(pixelCenterX + x, pixelCenterY + y, canvasType);
+			drawPixel(pixelCenterX - x, pixelCenterY + y, canvasType);
+			drawPixel(pixelCenterX + x, pixelCenterY - y, canvasType);
+			drawPixel(pixelCenterX - x, pixelCenterY - y, canvasType);
+		};
+
+		while (dx < dy) {
+			plotEllipsePoints(x, y);
+			x++;
+			dx += 2 * pixelRadiusY * pixelRadiusY;
+			if (d1 < 0) {
+				d1 += dx + pixelRadiusY * pixelRadiusY;
+			} else {
+				y--;
+				dy -= 2 * pixelRadiusX * pixelRadiusX;
+				d1 += dx - dy + pixelRadiusY * pixelRadiusY;
+			}
+		}
+
+		let d2 =
+			pixelRadiusY * pixelRadiusY * (x + 0.5) * (x + 0.5) +
+			pixelRadiusX * pixelRadiusX * (y - 1) * (y - 1) -
+			pixelRadiusX * pixelRadiusX * pixelRadiusY * pixelRadiusY;
+
+		while (y >= 0) {
+			plotEllipsePoints(x, y);
+			y--;
+			dy -= 2 * pixelRadiusX * pixelRadiusX;
+			if (d2 > 0) {
+				d2 += pixelRadiusX * pixelRadiusX - dy;
+			} else {
+				x++;
+				dx += 2 * pixelRadiusY * pixelRadiusY;
+				d2 += dx - dy + pixelRadiusX * pixelRadiusX;
+			}
+		}
+	};
+
+	if (circleType === CircleTypeEnum.Circle) {
+		drawPerfectCircle(centerX, centerY, radiusX, canvasType);
+	} else {
+		drawEllipseCircle(centerX, centerY, radiusX, radiusY, canvasType);
 	}
 
 	if (canvasType === "main") {

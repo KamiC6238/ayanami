@@ -1,11 +1,13 @@
 import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
+import type { CircleTypeEnum } from "./config";
 
 export type MessageType =
 	| "init"
 	| "fillRect"
 	| "fillHoverRect"
 	| "drawBresenhamLine"
+	| "drawCircle"
 	| "strokeRect"
 	| "clearRect"
 	| "clearHoverRect"
@@ -41,6 +43,15 @@ export interface LineMessagePayload {
 	pixelColor: string;
 }
 
+export interface CircleMessagePayload {
+	canvasType: CanvasType;
+	circleType: CircleTypeEnum;
+	circleStartPosition: Position;
+	circleEndPosition: Position;
+	pixelSize: number;
+	pixelColor: string;
+}
+
 export interface ClearHoverRectMessagePayload {
 	canvasType: CanvasType;
 	position: Position;
@@ -71,6 +82,7 @@ export interface OffscreenCanvasWorkerMessage {
 		| FillRectMessagePayload
 		| FillHoverRectMessagePayload
 		| LineMessagePayload
+		| CircleMessagePayload
 		| StrokeRectMessagePayload
 		| ClearRectMessagePayload
 		| ClearHoverRectMessagePayload

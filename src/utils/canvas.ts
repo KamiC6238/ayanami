@@ -1,4 +1,5 @@
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
+// import type { Record } from '@/types';
 
 export function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 	const dpr = Math.floor(window.devicePixelRatio) || 1;
@@ -32,3 +33,38 @@ export function drawGrid(canvas: HTMLCanvasElement) {
 		}
 	}
 }
+
+// export function applyRecords(canvas: HTMLCanvasElement, records: Record[]) {
+//   const context = canvas.getContext("2d");
+
+//   if (!context) return;
+
+//   context.clearRect(0, 0, canvas.width, canvas.height);
+
+//   let drawIndex = 0;
+//   const drawQueue: { x: number; y: number; pixelSize: number; color: string }[] = [];
+
+//   for (const record of records) {
+//     const [_, color, pixelSize, points] = record;
+
+//     for (const [x, y, drawCounts] of points) {
+//       for (let i = 0; i < drawCounts; i++) {
+//         drawQueue.push({ x, y, pixelSize, color });
+//       }
+//     }
+//   }
+
+//   function drawNext() {
+//     if (!context) return
+//     if (drawIndex >= drawQueue.length) return;
+
+//     const { x, y, pixelSize, color } = drawQueue[drawIndex];
+//     context.fillStyle = color;
+//     context.fillRect(x, y, pixelSize, pixelSize);
+
+//     drawIndex++;
+//     setTimeout(drawNext, 10);
+//   }
+
+//   drawNext();
+// }

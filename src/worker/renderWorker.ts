@@ -15,8 +15,8 @@ import {
 } from "@/types";
 import { getAlignedStartAndEndPosition } from "@/utils";
 
-let mainCanvas: HTMLCanvasElement | null = null;
-let previewCanvas: HTMLCanvasElement | null = null;
+let mainCanvas: OffscreenCanvas | null = null;
+let previewCanvas: OffscreenCanvas | null = null;
 
 self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 	const { type, payload } = e.data;

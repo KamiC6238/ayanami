@@ -72,7 +72,7 @@ export interface InitMessagePayload {
 	dpr: number;
 	clientWidth: number;
 	clientHeight: number;
-	canvasList: HTMLCanvasElement[];
+	canvasList: OffscreenCanvas[];
 }
 
 export interface OffscreenCanvasWorkerMessage {

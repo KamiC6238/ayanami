@@ -22,7 +22,7 @@ const perfectCircle = CircleTypeEnum.Circle;
 const ellipseCircle = CircleTypeEnum.Ellipse;
 
 const configStore = useConfigStore();
-const { clearAllPixels } = useCanvasStore();
+const { clearAllPixels, redo, undo } = useCanvasStore();
 
 useCircleTool();
 usePencilTool();
@@ -56,6 +56,8 @@ const onCircleTypeChange = (e: Event) => {
         <option :value="ellipseCircle">椭圆</option>
       </select>
       <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
+      <button style="margin-bottom: 10px" @click='redo'>redo</button>
+      <button style="margin-bottom: 10px" @click='undo'>undo</button>
     </div>
     <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
       <span>pixel size {{ configStore.pixelSize }}: </span>

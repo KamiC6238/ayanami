@@ -254,7 +254,17 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const redo = () => {
+		console.log("canvas redo");
+	};
+
+	const undo = () => {
+		console.log("canvas undo");
+	};
+
 	return {
+		redo,
+		undo,
 		record,
 		getRenderWorker,
 		getCanvas,

@@ -23,5 +23,11 @@ export type CircleConfig = {
 	circleEndPosition: Position;
 };
 
+export type LineConfig = {
+	canvasType: CanvasType;
+	lineStartPosition: Position;
+	lineEndPosition: Position;
+};
+
 export type CanvasMap = Record<CanvasType, HTMLCanvasElement | null> &
 	Record<CanvasMouseEventType, Observable<MouseEvent> | null>;

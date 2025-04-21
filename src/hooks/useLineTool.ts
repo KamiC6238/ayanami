@@ -101,18 +101,10 @@ export function useLineTool() {
 			return;
 		}
 
-		const worker = canvasStore.getRenderWorker();
-		if (!worker) return;
-
-		worker.postMessage({
-			type: "drawBresenhamLine",
-			payload: {
-				canvasType,
-				lineStartPosition: { ...lineStartPosition.value },
-				lineEndPosition: { ...lineEndPosition.value },
-				pixelSize: pixelSize.value,
-				pixelColor: pixelColor.value,
-			},
+		canvasStore.drawLine({
+			canvasType,
+			lineStartPosition: { ...lineStartPosition.value },
+			lineEndPosition: { ...lineEndPosition.value },
 		});
 	};
 }

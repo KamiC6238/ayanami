@@ -3,6 +3,7 @@ import type {
 	CanvasMap,
 	CanvasType,
 	CircleConfig,
+	LineConfig,
 	Position,
 	RectConfig,
 	SquareRectConfig,
@@ -220,6 +221,22 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const drawLine = (config: LineConfig) => {
+		const worker = getRenderWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "drawBresenhamLine",
+			payload: {
+				canvasType: config.canvasType,
+				lineStartPosition: config.lineStartPosition,
+				lineEndPosition: config.lineEndPosition,
+				pixelSize: configStore.pixelSize,
+				pixelColor: configStore.pixelColor,
+			},
+		});
+	};
+
 	return {
 		getRenderWorker,
 		getCanvas,
@@ -231,6 +248,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		clearHoverRect,
 		clearAllPixels,
 		drawCircle,
+		drawLine,
 		globalMouseUp$,
 		mouse$,
 		tabs,

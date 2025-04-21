@@ -98,9 +98,7 @@ export function useCircleTool() {
 	};
 
 	const drawCircle = (canvasType: CanvasType) => {
-		const worker = canvasStore.getRenderWorker();
-
-		if (!worker || !circleStartPosition.value || !circleEndPosition.value) {
+		if (!circleStartPosition.value || !circleEndPosition.value) {
 			return;
 		}
 

@@ -23,8 +23,8 @@ const ellipseCircle = CircleTypeEnum.Ellipse;
 
 const configStore = useConfigStore();
 const { clearAllPixels } = useCanvasStore();
-const { setCircleType } = useCircleTool();
 
+useCircleTool();
 usePencilTool();
 useEraserTool();
 useLineTool();
@@ -37,7 +37,7 @@ const onPixelSizeChange = (e: Event) => {
 const onCircleTypeChange = (e: Event) => {
 	if (e.target) {
 		const target = e.target as HTMLSelectElement;
-		setCircleType(target.value as CircleTypeEnum);
+		configStore.setCircleType(target.value as CircleTypeEnum);
 	}
 };
 </script>

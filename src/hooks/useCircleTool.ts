@@ -1,10 +1,5 @@
 import { useCanvasStore, useConfigStore } from "@/store";
-import {
-	type CanvasType,
-	CircleTypeEnum,
-	type Position,
-	ToolTypeEnum,
-} from "@/types";
+import { type CanvasType, type Position, ToolTypeEnum } from "@/types";
 import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
 import { type Subscription, merge, tap, throttleTime } from "rxjs";
@@ -16,7 +11,6 @@ export function useCircleTool() {
 	const circleStartPosition = ref<Position | null>();
 	const circleEndPosition = ref<Position | null>();
 	const circle$ = ref<Subscription>();
-	const circleType = ref<CircleTypeEnum>(CircleTypeEnum.Circle);
 
 	const configStore = useConfigStore();
 	const canvasStore = useCanvasStore();
@@ -104,31 +98,16 @@ export function useCircleTool() {
 	};
 
 	const drawCircle = (canvasType: CanvasType) => {
-		if (!circleStartPosition.value || !circleEndPosition.value) {
+		const worker = canvasStore.getRenderWorker();
+
+		if (!worker || !circleStartPosition.value || !circleEndPosition.value) {
 			return;
 		}
 
-		const worker = canvasStore.getRenderWorker();
-		if (!worker) return;
-
-		worker.postMessage({
-			type: "drawCircle",
-			payload: {
-				canvasType,
-				circleStartPosition: { ...circleStartPosition.value },
-				circleEndPosition: { ...circleEndPosition.value },
-				pixelSize: configStore.pixelSize,
-				pixelColor: configStore.pixelColor,
-				circleType: circleType.value,
-			},
+		canvasStore.drawCircle({
+			canvasType,
+			circleStartPosition: { ...circleStartPosition.value },
+			circleEndPosition: { ...circleEndPosition.value },
 		});
-	};
-
-	const setCircleType = (type: CircleTypeEnum) => {
-		circleType.value = type;
-	};
-
-	return {
-		setCircleType,
 	};
 }

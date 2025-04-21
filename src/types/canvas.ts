@@ -17,5 +17,11 @@ export type SquareRectConfig = RectConfig & {
 	endPosition: Position;
 };
 
+export type CircleConfig = {
+	canvasType: CanvasType;
+	circleStartPosition: Position;
+	circleEndPosition: Position;
+};
+
 export type CanvasMap = Record<CanvasType, HTMLCanvasElement | null> &
 	Record<CanvasMouseEventType, Observable<MouseEvent> | null>;

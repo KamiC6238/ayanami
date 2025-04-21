@@ -2,6 +2,7 @@ import { DEFAULT_HOVERED_PIXEL_COLOR } from "@/constants";
 import type {
 	CanvasMap,
 	CanvasType,
+	CircleConfig,
 	Position,
 	RectConfig,
 	SquareRectConfig,
@@ -202,6 +203,23 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const drawCircle = (config: CircleConfig) => {
+		const worker = getRenderWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "drawCircle",
+			payload: {
+				canvasType: config.canvasType,
+				circleStartPosition: config.circleStartPosition,
+				circleEndPosition: config.circleEndPosition,
+				pixelSize: configStore.pixelSize,
+				pixelColor: configStore.pixelColor,
+				circleType: configStore.circleType,
+			},
+		});
+	};
+
 	return {
 		getRenderWorker,
 		getCanvas,
@@ -212,6 +230,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		fillHoverRect,
 		clearHoverRect,
 		clearAllPixels,
+		drawCircle,
 		globalMouseUp$,
 		mouse$,
 		tabs,

@@ -8,8 +8,10 @@ import type {
 	InitMessagePayload,
 	LineMessagePayload,
 	OffscreenCanvasWorkerMessage,
+	RecordMessagePayload,
 	StrokeRectMessagePayload,
 } from "@/types";
+import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
 
 self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
@@ -19,9 +21,12 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "init":
 			renderUtils.initOffScreenCanvas(payload as InitMessagePayload);
 			break;
-		case "fillRect":
-			renderUtils.fillRect(payload as FillRectMessagePayload);
+		case "fillRect": {
+			const _payload = payload as FillRectMessagePayload;
+			renderUtils.fillRect(_payload);
+			recordUtils.updatePointsRecord(_payload);
 			break;
+		}
 		case "fillHoverRect":
 			renderUtils.fillHoverRect(payload as FillHoverRectMessagePayload);
 			break;
@@ -42,6 +47,13 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "clearAllPixels":
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
+			break;
+		case "record":
+			recordUtils.record(payload as RecordMessagePayload);
+			break;
+		case "redo":
+			break;
+		case "undo":
 			break;
 	}
 };

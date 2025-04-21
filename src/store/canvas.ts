@@ -10,7 +10,7 @@ import type {
 } from "@/types";
 import { drawGrid, scaleCanvasByDPR } from "@/utils";
 import RenderWorker from "@/worker/renderWorker?worker";
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import { type Observable, fromEvent } from "rxjs";
 import { v4 as uuidV4 } from "uuid";
 import { computed, ref, watch } from "vue";
@@ -25,6 +25,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	);
 
 	const configStore = useConfigStore();
+	const { toolType, pixelColor, pixelSize } = storeToRefs(configStore);
 
 	watch(
 		() => currentTabId.value,
@@ -143,6 +144,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			payload: {
 				canvasType: config.canvasType,
 				position: config.position,
+				toolType: toolType.value,
 				pixelColor: configStore.pixelColor,
 				pixelSize: configStore.pixelSize,
 			},
@@ -237,7 +239,23 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const record = () => {
+		const worker = getRenderWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "record",
+			payload: {
+				tabId: currentTabId.value,
+				toolType: toolType.value,
+				pixelSize: pixelSize.value,
+				pixelColor: pixelColor.value,
+			},
+		});
+	};
+
 	return {
+		record,
 		getRenderWorker,
 		getCanvas,
 		initCanvas,

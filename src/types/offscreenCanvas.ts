@@ -1,6 +1,6 @@
 import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
-import type { CircleTypeEnum } from "./config";
+import type { CircleTypeEnum, ToolTypeEnum } from "./config";
 
 export type MessageType =
 	| "init"
@@ -11,13 +11,17 @@ export type MessageType =
 	| "strokeRect"
 	| "clearRect"
 	| "clearHoverRect"
-	| "clearAllPixels";
+	| "clearAllPixels"
+	| "record"
+	| "redo"
+	| "undo";
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
 	position: Position;
 	pixelColor: string;
 	pixelSize: number;
+	toolType?: ToolTypeEnum;
 }
 
 export interface FillHoverRectMessagePayload {
@@ -75,6 +79,13 @@ export interface InitMessagePayload {
 	canvasList: OffscreenCanvas[];
 }
 
+export interface RecordMessagePayload {
+	tabId: string;
+	toolType: ToolTypeEnum;
+	pixelSize: number;
+	pixelColor: string;
+}
+
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;
 	payload?:
@@ -86,5 +97,6 @@ export interface OffscreenCanvasWorkerMessage {
 		| StrokeRectMessagePayload
 		| ClearRectMessagePayload
 		| ClearHoverRectMessagePayload
-		| ClearAllPixelsMessagePayload;
+		| ClearAllPixelsMessagePayload
+		| RecordMessagePayload;
 }

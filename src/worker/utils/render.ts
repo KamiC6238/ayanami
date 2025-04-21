@@ -9,9 +9,11 @@ import type {
 	FillRectMessagePayload,
 	InitMessagePayload,
 	LineMessagePayload,
+	Record,
+	RecordStack,
 	StrokeRectMessagePayload,
 } from "@/types";
-import { CircleTypeEnum } from "@/types";
+import { CircleTypeEnum, ToolTypeEnum } from "@/types";
 import { getAlignedStartAndEndPosition } from "@/utils";
 
 let mainCanvas: OffscreenCanvas | null = null;
@@ -317,5 +319,47 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 
 	if (canvasType === "main") {
 		clearAllPixels({ canvasType: "preview" });
+	}
+};
+
+export const redo = (recordStack: RecordStack) => {
+	const record = recordStack.redoStack.pop();
+
+	if (!record) return;
+
+	recordStack.undoStack.push(record);
+	replayRecords([record], "redo");
+};
+
+export const undo = (recordStack: RecordStack) => {
+	const record = recordStack.undoStack.pop();
+
+	if (!record) return;
+
+	recordStack.redoStack.push(record);
+	replayRecords(recordStack.undoStack, "undo");
+};
+
+export const replayRecords = (records: Record[], type: "redo" | "undo") => {
+	if (type === "undo") {
+		clearAllPixels({ canvasType: "main" });
+	}
+
+	for (const record of records) {
+		const [toolType, pixelColor, pixelSize, points] = record;
+
+		switch (toolType) {
+			case ToolTypeEnum.Pencil: {
+				for (const [x, y] of points) {
+					fillRect({
+						position: { x, y },
+						canvasType: "main",
+						pixelSize,
+						pixelColor,
+					});
+				}
+				break;
+			}
+		}
 	}
 };

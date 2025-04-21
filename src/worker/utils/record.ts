@@ -9,7 +9,7 @@ import * as pencilRecordUtils from "./pencilRecord";
 
 const records: Records = {};
 
-export const getRecords = (tabId: string) => {
+export const getUndoAndRedoStack = (tabId: string) => {
 	return records[tabId] ?? [];
 };
 
@@ -26,13 +26,14 @@ export const record = (payload: RecordMessagePayload) => {
 
 	if (!record) return;
 
-	if (records[tabId]) {
-		records[tabId].push(record);
-	} else {
-		records[tabId] = [record];
+	if (!records[tabId]) {
+		records[tabId] = {
+			undoStack: [],
+			redoStack: [],
+		};
 	}
 
-	console.log(records);
+	records[tabId].undoStack.push(record);
 };
 
 export const updatePointsRecord = (payload: FillRectMessagePayload) => {

@@ -86,6 +86,10 @@ export interface RecordMessagePayload {
 	pixelColor: string;
 }
 
+export interface RedoOrUndoMessagePayload {
+	tabId: string;
+}
+
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;
 	payload?:
@@ -98,5 +102,6 @@ export interface OffscreenCanvasWorkerMessage {
 		| ClearRectMessagePayload
 		| ClearHoverRectMessagePayload
 		| ClearAllPixelsMessagePayload
-		| RecordMessagePayload;
+		| RecordMessagePayload
+		| RedoOrUndoMessagePayload;
 }

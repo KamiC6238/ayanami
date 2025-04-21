@@ -9,6 +9,7 @@ import type {
 	LineMessagePayload,
 	OffscreenCanvasWorkerMessage,
 	RecordMessagePayload,
+	RedoOrUndoMessagePayload,
 	StrokeRectMessagePayload,
 } from "@/types";
 import * as recordUtils from "./utils/record";
@@ -51,9 +52,17 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "record":
 			recordUtils.record(payload as RecordMessagePayload);
 			break;
-		case "redo":
+		case "redo": {
+			const _payload = payload as RedoOrUndoMessagePayload;
+			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
+			renderUtils.redo(recordStack);
 			break;
-		case "undo":
+		}
+		case "undo": {
+			const _payload = payload as RedoOrUndoMessagePayload;
+			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
+			renderUtils.undo(recordStack);
 			break;
+		}
 	}
 };

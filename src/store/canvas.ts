@@ -255,11 +255,27 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const redo = () => {
-		console.log("canvas redo");
+		const worker = getRenderWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "redo",
+			payload: {
+				tabId: currentTabId.value,
+			},
+		});
 	};
 
 	const undo = () => {
-		console.log("canvas undo");
+		const worker = getRenderWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "undo",
+			payload: {
+				tabId: currentTabId.value,
+			},
+		});
 	};
 
 	return {

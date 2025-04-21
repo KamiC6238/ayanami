@@ -16,6 +16,11 @@ export type PencilRecord = [
 
 export type Record = PencilRecord;
 
+export type RecordStack = {
+	undoStack: Record[];
+	redoStack: Record[];
+};
+
 export interface Records {
-	[tabId: string]: Record[];
+	[tabId: string]: RecordStack;
 }

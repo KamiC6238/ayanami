@@ -7,7 +7,7 @@ import type {
 	SquareRectConfig,
 } from "@/types";
 import { drawGrid, scaleCanvasByDPR } from "@/utils";
-import OffscreenCanvasWorker from "@/worker/offscreencanvas.ts?worker";
+import RenderWorker from "@/worker/renderWorker?worker";
 import { defineStore } from "pinia";
 import { type Observable, fromEvent } from "rxjs";
 import { v4 as uuidV4 } from "uuid";
@@ -70,7 +70,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 	};
 
 	const initOffScreenCanvas = (canvasList: HTMLCanvasElement[]) => {
-		const worker = new OffscreenCanvasWorker();
+		const worker = new RenderWorker();
 		const offscreens = canvasList.map((canvas) =>
 			canvas.transferControlToOffscreen(),
 		);

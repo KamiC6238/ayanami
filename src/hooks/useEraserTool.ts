@@ -52,6 +52,7 @@ export function useEraserTool() {
 			mouseUp$.pipe(
 				tap(() => {
 					isErasing.value = false;
+					canvasStore.record();
 				}),
 			),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),

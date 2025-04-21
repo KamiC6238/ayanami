@@ -14,7 +14,11 @@ export type PencilRecord = [
 	Array<PencilPointRecord>,
 ];
 
-export type Record = PencilRecord;
+export type EraserPointRecord = [number, number];
+
+export type EraserRecord = [ToolTypeEnum, number, Array<EraserPointRecord>];
+
+export type Record = PencilRecord | EraserRecord;
 
 export type RecordStack = {
 	undoStack: Record[];

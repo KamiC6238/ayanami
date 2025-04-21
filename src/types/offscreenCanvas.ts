@@ -66,6 +66,7 @@ export interface ClearRectMessagePayload {
 	canvasType: CanvasType;
 	position: Position;
 	pixelSize: number;
+	toolType?: ToolTypeEnum;
 }
 
 export interface ClearAllPixelsMessagePayload {
@@ -90,18 +91,20 @@ export interface RedoOrUndoMessagePayload {
 	tabId: string;
 }
 
+export type MessagePayload =
+	| InitMessagePayload
+	| FillRectMessagePayload
+	| FillHoverRectMessagePayload
+	| LineMessagePayload
+	| CircleMessagePayload
+	| StrokeRectMessagePayload
+	| ClearRectMessagePayload
+	| ClearHoverRectMessagePayload
+	| ClearAllPixelsMessagePayload
+	| RecordMessagePayload
+	| RedoOrUndoMessagePayload;
+
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;
-	payload?:
-		| InitMessagePayload
-		| FillRectMessagePayload
-		| FillHoverRectMessagePayload
-		| LineMessagePayload
-		| CircleMessagePayload
-		| StrokeRectMessagePayload
-		| ClearRectMessagePayload
-		| ClearHoverRectMessagePayload
-		| ClearAllPixelsMessagePayload
-		| RecordMessagePayload
-		| RedoOrUndoMessagePayload;
+	payload?: MessagePayload;
 }

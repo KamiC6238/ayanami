@@ -40,9 +40,12 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "strokeRect":
 			renderUtils.strokeRect(payload as StrokeRectMessagePayload);
 			break;
-		case "clearRect":
-			renderUtils.clearRect(payload as ClearRectMessagePayload);
+		case "clearRect": {
+			const _payload = payload as ClearRectMessagePayload;
+			renderUtils.clearRect(_payload);
+			recordUtils.updatePointsRecord(_payload);
 			break;
+		}
 		case "clearHoverRect":
 			renderUtils.clearHoverRect(payload as ClearHoverRectMessagePayload);
 			break;

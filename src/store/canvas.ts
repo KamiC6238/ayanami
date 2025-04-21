@@ -159,6 +159,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "clearRect",
 			payload: {
 				canvasType: config.canvasType,
+				toolType: toolType.value,
 				position: config.position,
 				pixelSize: configStore.pixelSize,
 			},

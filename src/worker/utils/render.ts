@@ -5,10 +5,12 @@ import type {
 	ClearAllPixelsMessagePayload,
 	ClearHoverRectMessagePayload,
 	ClearRectMessagePayload,
+	EraserRecord,
 	FillHoverRectMessagePayload,
 	FillRectMessagePayload,
 	InitMessagePayload,
 	LineMessagePayload,
+	PencilRecord,
 	Record,
 	RecordStack,
 	StrokeRectMessagePayload,
@@ -346,20 +348,42 @@ export const replayRecords = (records: Record[], type: "redo" | "undo") => {
 	}
 
 	for (const record of records) {
-		const [toolType, pixelColor, pixelSize, points] = record;
+		const [toolType] = record;
 
 		switch (toolType) {
 			case ToolTypeEnum.Pencil: {
-				for (const [x, y] of points) {
-					fillRect({
-						position: { x, y },
-						canvasType: "main",
-						pixelSize,
-						pixelColor,
-					});
-				}
+				replayPencilRecord(record as PencilRecord);
+				break;
+			}
+			case ToolTypeEnum.Eraser: {
+				replayEraserRecord(record as EraserRecord);
 				break;
 			}
 		}
+	}
+};
+
+const replayPencilRecord = (record: PencilRecord) => {
+	const [_, pixelColor, pixelSize, points] = record;
+	for (const [x, y, drawCounts] of points) {
+		for (let i = 0; i < drawCounts; i++) {
+			fillRect({
+				position: { x, y },
+				canvasType: "main",
+				pixelSize,
+				pixelColor,
+			});
+		}
+	}
+};
+
+const replayEraserRecord = (record: EraserRecord) => {
+	const [_, pixelSize, points] = record;
+	for (const [x, y] of points) {
+		clearRect({
+			position: { x, y },
+			canvasType: "main",
+			pixelSize,
+		});
 	}
 };

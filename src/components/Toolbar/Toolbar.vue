@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import RedoIcon from "@/assets/icons/redo.svg";
+import UndoIcon from "@/assets/icons/undo.svg";
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import {
 	useCircleTool,
@@ -7,8 +9,7 @@ import {
 	usePencilTool,
 	useSquareTool,
 } from "@/hooks";
-import { useConfigStore } from "@/store";
-import { useCanvasStore } from "@/store";
+import { useCanvasStore, useConfigStore } from "@/store";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
 
 const tools = [
@@ -46,20 +47,18 @@ const onCircleTypeChange = (e: Event) => {
     <div class='flex flex-col w-full'>
       <button
         v-for="toolType of tools"
-        style='width: 100px; margin-bottom: 10px;'
+        style='margin-bottom: 10px;'
         @click="() => configStore.setToolType(toolType)"
       >
-        {{ toolType }}
+        {{ toolType.slice(0, 1) }}
       </button>
-      <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
+      <!-- <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
         <option :value="perfectCircle">圆形</option>
         <option :value="ellipseCircle">椭圆</option>
       </select>
-      <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button>
-      <button style="margin-bottom: 10px" @click='redo'>redo</button>
-      <button style="margin-bottom: 10px" @click='undo'>undo</button>
+      <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button> -->
     </div>
-    <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
+    <!-- <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
       <span>pixel size {{ configStore.pixelSize }}: </span>
       <input
         type="range"
@@ -70,6 +69,8 @@ const onCircleTypeChange = (e: Event) => {
         :step="DEFAULT_PIXEL_SIZE"
         @input="onPixelSizeChange"
       />
-    </div>
+    </div> -->
+    <UndoIcon class='w-6 h-6' @click='undo' />
+    <RedoIcon class='w-6 h-6' @click='redo' />
   </div>
 </template>

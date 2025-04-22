@@ -30,6 +30,7 @@ A free online pixel art drawing tool.
 - Vue3.5
 - Pinia
 - TypeScript
+- tailwindcss
 - Web Worker
 - OffscreenCanvas
 - Vite

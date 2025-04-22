@@ -131,6 +131,8 @@ export const record = (payload: RecordMessagePayload) => {
 		};
 	}
 
+	// Redo stack represents a possible future. If a new record occurs, that future is no longer valid — like a time paradox.
+	records[tabId].redoStack.length = 0;
 	records[tabId].undoStack.push(record);
 };
 

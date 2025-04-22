@@ -10,6 +10,7 @@ import type {
 	FillRectMessagePayload,
 	InitMessagePayload,
 	LineMessagePayload,
+	LineRecord,
 	PencilRecord,
 	Record,
 	RecordStack,
@@ -359,6 +360,9 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 				replayEraserRecord(record as EraserRecord);
 				break;
 			}
+			case ToolTypeEnum.Line:
+				replayLineRecord(record as LineRecord);
+				break;
 		}
 	}
 };
@@ -386,4 +390,19 @@ const replayEraserRecord = (record: EraserRecord) => {
 			pixelSize,
 		});
 	}
+};
+
+const replayLineRecord = (record: LineRecord) => {
+	const [_, pixelColor, pixelSize, points] = record;
+	const [startPoint, endPoint] = points;
+	const [startX, startY] = startPoint;
+	const [endX, endY] = endPoint;
+
+	drawBresenhamLine({
+		canvasType: "main",
+		lineStartPosition: { x: startX, y: startY },
+		lineEndPosition: { x: endX, y: endY },
+		pixelColor,
+		pixelSize,
+	});
 };

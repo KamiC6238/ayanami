@@ -53,7 +53,19 @@ export function useLineTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(tap(() => tap(() => onMouseUpHandler()))),
+			mouseUp$.pipe(
+				tap(() => {
+					canvasStore.record({
+						lineStartPosition: lineStartPosition.value
+							? { ...lineStartPosition.value }
+							: null,
+						lineEndPosition: lineEndPosition.value
+							? { ...lineEndPosition.value }
+							: null,
+					});
+					onMouseUpHandler();
+				}),
+			),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();

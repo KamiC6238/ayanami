@@ -3,6 +3,7 @@ import type {
 	EraserPointRecord,
 	EraserRecord,
 	FillRectMessagePayload,
+	LineRecord,
 	PencilPointRecord,
 	PencilRecord,
 	Position,
@@ -21,8 +22,14 @@ const clearRecordPoints = () => {
 	eraserRecordPoints.length = 0;
 };
 
-const makePencilRecord = (payload: RecordMessagePayload): PencilRecord => {
+const makePencilRecord = (
+	payload: RecordMessagePayload,
+): PencilRecord | null => {
 	const { toolType, pixelColor, pixelSize } = payload;
+
+	if (!pencilRecordPoints.length) {
+		return null;
+	}
 
 	return [toolType, pixelColor, pixelSize, [...pencilRecordPoints]];
 };
@@ -45,8 +52,14 @@ const updatePencilPointsRecord = (position: Position) => {
 	}
 };
 
-const makeEraserRecord = (payload: RecordMessagePayload): EraserRecord => {
+const makeEraserRecord = (
+	payload: RecordMessagePayload,
+): EraserRecord | null => {
 	const { toolType, pixelSize } = payload;
+
+	if (!eraserRecordPoints.length) {
+		return null;
+	}
 
 	return [toolType, pixelSize, [...eraserRecordPoints]];
 };
@@ -69,6 +82,24 @@ const updateEraserPointsRecord = (position: Position) => {
 	}
 };
 
+const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
+	const { lineStartPosition, lineEndPosition, pixelColor, pixelSize } = payload;
+
+	if (!lineStartPosition || !lineEndPosition) {
+		return null;
+	}
+
+	return [
+		ToolTypeEnum.Line,
+		pixelColor,
+		pixelSize,
+		[
+			[lineStartPosition.x, lineStartPosition.y],
+			[lineEndPosition.x, lineEndPosition.y],
+		],
+	];
+};
+
 export const getUndoAndRedoStack = (tabId: string) => {
 	return records[tabId] ?? [];
 };
@@ -83,6 +114,9 @@ export const record = (payload: RecordMessagePayload) => {
 			break;
 		case ToolTypeEnum.Eraser:
 			record = makeEraserRecord(payload);
+			break;
+		case ToolTypeEnum.Line:
+			record = makeLineRecord(payload);
 			break;
 	}
 

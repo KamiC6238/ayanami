@@ -240,7 +240,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
-	const record = () => {
+	const record = (extra = {}) => {
 		const worker = getRenderWorker();
 		if (!worker) return;
 
@@ -251,6 +251,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 				toolType: toolType.value,
 				pixelSize: pixelSize.value,
 				pixelColor: pixelColor.value,
+				...extra,
 			},
 		});
 	};

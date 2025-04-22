@@ -85,6 +85,8 @@ export interface RecordMessagePayload {
 	toolType: ToolTypeEnum;
 	pixelSize: number;
 	pixelColor: string;
+	lineStartPosition?: Position;
+	lineEndPosition?: Position;
 }
 
 export interface RedoOrUndoMessagePayload {

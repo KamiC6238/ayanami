@@ -30,7 +30,10 @@ export type EraserRecord = [ToolTypeEnum, number, Array<EraserPointRecord>];
 export type LinePointRecord = [[number, number], [number, number]];
 export type LineRecord = [ToolTypeEnum, string, number, LinePointRecord];
 
-export type Record = PencilRecord | EraserRecord | LineRecord;
+export type SquarePointRecord = [[number, number], [number, number]];
+export type SquareRecord = [ToolTypeEnum, string, number, SquarePointRecord];
+
+export type Record = PencilRecord | EraserRecord | LineRecord | SquareRecord;
 
 export type RecordStack = {
 	undoStack: Record[];

@@ -53,7 +53,19 @@ export function useSquareTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(tap(() => onMouseUpHandler())),
+			mouseUp$.pipe(
+				tap(() => {
+					canvasStore.record({
+						squareStartPosition: squareStartPosition.value
+							? { ...squareStartPosition.value }
+							: null,
+						squareEndPosition: squareEndPosition.value
+							? { ...squareEndPosition.value }
+							: null,
+					});
+					onMouseUpHandler();
+				}),
+			),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();

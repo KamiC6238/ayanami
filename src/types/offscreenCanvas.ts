@@ -87,6 +87,8 @@ export interface RecordMessagePayload {
 	pixelColor: string;
 	lineStartPosition?: Position;
 	lineEndPosition?: Position;
+	squareStartPosition?: Position;
+	squareEndPosition?: Position;
 }
 
 export interface RedoOrUndoMessagePayload {

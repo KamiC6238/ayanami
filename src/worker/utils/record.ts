@@ -10,6 +10,7 @@ import type {
 	Record,
 	RecordMessagePayload,
 	Records,
+	SquareRecord,
 } from "@/types";
 import { ToolTypeEnum } from "@/types";
 
@@ -34,6 +35,68 @@ const makePencilRecord = (
 	return [toolType, pixelColor, pixelSize, [...pencilRecordPoints]];
 };
 
+const makeEraserRecord = (
+	payload: RecordMessagePayload,
+): EraserRecord | null => {
+	const { toolType, pixelSize } = payload;
+
+	if (!eraserRecordPoints.length) {
+		return null;
+	}
+
+	return [toolType, pixelSize, [...eraserRecordPoints]];
+};
+
+const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
+	const {
+		toolType,
+		lineStartPosition,
+		lineEndPosition,
+		pixelColor,
+		pixelSize,
+	} = payload;
+
+	if (!lineStartPosition || !lineEndPosition) {
+		return null;
+	}
+
+	return [
+		toolType,
+		pixelColor,
+		pixelSize,
+		[
+			[lineStartPosition.x, lineStartPosition.y],
+			[lineEndPosition.x, lineEndPosition.y],
+		],
+	];
+};
+
+const makeSquareRecord = (
+	payload: RecordMessagePayload,
+): SquareRecord | null => {
+	const {
+		toolType,
+		squareStartPosition,
+		squareEndPosition,
+		pixelColor,
+		pixelSize,
+	} = payload;
+
+	if (!squareStartPosition || !squareEndPosition) {
+		return null;
+	}
+
+	return [
+		toolType,
+		pixelColor,
+		pixelSize,
+		[
+			[squareStartPosition.x, squareStartPosition.y],
+			[squareEndPosition.x, squareEndPosition.y],
+		],
+	];
+};
+
 const updatePencilPointsRecord = (position: Position) => {
 	let saveAsNewPoint = true;
 
@@ -50,18 +113,6 @@ const updatePencilPointsRecord = (position: Position) => {
 	if (saveAsNewPoint) {
 		pencilRecordPoints.push([position.x, position.y, 1]);
 	}
-};
-
-const makeEraserRecord = (
-	payload: RecordMessagePayload,
-): EraserRecord | null => {
-	const { toolType, pixelSize } = payload;
-
-	if (!eraserRecordPoints.length) {
-		return null;
-	}
-
-	return [toolType, pixelSize, [...eraserRecordPoints]];
 };
 
 const updateEraserPointsRecord = (position: Position) => {
@@ -82,22 +133,19 @@ const updateEraserPointsRecord = (position: Position) => {
 	}
 };
 
-const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
-	const { lineStartPosition, lineEndPosition, pixelColor, pixelSize } = payload;
+export const updatePointsRecord = (
+	payload: FillRectMessagePayload | ClearRectMessagePayload,
+) => {
+	const { toolType, position } = payload;
 
-	if (!lineStartPosition || !lineEndPosition) {
-		return null;
+	switch (toolType) {
+		case ToolTypeEnum.Pencil:
+			updatePencilPointsRecord(position);
+			break;
+		case ToolTypeEnum.Eraser:
+			updateEraserPointsRecord(position);
+			break;
 	}
-
-	return [
-		ToolTypeEnum.Line,
-		pixelColor,
-		pixelSize,
-		[
-			[lineStartPosition.x, lineStartPosition.y],
-			[lineEndPosition.x, lineEndPosition.y],
-		],
-	];
 };
 
 export const getUndoAndRedoStack = (tabId: string) => {
@@ -118,6 +166,9 @@ export const record = (payload: RecordMessagePayload) => {
 		case ToolTypeEnum.Line:
 			record = makeLineRecord(payload);
 			break;
+		case ToolTypeEnum.Square:
+			record = makeSquareRecord(payload);
+			break;
 	}
 
 	clearRecordPoints();
@@ -134,19 +185,4 @@ export const record = (payload: RecordMessagePayload) => {
 	// Redo stack represents a possible future. If a new record occurs, that future is no longer valid — like a time paradox.
 	records[tabId].redoStack.length = 0;
 	records[tabId].undoStack.push(record);
-};
-
-export const updatePointsRecord = (
-	payload: FillRectMessagePayload | ClearRectMessagePayload,
-) => {
-	const { toolType, position } = payload;
-
-	switch (toolType) {
-		case ToolTypeEnum.Pencil:
-			updatePencilPointsRecord(position);
-			break;
-		case ToolTypeEnum.Eraser:
-			updateEraserPointsRecord(position);
-			break;
-	}
 };

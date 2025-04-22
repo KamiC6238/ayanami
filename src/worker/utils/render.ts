@@ -14,6 +14,7 @@ import type {
 	PencilRecord,
 	Record,
 	RecordStack,
+	SquareRecord,
 	StrokeRectMessagePayload,
 } from "@/types";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
@@ -71,9 +72,9 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 	const {
 		canvasType,
 		squareStartPosition,
+		squareEndPosition,
 		pixelSize,
 		pixelColor,
-		squareEndPosition,
 	} = payload;
 	const context = getContext(canvasType);
 
@@ -369,6 +370,9 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 			case ToolTypeEnum.Line:
 				replayLineRecord(record as LineRecord);
 				break;
+			case ToolTypeEnum.Square:
+				replaySquareRecord(record as SquareRecord);
+				break;
 		}
 	}
 };
@@ -410,5 +414,20 @@ const replayLineRecord = (record: LineRecord) => {
 		lineEndPosition: { x: endX, y: endY },
 		pixelColor,
 		pixelSize,
+	});
+};
+
+const replaySquareRecord = (record: SquareRecord) => {
+	const [_, pixelColor, pixelSize, points] = record;
+	const [startPoint, endPoint] = points;
+	const [startX, startY] = startPoint;
+	const [endX, endY] = endPoint;
+
+	strokeRect({
+		canvasType: "main",
+		squareStartPosition: { x: startX, y: startY },
+		squareEndPosition: { x: endX, y: endY },
+		pixelSize,
+		pixelColor,
 	});
 };

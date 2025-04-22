@@ -13,8 +13,10 @@ export interface RectConfig {
 	canvasType: CanvasType;
 }
 
-export type SquareRectConfig = RectConfig & {
-	endPosition: Position;
+export type SquareRectConfig = {
+	canvasType: CanvasType;
+	squareStartPosition: Position;
+	squareEndPosition: Position;
 };
 
 export type CircleConfig = {

@@ -108,9 +108,9 @@ export function useSquareTool() {
 			});
 		} else {
 			canvasStore.strokeRect({
-				position: { ...squareStartPosition.value },
+				squareStartPosition: { ...squareStartPosition.value },
+				squareEndPosition: { ...squareEndPosition.value },
 				canvasType,
-				endPosition: { ...squareEndPosition.value },
 			});
 		}
 	};

@@ -33,10 +33,10 @@ export interface FillHoverRectMessagePayload {
 
 export interface StrokeRectMessagePayload {
 	canvasType: CanvasType;
-	position: Position;
+	squareStartPosition: Position;
+	squareEndPosition: Position;
 	pixelColor: string;
 	pixelSize: number;
-	endPosition: Position;
 }
 
 export interface LineMessagePayload {

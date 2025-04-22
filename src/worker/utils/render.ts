@@ -68,13 +68,19 @@ export const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
 };
 
 export const strokeRect = (payload: StrokeRectMessagePayload) => {
-	const { canvasType, position, pixelSize, pixelColor, endPosition } = payload;
+	const {
+		canvasType,
+		squareStartPosition,
+		pixelSize,
+		pixelColor,
+		squareEndPosition,
+	} = payload;
 	const context = getContext(canvasType);
 
 	if (!context) return;
 
-	const { x: startX, y: startY } = position;
-	const { x: endX, y: endY } = endPosition;
+	const { x: startX, y: startY } = squareStartPosition;
+	const { x: endX, y: endY } = squareEndPosition;
 
 	context.strokeStyle = pixelColor;
 	context.lineWidth = pixelSize;

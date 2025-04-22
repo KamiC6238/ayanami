@@ -127,10 +127,10 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "strokeRect",
 			payload: {
 				canvasType: config.canvasType,
-				position: config.position,
+				squareStartPosition: config.squareStartPosition,
+				squareEndPosition: config.squareEndPosition,
 				pixelColor: configStore.pixelColor,
 				pixelSize: configStore.pixelSize,
-				endPosition: config.endPosition,
 			},
 		});
 	};

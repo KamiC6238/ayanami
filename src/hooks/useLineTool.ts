@@ -55,14 +55,12 @@ export function useLineTool() {
 			),
 			mouseUp$.pipe(
 				tap(() => {
-					canvasStore.record({
-						lineStartPosition: lineStartPosition.value
-							? { ...lineStartPosition.value }
-							: null,
-						lineEndPosition: lineEndPosition.value
-							? { ...lineEndPosition.value }
-							: null,
-					});
+					if (lineStartPosition.value && lineEndPosition.value) {
+						canvasStore.record({
+							lineStartPosition: { ...lineStartPosition.value },
+							lineEndPosition: { ...lineEndPosition.value },
+						});
+					}
 					onMouseUpHandler();
 				}),
 			),

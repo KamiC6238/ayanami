@@ -1,4 +1,5 @@
 import type {
+	CircleRecord,
 	ClearRectMessagePayload,
 	EraserPointRecord,
 	EraserRecord,
@@ -97,6 +98,34 @@ const makeSquareRecord = (
 	];
 };
 
+const makeCircleRecord = (
+	payload: RecordMessagePayload,
+): CircleRecord | null => {
+	const {
+		toolType,
+		circleType,
+		circleStartPosition,
+		circleEndPosition,
+		pixelColor,
+		pixelSize,
+	} = payload;
+
+	if (!circleType || !circleStartPosition || !circleEndPosition) {
+		return null;
+	}
+
+	return [
+		toolType,
+		circleType,
+		pixelColor,
+		pixelSize,
+		[
+			[circleStartPosition.x, circleStartPosition.y],
+			[circleEndPosition.x, circleEndPosition.y],
+		],
+	];
+};
+
 const updatePencilPointsRecord = (position: Position) => {
 	let saveAsNewPoint = true;
 
@@ -168,6 +197,9 @@ export const record = (payload: RecordMessagePayload) => {
 			break;
 		case ToolTypeEnum.Square:
 			record = makeSquareRecord(payload);
+			break;
+		case ToolTypeEnum.Circle:
+			record = makeCircleRecord(payload);
 			break;
 	}
 

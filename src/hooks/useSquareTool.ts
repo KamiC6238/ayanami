@@ -55,14 +55,12 @@ export function useSquareTool() {
 			),
 			mouseUp$.pipe(
 				tap(() => {
-					canvasStore.record({
-						squareStartPosition: squareStartPosition.value
-							? { ...squareStartPosition.value }
-							: null,
-						squareEndPosition: squareEndPosition.value
-							? { ...squareEndPosition.value }
-							: null,
-					});
+					if (squareStartPosition.value && squareEndPosition.value) {
+						canvasStore.record({
+							squareStartPosition: { ...squareStartPosition.value },
+							squareEndPosition: { ...squareEndPosition.value },
+						});
+					}
 					onMouseUpHandler();
 				}),
 			),

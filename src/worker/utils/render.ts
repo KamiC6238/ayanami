@@ -2,6 +2,7 @@ import { GRID_SIZE } from "@/constants";
 import type {
 	CanvasType,
 	CircleMessagePayload,
+	CircleRecord,
 	ClearAllPixelsMessagePayload,
 	ClearHoverRectMessagePayload,
 	ClearRectMessagePayload,
@@ -359,19 +360,20 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 		const [toolType] = record;
 
 		switch (toolType) {
-			case ToolTypeEnum.Pencil: {
+			case ToolTypeEnum.Pencil:
 				replayPencilRecord(record as PencilRecord);
 				break;
-			}
-			case ToolTypeEnum.Eraser: {
+			case ToolTypeEnum.Eraser:
 				replayEraserRecord(record as EraserRecord);
 				break;
-			}
 			case ToolTypeEnum.Line:
 				replayLineRecord(record as LineRecord);
 				break;
 			case ToolTypeEnum.Square:
 				replaySquareRecord(record as SquareRecord);
+				break;
+			case ToolTypeEnum.Circle:
+				replayCircleRecord(record as CircleRecord);
 				break;
 		}
 	}
@@ -429,5 +431,21 @@ const replaySquareRecord = (record: SquareRecord) => {
 		squareEndPosition: { x: endX, y: endY },
 		pixelSize,
 		pixelColor,
+	});
+};
+
+const replayCircleRecord = (record: CircleRecord) => {
+	const [_, circleType, pixelColor, pixelSize, points] = record;
+	const [startPoint, endPoint] = points;
+	const [startX, startY] = startPoint;
+	const [endX, endY] = endPoint;
+
+	drawCircle({
+		canvasType: "main",
+		circleStartPosition: { x: startX, y: startY },
+		circleEndPosition: { x: endX, y: endY },
+		pixelSize,
+		pixelColor,
+		circleType,
 	});
 };

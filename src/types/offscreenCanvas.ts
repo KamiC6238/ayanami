@@ -89,6 +89,9 @@ export interface RecordMessagePayload {
 	lineEndPosition?: Position;
 	squareStartPosition?: Position;
 	squareEndPosition?: Position;
+	circleStartPosition?: Position;
+	circleEndPosition?: Position;
+	circleType?: CircleTypeEnum;
 }
 
 export interface RedoOrUndoMessagePayload {

@@ -1,4 +1,4 @@
-import type { ToolTypeEnum } from "./config";
+import type { CircleTypeEnum, ToolTypeEnum } from "./config";
 
 /**
  * @description PointRecord means a point record of a tool,
@@ -33,7 +33,21 @@ export type LineRecord = [ToolTypeEnum, string, number, LinePointRecord];
 export type SquarePointRecord = [[number, number], [number, number]];
 export type SquareRecord = [ToolTypeEnum, string, number, SquarePointRecord];
 
-export type Record = PencilRecord | EraserRecord | LineRecord | SquareRecord;
+export type CirclePointRecord = [[number, number], [number, number]];
+export type CircleRecord = [
+	ToolTypeEnum,
+	CircleTypeEnum,
+	string,
+	number,
+	CirclePointRecord,
+];
+
+export type Record =
+	| PencilRecord
+	| EraserRecord
+	| LineRecord
+	| SquareRecord
+	| CircleRecord;
 
 export type RecordStack = {
 	undoStack: Record[];

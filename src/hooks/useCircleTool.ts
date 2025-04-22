@@ -53,7 +53,18 @@ export function useCircleTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(tap(() => onMouseUpHandler())),
+			mouseUp$.pipe(
+				tap(() => {
+					if (circleStartPosition.value && circleEndPosition.value) {
+						canvasStore.record({
+							circleStartPosition: { ...circleStartPosition.value },
+							circleEndPosition: { ...circleEndPosition.value },
+							circleType: configStore.circleType,
+						});
+					}
+					onMouseUpHandler();
+				}),
+			),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();

@@ -8,12 +8,17 @@ A free online pixel art drawing tool.
 - [x] Square tool
 - [x] Line tool
 - [x] Circle tool
-- [ ] Color picker
+- [x] Color picker
 - [ ] Bucket tool
 - [ ] Select tool
 - [ ] Gradient tool
 - [ ] Support different canvas sizes
-- [ ] Undo & Redo
+- [x] Undo & Redo
+  - [x] Pencil tool
+  - [x] Eraser tool
+  - [x] Square tool
+  - [x] Circle tool
+  - [ ] Bucket tool
 - [ ] Download and save
   - [ ] as PNG
   - [ ] as RAW
@@ -25,7 +30,8 @@ A free online pixel art drawing tool.
 - Vue3.5
 - Pinia
 - TypeScript
-- RxJS
+- Web Worker
+- OffscreenCanvas
 - Vite
 
 # License

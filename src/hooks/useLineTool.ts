@@ -16,7 +16,7 @@ export function useLineTool() {
 	const canvasStore = useCanvasStore();
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
-	const { toolType, pixelSize, pixelColor } = storeToRefs(configStore);
+	const { toolType } = storeToRefs(configStore);
 	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {

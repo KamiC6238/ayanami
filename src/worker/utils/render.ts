@@ -330,7 +330,7 @@ export const redo = (recordStack: RecordStack) => {
 	if (!record) return;
 
 	recordStack.undoStack.push(record);
-	replayRecords([record], "redo");
+	replayRecords("redo", [record]);
 };
 
 export const undo = (recordStack: RecordStack) => {
@@ -339,10 +339,10 @@ export const undo = (recordStack: RecordStack) => {
 	if (!record) return;
 
 	recordStack.redoStack.push(record);
-	replayRecords(recordStack.undoStack, "undo");
+	replayRecords("undo", recordStack.undoStack);
 };
 
-export const replayRecords = (records: Record[], type: "redo" | "undo") => {
+export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 	if (type === "undo") {
 		clearAllPixels({ canvasType: "main" });
 	}

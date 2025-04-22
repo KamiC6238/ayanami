@@ -110,9 +110,9 @@ export const useCanvasStore = defineStore("canvas", () => {
 				preview: previewCanvas,
 				grid: gridCanvas,
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
-				mouseMove$: fromEvent<MouseEvent>(previewCanvas, "mousemove"),
-				mouseUp$: fromEvent<MouseEvent>(previewCanvas, "mouseup"),
-				mouseLeave$: fromEvent<MouseEvent>(previewCanvas, "mouseleave"),
+				mouseMove$: fromEvent<MouseEvent>(document, "mousemove"),
+				mouseUp$: fromEvent<MouseEvent>(document, "mouseup"),
+				mouseLeave$: fromEvent<MouseEvent>(document, "mouseleave"),
 			};
 		}
 

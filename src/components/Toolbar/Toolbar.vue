@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import RedoIcon from "@/assets/icons/redo.svg";
-import UndoIcon from "@/assets/icons/undo.svg";
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import {
 	useCircleTool,
@@ -23,7 +21,7 @@ const perfectCircle = CircleTypeEnum.Circle;
 const ellipseCircle = CircleTypeEnum.Ellipse;
 
 const configStore = useConfigStore();
-const { clearAllPixels, redo, undo } = useCanvasStore();
+const { clearAllPixels } = useCanvasStore();
 
 useCircleTool();
 usePencilTool();
@@ -70,7 +68,5 @@ const onCircleTypeChange = (e: Event) => {
         @input="onPixelSizeChange"
       />
     </div> -->
-    <UndoIcon class='w-6 h-6' @click='undo' />
-    <RedoIcon class='w-6 h-6' @click='redo' />
   </div>
 </template>

@@ -7,6 +7,7 @@ import {
 	SocialMedia,
 	Toolbar,
 	TrafficLights,
+	UndoRedo,
 } from "@/components";
 import { generatePixelBorder } from "@/utils";
 import { ColumnResizer, VerticalResizer } from "./layout";
@@ -43,6 +44,7 @@ generatePixelBorder(4, 3);
             <div class='flex w-full h-[calc(100%-40px)]'>
               <PixelBorderSecondary>
                 <Canvas />
+                <UndoRedo />
               </PixelBorderSecondary>
               <Toolbar />
             </div>

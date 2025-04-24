@@ -2,11 +2,13 @@
 It's a free online pixel art editor.
 
 ## Why I made it?
-I bought a Nintendo Switch and [Octopath Traveler II](https://en.wikipedia.org/wiki/Octopath_Traveler_II) in 2023. The game’s scenery captivated me, and at that moment, a thought came to mind: maybe I could make a pixel art tool by myself one day.
+I bought [Octopath Traveler II](https://en.wikipedia.org/wiki/Octopath_Traveler_II) in 2024. The game’s scenery captivated me, and at that moment, a thought came to mind: maybe I could make a pixel art tool by myself one day.
 
 After the idea took root, I started looking for pixel art editors in the community and eventually discovered [Aseprite](https://www.aseprite.org/).
 I was inspired by its color design and began developing my own pixel art editor.
 It’s not perfect yet, but I’ll keep improving it—step by step—until it becomes what I envisioned.
+
+Lately, I’ve also been playing Stardew Valley in my free time.
 
 ## 🚧 Version 0.1.0
 ### features

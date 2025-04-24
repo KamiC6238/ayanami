@@ -8,7 +8,7 @@ After the idea took root, I started looking for pixel art editors in the communi
 I was inspired by its color design and began developing my own pixel art editor.
 It’s not perfect yet, but I’ll keep improving it—step by step—until it becomes what I envisioned.
 
-Lately, I’ve also been playing Stardew Valley in my free time.
+Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/Stardew_Valley) in my free time.
 
 ## 🚧 Version 0.1.0
 ### features

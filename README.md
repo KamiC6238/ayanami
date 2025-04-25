@@ -17,19 +17,18 @@ Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/
 - [x] Square tool
 - [x] Line tool
 - [x] Circle tool
-- [x] Color picker
 - [ ] Bucket tool
-- [ ] Select tool (Version 0.2.0)
-- [ ] Gradient tool (Version 0.2.0)
-- [ ] Support different canvas sizes (Version 0.2.0)
+- [x] Color picker
 - [x] Undo & Redo
-  - [x] Pencil tool
-  - [x] Eraser tool
-  - [x] Square tool
-  - [x] Circle tool
-  - [ ] Bucket tool
 - [ ] Download and save
   - [ ] as PNG
+
+## 🚧 Version 0.2.0
+- [ ] Support for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
+- [ ] Support multiple frames for animation
+- [ ] Support different canvas sizes
+- [ ] Select tool
+- [ ] Gradient tool
 
 ## Tech stack
 - [Vue 3](https://vuejs.org/guide/introduction.html)

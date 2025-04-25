@@ -32,13 +32,13 @@ Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/
   - [ ] as PNG
 
 ## Tech stack
-- Vue3.5
-- Pinia
-- TypeScript
-- tailwindcss
-- Web Worker
-- OffscreenCanvas
-- Vite
+- [Vue 3](https://vuejs.org/guide/introduction.html)
+- [Pinia](https://pinia.vuejs.org/introduction.html)
+- [TypeScript](https://www.typescriptlang.org/)
+- [tailwindcss](https://tailwindcss.com/)
+- [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
+- [OffscreenCanvas](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas)
+- [Vite](https://vite.dev/guide/)
 
 ## License
 Licensed under the MIT License.

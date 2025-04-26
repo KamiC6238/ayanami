@@ -240,6 +240,21 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const fillBucket = () => {
+		const worker = getRenderWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "fillBucket",
+			payload: {
+				tabId: currentTabId.value,
+				toolType: toolType.value,
+				replacementColor: pixelColor.value,
+				targetColor: "",
+			},
+		});
+	};
+
 	const record = (extra = {}) => {
 		const worker = getRenderWorker();
 		if (!worker) return;
@@ -295,6 +310,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		clearAllPixels,
 		drawCircle,
 		drawLine,
+		fillBucket,
 		globalMouseUp$,
 		mouse$,
 		tabs,

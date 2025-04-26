@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import {
+	useBucketTool,
 	useCircleTool,
 	useEraserTool,
 	useLineTool,
@@ -13,6 +14,7 @@ import { CircleTypeEnum, ToolTypeEnum } from "@/types";
 const tools = [
 	ToolTypeEnum.Pencil,
 	ToolTypeEnum.Eraser,
+	ToolTypeEnum.Bucket,
 	ToolTypeEnum.Line,
 	ToolTypeEnum.Square,
 	ToolTypeEnum.Circle,
@@ -28,6 +30,7 @@ usePencilTool();
 useEraserTool();
 useLineTool();
 useSquareTool();
+useBucketTool();
 
 const onPixelSizeChange = (e: Event) => {
 	configStore.setPixelSize(Number((e.target as HTMLInputElement).value));

@@ -30,12 +30,20 @@ export const useCanvasStore = defineStore("canvas", () => {
 	watch(
 		() => currentTabId.value,
 		(tabId) => {
-			const { main: mainCanvas, preview: previewCanvas } = tabs.value[tabId];
+			const {
+				main: mainCanvas,
+				preview: previewCanvas,
+				grid: gridCanvas,
+			} = tabs.value[tabId];
 
-			if (!mainCanvas || !previewCanvas) return;
+			if (!mainCanvas || !previewCanvas || !gridCanvas) return;
 
 			renderWorker.value?.terminate();
-			renderWorker.value = initOffScreenCanvas([mainCanvas, previewCanvas]);
+			renderWorker.value = initOffScreenCanvas([
+				mainCanvas,
+				previewCanvas,
+				gridCanvas,
+			]);
 		},
 	);
 
@@ -100,9 +108,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 		previewCanvas: HTMLCanvasElement,
 	) => {
 		const tabId = uuidV4();
-
-		scaleCanvasByDPR(gridCanvas);
-		drawGrid(gridCanvas);
 
 		if (!tabs.value[tabId]) {
 			tabs.value[tabId] = {

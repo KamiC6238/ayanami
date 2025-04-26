@@ -20,23 +20,27 @@ import type {
 	StrokeRectMessagePayload,
 } from "@/types";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
-import { getAlignedStartAndEndPosition } from "@/utils";
+import { drawGrid, getAlignedStartAndEndPosition } from "@/utils";
 
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
+let gridCanvas: OffscreenCanvas | null = null;
 
 export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 	const { dpr, clientWidth, clientHeight, canvasList } =
 		payload as InitMessagePayload;
 
-	mainCanvas = canvasList[0]; // main canvas
-	previewCanvas = canvasList[1]; // preview canvas
+	mainCanvas = canvasList[0];
+	previewCanvas = canvasList[1];
+	gridCanvas = canvasList[2];
 
 	for (const canvas of canvasList) {
 		canvas.width = clientWidth * dpr;
 		canvas.height = clientHeight * dpr;
 		canvas.getContext("2d")?.scale(dpr, dpr);
 	}
+
+	drawGrid(gridCanvas, { clientWidth, clientHeight });
 };
 
 export const getContext = (canvasType: CanvasType) => {

@@ -9,12 +9,18 @@ export function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 	canvas.getContext("2d")?.scale(dpr, dpr);
 }
 
-export function drawGrid(canvas: HTMLCanvasElement) {
+export function drawGrid(
+	canvas: OffscreenCanvas,
+	config: {
+		clientWidth: number;
+		clientHeight: number;
+	},
+) {
 	const context = canvas.getContext("2d");
 
 	if (!context) return;
 
-	const { clientWidth: width, clientHeight: height } = canvas;
+	const { clientWidth: width, clientHeight: height } = config;
 	const centerX = Math.floor(width / 2);
 	const centerY = Math.floor(height / 2);
 

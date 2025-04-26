@@ -1,4 +1,5 @@
 import type {
+	BucketMessagePayload,
 	CircleMessagePayload,
 	ClearAllPixelsMessagePayload,
 	ClearHoverRectMessagePayload,
@@ -39,6 +40,9 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "strokeRect":
 			renderUtils.strokeRect(payload as StrokeRectMessagePayload);
+			break;
+		case "fillBucket":
+			renderUtils.fillBucket(payload as BucketMessagePayload);
 			break;
 		case "clearRect": {
 			const _payload = payload as ClearRectMessagePayload;

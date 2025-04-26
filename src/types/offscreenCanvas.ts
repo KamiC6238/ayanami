@@ -9,6 +9,7 @@ export type MessageType =
 	| "drawBresenhamLine"
 	| "drawCircle"
 	| "strokeRect"
+	| "fillBucket"
 	| "clearRect"
 	| "clearHoverRect"
 	| "clearAllPixels"
@@ -54,6 +55,13 @@ export interface CircleMessagePayload {
 	circleEndPosition: Position;
 	pixelSize: number;
 	pixelColor: string;
+}
+
+export interface BucketMessagePayload {
+	canvasType: CanvasType;
+	targetColor: string;
+	replacementColor: string;
+	position: Position;
 }
 
 export interface ClearHoverRectMessagePayload {

@@ -1,5 +1,6 @@
 import { GRID_SIZE } from "@/constants";
 import type {
+	BucketMessagePayload,
 	CanvasType,
 	CircleMessagePayload,
 	CircleRecord,
@@ -103,6 +104,10 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 	if (canvasType === "main") {
 		clearAllPixels({ canvasType: "preview" });
 	}
+};
+
+export const fillBucket = (payload: BucketMessagePayload) => {
+	console.log("fill bucket: ", payload);
 };
 
 export const clearRect = (payload: ClearRectMessagePayload) => {

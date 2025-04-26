@@ -248,7 +248,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "fillBucket",
 			payload: {
 				tabId: currentTabId.value,
-				toolType: toolType.value,
 				replacementColor: pixelColor.value,
 				targetColor: "",
 			},

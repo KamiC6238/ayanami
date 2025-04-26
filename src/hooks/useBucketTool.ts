@@ -33,8 +33,7 @@ export function useBucketTool() {
 		bucket$.value = merge(
 			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
-					// canvasStore.fillBucket(event)
-					console.log("fill bucket: ", event);
+					canvasStore.fillBucket();
 				}),
 			),
 			mouseMove$.pipe(tap((event: MouseEvent) => drawHoverPixel(event))),

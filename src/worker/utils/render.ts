@@ -96,8 +96,46 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 
 	if (!context) return;
 
-	const { x: startX, y: startY } = squareStartPosition;
-	const { x: endX, y: endY } = squareEndPosition;
+	let { x: startX, y: startY } = squareStartPosition;
+	let { x: endX, y: endY } = squareEndPosition;
+
+	const updateColorPositionMap = () => {
+		if (startX > endX) {
+			[startX, endX] = [endX, startX];
+		}
+		if (startY > endY) {
+			[startY, endY] = [endY, startY];
+		}
+
+		// top
+		for (let x = startX; x <= endX; x += pixelSize) {
+			const colorPositionKey = makeColorPositionKey({ x, y: startY });
+			colorPositionMap?.set(colorPositionKey, pixelColor);
+		}
+
+		// bottom
+		for (let x = startX; x <= endX; x += pixelSize) {
+			const colorPositionKey = makeColorPositionKey({ x, y: endY });
+			colorPositionMap?.set(colorPositionKey, pixelColor);
+		}
+
+		// left
+		for (let y = startY + pixelSize; y < endY; y += pixelSize) {
+			const colorPositionKey = makeColorPositionKey({ x: startX, y });
+			colorPositionMap?.set(colorPositionKey, pixelColor);
+		}
+
+		// right
+		for (let y = startY + pixelSize; y < endY; y += pixelSize) {
+			const colorPositionKey = makeColorPositionKey({ x: endX, y });
+			colorPositionMap?.set(colorPositionKey, pixelColor);
+		}
+	};
+
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+		updateColorPositionMap();
+	}
 
 	context.strokeStyle = pixelColor;
 	context.lineWidth = pixelSize;
@@ -114,10 +152,6 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 		endX - startX,
 		endY - startY,
 	);
-
-	if (canvasType === "main") {
-		clearAllPixels({ canvasType: "preview" });
-	}
 };
 
 export const fillBucket = (payload: BucketMessagePayload) => {
@@ -130,23 +164,27 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 	const { width, height } = mainCanvas;
 	const queue = [{ x: position.x, y: position.y }];
 	const targetColor = colorPositionMap.get(makeColorPositionKey(position));
+	const visited = new Set<string>();
 
 	while (queue.length > 0) {
 		const pos = queue.pop() as Position;
 		const { x, y } = pos;
-		const curPosColor = colorPositionMap.get(makeColorPositionKey(pos));
+		const curPositionColorKey = makeColorPositionKey(pos);
+		const curPositionColor = colorPositionMap.get(curPositionColorKey);
 
 		if (
 			x < 0 ||
 			x >= width ||
 			y < 0 ||
 			y >= height ||
-			curPosColor !== targetColor
+			visited.has(curPositionColorKey) ||
+			curPositionColor !== targetColor
 		) {
 			continue;
 		}
 
-		colorPositionMap.set(makeColorPositionKey(pos), replacementColor);
+		visited.add(curPositionColorKey);
+		colorPositionMap.set(curPositionColorKey, replacementColor);
 
 		fillRect({
 			position: pos,

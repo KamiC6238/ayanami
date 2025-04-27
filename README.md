@@ -10,6 +10,9 @@ It’s not perfect yet, but I’ll keep improving it—step by step—until it b
 
 Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/Stardew_Valley) in my free time.
 
+## Big thanks
+I’m truly grateful for Luke Morrigan’s work, [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which has greatly helped me in creating pixel-style borders.
+
 ## 🚧 Version 0.1.0
 ### features
 - [x] Pencil tool

@@ -1,5 +1,6 @@
 import { useCanvasStore, useConfigStore } from "@/store";
 import { ToolTypeEnum } from "@/types";
+import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
 import { type Subscription, merge, tap } from "rxjs";
 import { ref, watch } from "vue";
@@ -33,7 +34,13 @@ export function useBucketTool() {
 		bucket$.value = merge(
 			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
-					canvasStore.fillBucket();
+					const canvas = canvasStore.getCanvas("preview");
+
+					if (canvas) {
+						canvasStore.fillBucket({
+							position: getPixelPosition(canvas, event),
+						});
+					}
 				}),
 			),
 			mouseMove$.pipe(tap((event: MouseEvent) => drawHoverPixel(event))),

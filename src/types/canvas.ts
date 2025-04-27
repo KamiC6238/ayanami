@@ -31,5 +31,9 @@ export type LineConfig = {
 	lineEndPosition: Position;
 };
 
+export interface BucketConfig {
+	position: Position;
+}
+
 export type CanvasMap = Record<CanvasType, HTMLCanvasElement | null> &
 	Record<CanvasMouseEventType, Observable<MouseEvent> | null>;

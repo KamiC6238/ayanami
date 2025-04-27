@@ -14,17 +14,25 @@ import type {
 	LineMessagePayload,
 	LineRecord,
 	PencilRecord,
+	Position,
 	Record,
 	RecordStack,
 	SquareRecord,
 	StrokeRectMessagePayload,
 } from "@/types";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
-import { drawGrid, getAlignedStartAndEndPosition } from "@/utils";
+import {
+	drawGrid,
+	getAlignedStartAndEndPosition,
+	makeColorPositionKey,
+} from "@/utils";
 
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
 let gridCanvas: OffscreenCanvas | null = null;
+
+let colorPositionMap: Map<string, string> | null = null;
+let colorPositionMapBackup: Map<string, string> | null = null;
 
 export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 	const { dpr, clientWidth, clientHeight, canvasList } =
@@ -40,7 +48,8 @@ export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 		canvas.getContext("2d")?.scale(dpr, dpr);
 	}
 
-	drawGrid(gridCanvas, { clientWidth, clientHeight });
+	colorPositionMapBackup = drawGrid(gridCanvas, { clientWidth, clientHeight });
+	colorPositionMap = new Map(colorPositionMapBackup);
 };
 
 export const getContext = (canvasType: CanvasType) => {
@@ -54,13 +63,14 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 
 	if (!context) return;
 
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+		colorPositionMap?.set(makeColorPositionKey(position), pixelColor);
+	}
+
 	const { x, y } = position;
 	context.fillStyle = pixelColor;
 	context.fillRect(x, y, pixelSize, pixelSize);
-
-	if (canvasType === "main") {
-		clearAllPixels({ canvasType: "preview" });
-	}
 };
 
 export const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
@@ -111,7 +121,45 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 };
 
 export const fillBucket = (payload: BucketMessagePayload) => {
-	console.log("fill bucket: ", payload);
+	if (!colorPositionMap || !mainCanvas) return;
+	const context = getContext("main");
+	if (!context) return;
+
+	const { position, replacementColor, pixelSize } = payload;
+
+	const { width, height } = mainCanvas;
+	const queue = [{ x: position.x, y: position.y }];
+	const targetColor = colorPositionMap.get(makeColorPositionKey(position));
+
+	while (queue.length > 0) {
+		const pos = queue.pop() as Position;
+		const { x, y } = pos;
+		const curPosColor = colorPositionMap.get(makeColorPositionKey(pos));
+
+		if (
+			x < 0 ||
+			x >= width ||
+			y < 0 ||
+			y >= height ||
+			curPosColor !== targetColor
+		) {
+			continue;
+		}
+
+		colorPositionMap.set(makeColorPositionKey(pos), replacementColor);
+
+		fillRect({
+			position: pos,
+			canvasType: "main",
+			pixelColor: replacementColor,
+			pixelSize,
+		});
+
+		queue.push({ x: pos.x, y: pos.y - pixelSize });
+		queue.push({ x: pos.x + pixelSize, y });
+		queue.push({ x: pos.x, y: pos.y + pixelSize });
+		queue.push({ x: pos.x - pixelSize, y });
+	}
 };
 
 export const clearRect = (payload: ClearRectMessagePayload) => {
@@ -122,6 +170,7 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 
 	const { x, y } = position;
 	context.clearRect(x, y, pixelSize, pixelSize);
+	colorPositionMap?.set(makeColorPositionKey(position), "");
 };
 
 export const clearHoverRect = (payload: ClearHoverRectMessagePayload) => {
@@ -140,6 +189,10 @@ export const clearAllPixels = (payload: ClearAllPixelsMessagePayload) => {
 
 	if (!context) return;
 	context?.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+	if (canvasType === "main") {
+		colorPositionMap = new Map(colorPositionMapBackup);
+	}
 };
 
 export const drawBresenhamLine = (payload: LineMessagePayload) => {

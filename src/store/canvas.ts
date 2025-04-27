@@ -1,5 +1,6 @@
 import { DEFAULT_HOVERED_PIXEL_COLOR } from "@/constants";
 import type {
+	BucketConfig,
 	CanvasMap,
 	CanvasType,
 	CircleConfig,
@@ -8,7 +9,6 @@ import type {
 	RectConfig,
 	SquareRectConfig,
 } from "@/types";
-import { drawGrid, scaleCanvasByDPR } from "@/utils";
 import RenderWorker from "@/worker/renderWorker?worker";
 import { defineStore, storeToRefs } from "pinia";
 import { type Observable, fromEvent } from "rxjs";
@@ -245,7 +245,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
-	const fillBucket = () => {
+	const fillBucket = (config: BucketConfig) => {
 		const worker = getRenderWorker();
 		if (!worker) return;
 
@@ -253,8 +253,9 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "fillBucket",
 			payload: {
 				tabId: currentTabId.value,
+				position: config.position,
+				pixelSize: pixelSize.value,
 				replacementColor: pixelColor.value,
-				targetColor: "",
 			},
 		});
 	};

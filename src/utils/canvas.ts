@@ -9,6 +9,10 @@ export function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 	canvas.getContext("2d")?.scale(dpr, dpr);
 }
 
+export function makeColorPositionKey({ x, y }: Position) {
+	return `${x}_${y}`;
+}
+
 export function drawGrid(
 	canvas: OffscreenCanvas,
 	config: {
@@ -16,9 +20,10 @@ export function drawGrid(
 		clientHeight: number;
 	},
 ) {
+	const colorPositionMap = new Map();
 	const context = canvas.getContext("2d");
 
-	if (!context) return;
+	if (!context) return null;
 
 	const { clientWidth: width, clientHeight: height } = config;
 	const centerX = Math.floor(width / 2);
@@ -35,9 +40,12 @@ export function drawGrid(
 				context.fillStyle = "#c0c0c0";
 			}
 
+			colorPositionMap.set(makeColorPositionKey({ x, y }), "");
 			context.fillRect(x, y, DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_SIZE);
 		}
 	}
+
+	return colorPositionMap;
 }
 
 // for line tool

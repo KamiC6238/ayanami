@@ -59,9 +59,9 @@ export interface CircleMessagePayload {
 
 export interface BucketMessagePayload {
 	canvasType: CanvasType;
-	targetColor: string;
 	replacementColor: string;
 	position: Position;
+	pixelSize: number;
 }
 
 export interface ClearHoverRectMessagePayload {

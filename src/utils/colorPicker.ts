@@ -198,6 +198,46 @@ export const rgbToHex = (rgba: RGBA) => {
 	return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alpha)}`;
 };
 
+export const hexToRgba = (
+	hex: string,
+): { r: number; g: number; b: number; a: number } => {
+	const normalizedHex = hex.replace("#", "");
+	const hasAlpha = normalizedHex.length === 8;
+
+	const r = Number.parseInt(normalizedHex.slice(0, 2), 16);
+	const g = Number.parseInt(normalizedHex.slice(2, 4), 16);
+	const b = Number.parseInt(normalizedHex.slice(4, 6), 16);
+	const a = hasAlpha ? Number.parseInt(normalizedHex.slice(6, 8), 16) : 255;
+
+	return { r, g, b, a };
+};
+
+export const blendColors = (color1: string, color2: string): string => {
+	const rgba1 = hexToRgba(color1);
+	const rgba2 = hexToRgba(color2);
+
+	const alpha1 = rgba1.a / 255;
+	const alpha2 = rgba2.a / 255;
+	const outAlpha = alpha1 + alpha2 * (1 - alpha1);
+
+	if (outAlpha === 0) {
+		return "#00000000";
+	}
+
+	const outR = Math.round(
+		(rgba1.r * alpha1 + rgba2.r * alpha2 * (1 - alpha1)) / outAlpha,
+	);
+	const outG = Math.round(
+		(rgba1.g * alpha1 + rgba2.g * alpha2 * (1 - alpha1)) / outAlpha,
+	);
+	const outB = Math.round(
+		(rgba1.b * alpha1 + rgba2.b * alpha2 * (1 - alpha1)) / outAlpha,
+	);
+
+	const outA = Math.round(outAlpha * 255);
+	return rgbToHex({ r: outR, g: outG, b: outB, a: outA });
+};
+
 export const generateTintAndShade = (hsl: HSL): { tint: RGBA; shade: RGBA } => {
 	const { h, s, l } = hsl;
 

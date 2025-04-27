@@ -20,7 +20,7 @@ I’m truly grateful for Luke Morrigan’s work, [Pixel-Corners](https://github.
 - [x] Square tool
 - [x] Line tool
 - [x] Circle tool
-- [ ] Bucket tool
+- [x] Bucket tool
 - [x] Color picker
 - [x] Undo & Redo
 - [ ] Download and save

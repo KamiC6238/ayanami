@@ -2,8 +2,13 @@ import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
 import type { CircleTypeEnum, ToolTypeEnum } from "./config";
 
+export enum ExportTypeEnum {
+	PNG = "png",
+}
+
 export type MessageType =
 	| "init"
+	// render utils
 	| "fillRect"
 	| "fillHoverRect"
 	| "drawBresenhamLine"
@@ -13,9 +18,12 @@ export type MessageType =
 	| "clearRect"
 	| "clearHoverRect"
 	| "clearAllPixels"
+	// record utils
 	| "record"
 	| "redo"
-	| "undo";
+	| "undo"
+	// export utils
+	| "export";
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
@@ -102,6 +110,10 @@ export interface RecordMessagePayload {
 	circleType?: CircleTypeEnum;
 }
 
+export interface ExportMessagePayload {
+	exportType: ExportTypeEnum;
+}
+
 export interface RedoOrUndoMessagePayload {
 	tabId: string;
 }
@@ -118,7 +130,8 @@ export type MessagePayload =
 	| ClearHoverRectMessagePayload
 	| ClearAllPixelsMessagePayload
 	| RecordMessagePayload
-	| RedoOrUndoMessagePayload;
+	| RedoOrUndoMessagePayload
+	| ExportMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;

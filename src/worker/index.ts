@@ -1,18 +1,21 @@
-import type {
-	BucketMessagePayload,
-	CircleMessagePayload,
-	ClearAllPixelsMessagePayload,
-	ClearHoverRectMessagePayload,
-	ClearRectMessagePayload,
-	FillHoverRectMessagePayload,
-	FillRectMessagePayload,
-	InitMessagePayload,
-	LineMessagePayload,
-	OffscreenCanvasWorkerMessage,
-	RecordMessagePayload,
-	RedoOrUndoMessagePayload,
-	StrokeRectMessagePayload,
+import {
+	type BucketMessagePayload,
+	type CircleMessagePayload,
+	type ClearAllPixelsMessagePayload,
+	type ClearHoverRectMessagePayload,
+	type ClearRectMessagePayload,
+	type ExportMessagePayload,
+	ExportTypeEnum,
+	type FillHoverRectMessagePayload,
+	type FillRectMessagePayload,
+	type InitMessagePayload,
+	type LineMessagePayload,
+	type OffscreenCanvasWorkerMessage,
+	type RecordMessagePayload,
+	type RedoOrUndoMessagePayload,
+	type StrokeRectMessagePayload,
 } from "@/types";
+import * as exportUtils from "./utils/export";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
 
@@ -70,6 +73,15 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
 			renderUtils.undo(recordStack);
 			break;
+		}
+		case "export": {
+			const _payload = payload as ExportMessagePayload;
+			const { exportType } = _payload;
+
+			if (exportType === ExportTypeEnum.PNG) {
+				const canvas = renderUtils.getCanvas("main");
+				canvas && exportUtils.exportToPNG(canvas, self);
+			}
 		}
 	}
 };

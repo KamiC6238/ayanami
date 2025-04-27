@@ -77,6 +77,10 @@ export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 	colorPositionMap = new Map(colorPositionMapBackup);
 };
 
+export const getCanvas = (canvasType: CanvasType) => {
+	return canvasType === "main" ? mainCanvas : previewCanvas;
+};
+
 export const getContext = (canvasType: CanvasType) => {
 	const canvas = canvasType === "main" ? mainCanvas : previewCanvas;
 	return canvas?.getContext("2d");

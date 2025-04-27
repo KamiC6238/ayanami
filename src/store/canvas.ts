@@ -1,13 +1,14 @@
 import { DEFAULT_HOVERED_PIXEL_COLOR } from "@/constants";
-import type {
-	BucketConfig,
-	CanvasMap,
-	CanvasType,
-	CircleConfig,
-	LineConfig,
-	Position,
-	RectConfig,
-	SquareRectConfig,
+import {
+	type BucketConfig,
+	type CanvasMap,
+	type CanvasType,
+	type CircleConfig,
+	ExportTypeEnum,
+	type LineConfig,
+	type Position,
+	type RectConfig,
+	type SquareRectConfig,
 } from "@/types";
 import CanvasWorker from "@/worker?worker";
 import { defineStore, storeToRefs } from "pinia";
@@ -300,6 +301,18 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const exportToPNG = () => {
+		const worker = getCanvasWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "export",
+			payload: {
+				exportType: ExportTypeEnum.PNG,
+			},
+		});
+	};
+
 	return {
 		redo,
 		undo,
@@ -321,5 +334,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		tabs,
 		currentTabId,
 		setTabId,
+		exportToPNG,
+		canvasWorker,
 	};
 });

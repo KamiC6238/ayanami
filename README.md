@@ -23,8 +23,8 @@ I’m truly grateful for Luke Morrigan’s work, [Pixel-Corners](https://github.
 - [x] Bucket tool
 - [x] Color picker
 - [x] Undo & Redo
-- [ ] Download and save
-  - [ ] as PNG
+- [x] Download and save
+  - [x] as PNG
 
 ## 🚧 Version 0.2.0
 - [ ] Support for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
@@ -32,6 +32,8 @@ I’m truly grateful for Luke Morrigan’s work, [Pixel-Corners](https://github.
 - [ ] Support different canvas sizes
 - [ ] Select tool
 - [ ] Gradient tool
+- [ ] Download and save
+  - [ ] as GIF
 
 ## Tech stack
 - [Vue 3](https://vuejs.org/guide/introduction.html)

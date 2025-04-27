@@ -23,7 +23,7 @@ const perfectCircle = CircleTypeEnum.Circle;
 const ellipseCircle = CircleTypeEnum.Ellipse;
 
 const configStore = useConfigStore();
-const { clearAllPixels } = useCanvasStore();
+const canvasStore = useCanvasStore();
 
 useCircleTool();
 usePencilTool();

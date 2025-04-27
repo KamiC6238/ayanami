@@ -1,6 +1,7 @@
 import { GRID_SIZE } from "@/constants";
 import type {
 	BucketMessagePayload,
+	BucketRecord,
 	CanvasType,
 	CircleMessagePayload,
 	CircleRecord,
@@ -448,6 +449,7 @@ export const undo = (recordStack: RecordStack) => {
 	if (!record) return;
 
 	recordStack.redoStack.push(record);
+	colorPositionMap = new Map(colorPositionMapBackup);
 	replayRecords("undo", recordStack.undoStack);
 };
 
@@ -474,6 +476,9 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 				break;
 			case ToolTypeEnum.Circle:
 				replayCircleRecord(record as CircleRecord);
+				break;
+			case ToolTypeEnum.Bucket:
+				replayBucketRecord(record as BucketRecord);
 				break;
 		}
 	}
@@ -547,5 +552,16 @@ const replayCircleRecord = (record: CircleRecord) => {
 		pixelSize,
 		pixelColor,
 		circleType,
+	});
+};
+
+const replayBucketRecord = (record: BucketRecord) => {
+	const [_, replacementColor, pixelSize, point] = record;
+	const [x, y] = point;
+
+	fillBucket({
+		replacementColor,
+		pixelSize,
+		position: { x, y },
 	});
 };

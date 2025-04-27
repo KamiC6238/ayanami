@@ -37,9 +37,9 @@ export function useBucketTool() {
 					const canvas = canvasStore.getCanvas("preview");
 
 					if (canvas) {
-						canvasStore.fillBucket({
-							position: getPixelPosition(canvas, event),
-						});
+						const position = getPixelPosition(canvas, event);
+						canvasStore.fillBucket({ position });
+						canvasStore.record({ position });
 					}
 				}),
 			),

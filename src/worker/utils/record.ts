@@ -1,4 +1,5 @@
 import type {
+	BucketRecord,
 	CircleRecord,
 	ClearRectMessagePayload,
 	EraserPointRecord,
@@ -126,6 +127,16 @@ const makeCircleRecord = (
 	];
 };
 
+const makeBucketRecord = (
+	payload: RecordMessagePayload,
+): BucketRecord | null => {
+	const { toolType, pixelColor, pixelSize, position } = payload;
+
+	if (!position) return null;
+
+	return [toolType, pixelColor, pixelSize, [position.x, position.y]];
+};
+
 const updatePencilPointsRecord = (position: Position) => {
 	let saveAsNewPoint = true;
 
@@ -200,6 +211,9 @@ export const record = (payload: RecordMessagePayload) => {
 			break;
 		case ToolTypeEnum.Circle:
 			record = makeCircleRecord(payload);
+			break;
+		case ToolTypeEnum.Bucket:
+			record = makeBucketRecord(payload);
 			break;
 	}
 

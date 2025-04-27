@@ -42,12 +42,23 @@ export type CircleRecord = [
 	CirclePointRecord,
 ];
 
+export type BucketRecord = [
+	ToolTypeEnum,
+	// replacementColor
+	string,
+	// pixelSize
+	number,
+	// position
+	[number, number],
+];
+
 export type Record =
 	| PencilRecord
 	| EraserRecord
 	| LineRecord
 	| SquareRecord
-	| CircleRecord;
+	| CircleRecord
+	| BucketRecord;
 
 export type RecordStack = {
 	undoStack: Record[];

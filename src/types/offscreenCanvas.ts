@@ -58,7 +58,6 @@ export interface CircleMessagePayload {
 }
 
 export interface BucketMessagePayload {
-	canvasType: CanvasType;
 	replacementColor: string;
 	position: Position;
 	pixelSize: number;
@@ -93,6 +92,7 @@ export interface RecordMessagePayload {
 	toolType: ToolTypeEnum;
 	pixelSize: number;
 	pixelColor: string;
+	position?: Position;
 	lineStartPosition?: Position;
 	lineEndPosition?: Position;
 	squareStartPosition?: Position;
@@ -113,6 +113,7 @@ export type MessagePayload =
 	| LineMessagePayload
 	| CircleMessagePayload
 	| StrokeRectMessagePayload
+	| BucketMessagePayload
 	| ClearRectMessagePayload
 	| ClearHoverRectMessagePayload
 	| ClearAllPixelsMessagePayload

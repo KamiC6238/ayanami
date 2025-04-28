@@ -23,7 +23,8 @@ import type {
 } from "@/types";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
 import {
-	blendColors,
+	blendHexColors,
+	checkIsValidPosition,
 	drawGrid,
 	getAlignedStartAndEndPosition,
 	makeColorPositionKey,
@@ -41,19 +42,24 @@ const setColorPositionMap = (
 	position: Position,
 	type: "add" | "delete",
 ) => {
-	if (!colorPositionMap) return;
+	if (
+		!mainCanvas ||
+		!colorPositionMap ||
+		!checkIsValidPosition(mainCanvas, position)
+	) {
+		return;
+	}
 
 	const key = makeColorPositionKey(position);
 
 	if (type === "add") {
-		let _color = color;
 		const existedColor = colorPositionMap.get(key);
 
-		if (existedColor) {
-			_color = blendColors(existedColor, color);
+		if (existedColor && existedColor !== color) {
+			colorPositionMap.set(key, blendHexColors(existedColor, color));
+		} else {
+			colorPositionMap.set(key, color);
 		}
-
-		colorPositionMap.set(key, _color);
 	} else {
 		colorPositionMap.set(key, "");
 	}
@@ -136,23 +142,13 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 			[startY, endY] = [endY, startY];
 		}
 
-		// top
 		for (let x = startX; x <= endX; x += pixelSize) {
 			setColorPositionMap(pixelColor, { x, y: startY }, "add");
-		}
-
-		// bottom
-		for (let x = startX; x <= endX; x += pixelSize) {
 			setColorPositionMap(pixelColor, { x, y: endY }, "add");
 		}
 
-		// left
 		for (let y = startY + pixelSize; y < endY; y += pixelSize) {
 			setColorPositionMap(pixelColor, { x: startX, y }, "add");
-		}
-
-		// right
-		for (let y = startY + pixelSize; y < endY; y += pixelSize) {
 			setColorPositionMap(pixelColor, { x: endX, y }, "add");
 		}
 	};
@@ -190,6 +186,8 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 	const queue = [{ x: position.x, y: position.y }];
 	const targetColor = colorPositionMap.get(makeColorPositionKey(position));
 	const visited = new Set<string>();
+
+	if (targetColor === replacementColor) return;
 
 	while (queue.length > 0) {
 		const pos = queue.pop() as Position;

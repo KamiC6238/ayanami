@@ -49,7 +49,7 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 		const toHex = (n: number) => n.toString(16).padStart(2, "0");
 		const withoutAlpha = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 
-		return _alpha === 255 ? withoutAlpha : `${withoutAlpha}${toHex(_alpha)}`;
+		return `${withoutAlpha}${toHex(_alpha)}`;
 	});
 
 	const setPalette = (canvas: HTMLCanvasElement) => {

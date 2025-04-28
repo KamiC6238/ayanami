@@ -20,11 +20,11 @@ onMounted(() => {
 
 	const ctx = palette.value?.getContext("2d");
 	const { hsl, alpha, pickedColor, hslPalettePos } = JSON.parse(storage.value);
-	colorpickerStore.setHSL(hsl);
-	colorpickerStore.setAlpha(alpha);
-	colorpickerStore.setPickedColor(pickedColor);
-	colorpickerStore.setMousePosOnHSLPalette(hslPalettePos);
-	ctx && drawHSLPalette(ctx, hsl.h);
+	hsl && colorpickerStore.setHSL(hsl);
+	alpha && colorpickerStore.setAlpha(alpha);
+	pickedColor && colorpickerStore.setPickedColor(pickedColor);
+	hslPalettePos && colorpickerStore.setMousePosOnHSLPalette(hslPalettePos);
+	hsl && ctx && drawHSLPalette(ctx, hsl.h);
 });
 </script>
 <template>

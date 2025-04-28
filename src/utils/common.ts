@@ -1,3 +1,4 @@
+import type { Position } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -91,4 +92,20 @@ export const roughSizeOfObject = (object: any) => {
 	};
 
 	return formatSize(sizeOf(object));
+};
+
+export const checkIsValidPosition = (
+	canvas: HTMLCanvasElement | OffscreenCanvas,
+	position: Position,
+) => {
+	if (!canvas) return false;
+
+	const { width, height } = canvas;
+	const styleWidth = width / 2;
+	const styleHeight = height / 2;
+	const { x, y } = position;
+
+	if (x < 0 || x > styleWidth) return false;
+	if (y < 0 || y > styleHeight) return false;
+	return true;
 };

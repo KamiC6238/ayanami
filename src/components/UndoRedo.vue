@@ -2,33 +2,51 @@
 import RedoIcon from "@/assets/icons/redo.svg";
 import UndoIcon from "@/assets/icons/undo.svg";
 import { useCanvasStore } from "@/store";
-import { type Subscription, fromEvent, tap } from "rxjs";
+import { type Subscription, filter, fromEvent, tap } from "rxjs";
 import { onBeforeMount, onMounted, ref } from "vue";
 import { PixelBorderUltimate } from "./PixelBorder";
 
-const undoAndRedo$ = ref<Subscription | null>(null);
+const undo$ = ref<Subscription | null>(null);
+const redo$ = ref<Subscription | null>(null);
 
 const canvasStore = useCanvasStore();
 
 onMounted(() => {
-	undoAndRedo$.value = fromEvent<KeyboardEvent>(window, "keydown")
+	undo$.value = fromEvent<KeyboardEvent>(window, "keydown")
 		.pipe(
+			filter(
+				(event) =>
+					(event.ctrlKey || event.metaKey) &&
+					!event.shiftKey &&
+					event.key.toLowerCase() === "z",
+			),
 			tap((event) => {
 				event.preventDefault();
+				canvasStore.undo();
+			}),
+		)
+		.subscribe();
 
-				const _ =
-					(event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z";
-				const isUndo = _ && !event.shiftKey;
-				const isRedo = _ && event.shiftKey;
-
-				isUndo && canvasStore.undo();
-				isRedo && canvasStore.redo();
+	redo$.value = fromEvent<KeyboardEvent>(window, "keydown")
+		.pipe(
+			filter(
+				(event) =>
+					(event.ctrlKey || event.metaKey) &&
+					event.shiftKey &&
+					event.key.toLowerCase() === "z",
+			),
+			tap((event) => {
+				event.preventDefault();
+				canvasStore.redo();
 			}),
 		)
 		.subscribe();
 });
 
-onBeforeMount(() => undoAndRedo$.value?.unsubscribe());
+onBeforeMount(() => {
+	undo$.value?.unsubscribe();
+	redo$.value?.unsubscribe();
+});
 </script>
 <template>
   <div class="flex absolute bottom-2 right-2 gap-2">

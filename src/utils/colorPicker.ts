@@ -198,46 +198,6 @@ export const rgbToHex = (rgba: RGBA) => {
 	return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alpha)}`;
 };
 
-export const hexToRgba = (
-	hex: string,
-): { r: number; g: number; b: number; a: number } => {
-	const normalizedHex = hex.replace("#", "");
-	const hasAlpha = normalizedHex.length === 8;
-
-	const r = Number.parseInt(normalizedHex.slice(0, 2), 16);
-	const g = Number.parseInt(normalizedHex.slice(2, 4), 16);
-	const b = Number.parseInt(normalizedHex.slice(4, 6), 16);
-	const a = hasAlpha ? Number.parseInt(normalizedHex.slice(6, 8), 16) : 255;
-
-	return { r, g, b, a };
-};
-
-export const blendColors = (color1: string, color2: string): string => {
-	const rgba1 = hexToRgba(color1);
-	const rgba2 = hexToRgba(color2);
-
-	const alpha1 = rgba1.a / 255;
-	const alpha2 = rgba2.a / 255;
-	const outAlpha = alpha1 + alpha2 * (1 - alpha1);
-
-	if (outAlpha === 0) {
-		return "#00000000";
-	}
-
-	const outR = Math.round(
-		(rgba1.r * alpha1 + rgba2.r * alpha2 * (1 - alpha1)) / outAlpha,
-	);
-	const outG = Math.round(
-		(rgba1.g * alpha1 + rgba2.g * alpha2 * (1 - alpha1)) / outAlpha,
-	);
-	const outB = Math.round(
-		(rgba1.b * alpha1 + rgba2.b * alpha2 * (1 - alpha1)) / outAlpha,
-	);
-
-	const outA = Math.round(outAlpha * 255);
-	return rgbToHex({ r: outR, g: outG, b: outB, a: outA });
-};
-
 export const generateTintAndShade = (hsl: HSL): { tint: RGBA; shade: RGBA } => {
 	const { h, s, l } = hsl;
 
@@ -251,4 +211,47 @@ export const generateTintAndShade = (hsl: HSL): { tint: RGBA; shade: RGBA } => {
 		tint: hslToRgb(tint),
 		shade: hslToRgb(shade),
 	};
+};
+
+export const blendHexColors = (baseHex: string, topHex: string): string => {
+	const parseHex = (hex: string) => {
+		let _hex = hex;
+		if (hex.startsWith("#")) _hex = hex.slice(1);
+		if (_hex.length !== 8) throw new Error("Invalid color format");
+		const r = Number.parseInt(_hex.slice(0, 2), 16);
+		const g = Number.parseInt(_hex.slice(2, 4), 16);
+		const b = Number.parseInt(_hex.slice(4, 6), 16);
+		const a = Number.parseInt(_hex.slice(6, 8), 16) / 255;
+		return { r, g, b, a };
+	};
+
+	const blendChannel = (
+		top: number,
+		topA: number,
+		base: number,
+		baseA: number,
+	) => {
+		return Math.round(
+			(top * topA + base * baseA * (1 - topA)) / (topA + baseA * (1 - topA)),
+		);
+	};
+
+	const base = parseHex(baseHex);
+	const top = parseHex(topHex);
+
+	const outA = top.a + base.a * (1 - top.a);
+
+	if (outA === 0) {
+		return "#00000000";
+	}
+
+	const outR = blendChannel(top.r, top.a, base.r, base.a);
+	const outG = blendChannel(top.g, top.a, base.g, base.a);
+	const outB = blendChannel(top.b, top.a, base.b, base.b);
+
+	// 转成16进制
+	const toHex = (v: number) => v.toString(16).padStart(2, "0");
+	const outAlpha = Math.round(outA * 255);
+
+	return `#${toHex(outR)}${toHex(outG)}${toHex(outB)}${toHex(outAlpha)}`;
 };

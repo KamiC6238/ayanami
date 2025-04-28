@@ -20,7 +20,7 @@ onMounted(() => {
     >
       <slot name='top' />
     </div>
-    <div data-item-type='BAR' class='cursor-row-resize bg-[#7d929e]' />
+    <div data-item-type='BAR' class='cursor-row-resize bg-[#6e8f8b]' />
     <div data-item-type='SECTION' :style="{
         minHeight: '180px',
         maxHeight: '100%',

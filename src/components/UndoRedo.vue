@@ -2,17 +2,17 @@
 import RedoIcon from "@/assets/icons/redo.svg";
 import UndoIcon from "@/assets/icons/undo.svg";
 import { useCanvasStore } from "@/store";
-import { cn } from "@/utils";
+import { PixelBorderUltimate } from "./PixelBorder";
 
 const canvasStore = useCanvasStore();
-
-const cls = cn(
-	"w-6 h-6 bg-[#c6c6c6] hover:bg-white rounded shadow cursor-pointer",
-);
 </script>
 <template>
   <div class="flex absolute bottom-2 right-2 gap-2">
-    <UndoIcon :class="cls" @click='canvasStore.undo' />
-    <RedoIcon :class="cls" @click='canvasStore.redo' />
+    <PixelBorderUltimate @click='canvasStore.undo'>
+      <UndoIcon class='w-6 h-6' />
+    </PixelBorderUltimate>
+    <PixelBorderUltimate @click='canvasStore.redo'>
+      <RedoIcon class='w-6 h-6' />
+    </PixelBorderUltimate>
   </div>
 </template>

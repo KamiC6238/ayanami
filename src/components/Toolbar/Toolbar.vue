@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { DEFAULT_PIXEL_SIZE } from "@/constants";
+import BroomIconSrc from "@/assets/icons/broom.png";
+import BucketIconSrc from "@/assets/icons/bucket.png";
+import CircleIconSrc from "@/assets/icons/circle.png";
+import EllipsisCircleIconSrc from "@/assets/icons/ellipsis.png";
+import EraserIconSrc from "@/assets/icons/eraser.png";
+import LineIconSrc from "@/assets/icons/line.png";
+import PencilIconSrc from "@/assets/icons/pencil.png";
+import SquareIconSrc from "@/assets/icons/square.png";
 import {
 	useBucketTool,
 	useCircleTool,
@@ -10,17 +17,44 @@ import {
 } from "@/hooks";
 import { useCanvasStore, useConfigStore } from "@/store";
 import { CircleTypeEnum, ToolTypeEnum } from "@/types";
+import Export from "../Export.vue";
+import { PixelBorderUltimate } from "../PixelBorder";
 
 const tools = [
-	ToolTypeEnum.Pencil,
-	ToolTypeEnum.Eraser,
-	ToolTypeEnum.Bucket,
-	ToolTypeEnum.Line,
-	ToolTypeEnum.Square,
-	ToolTypeEnum.Circle,
+	{
+		url: PencilIconSrc,
+		type: ToolTypeEnum.Pencil,
+	},
+	{
+		url: EraserIconSrc,
+		type: ToolTypeEnum.Eraser,
+	},
+	{
+		url: BucketIconSrc,
+		type: ToolTypeEnum.Bucket,
+	},
+	{
+		url: LineIconSrc,
+		type: ToolTypeEnum.Line,
+	},
+	{
+		url: CircleIconSrc,
+		type: ToolTypeEnum.Circle,
+	},
+	{
+		url: EllipsisCircleIconSrc,
+		type: ToolTypeEnum.Circle,
+		subType: CircleTypeEnum.Ellipse,
+	},
+	{
+		url: SquareIconSrc,
+		type: ToolTypeEnum.Square,
+	},
+	{
+		url: BroomIconSrc,
+		type: ToolTypeEnum.Broom,
+	},
 ];
-const perfectCircle = CircleTypeEnum.Circle;
-const ellipseCircle = CircleTypeEnum.Ellipse;
 
 const configStore = useConfigStore();
 const canvasStore = useCanvasStore();
@@ -32,44 +66,34 @@ useLineTool();
 useSquareTool();
 useBucketTool();
 
-const onPixelSizeChange = (e: Event) => {
-	configStore.setPixelSize(Number((e.target as HTMLInputElement).value));
-};
-
-const onCircleTypeChange = (e: Event) => {
-	if (e.target) {
-		const target = e.target as HTMLSelectElement;
-		configStore.setCircleType(target.value as CircleTypeEnum);
+const toolHandler = ({
+	type,
+	subType,
+}: { type: ToolTypeEnum; subType?: CircleTypeEnum }) => {
+	switch (type) {
+		case ToolTypeEnum.Circle:
+			subType && configStore.setCircleType(subType);
+			break;
+		case ToolTypeEnum.Broom:
+			canvasStore.clearAllPixels("main");
+			return;
 	}
+
+	configStore.setToolType(type);
 };
 </script>
 <template>
-  <div>
-    <div class='flex flex-col w-full'>
-      <button
-        v-for="toolType of tools"
-        style='margin-bottom: 10px;'
-        @click="() => configStore.setToolType(toolType)"
-      >
-        {{ toolType.slice(0, 1) }}
-      </button>
-      <!-- <select :value="perfectCircle" @change="onCircleTypeChange" style='margin-bottom: 10px;'>
-        <option :value="perfectCircle">圆形</option>
-        <option :value="ellipseCircle">椭圆</option>
-      </select>
-      <button style="margin-bottom: 10px" @click="() => clearAllPixels('main')">clear</button> -->
-    </div>
-    <!-- <div style="display: flex; flex-direction: column; margin-top: 10px; width: 100px; font-size: 12px;" >
-      <span>pixel size {{ configStore.pixelSize }}: </span>
-      <input
-        type="range"
-        id='pixelSize'
-        :min="DEFAULT_PIXEL_SIZE"
-        max="100"
-        :value="configStore.pixelSize"
-        :step="DEFAULT_PIXEL_SIZE"
-        @input="onPixelSizeChange"
+  <div class='flex flex-col w-full basis-[40px] items-center ml-[3px]'>
+    <PixelBorderUltimate
+      v-for="(item, index) of tools" :key='index'
+      :active='item.type === configStore.toolType'
+    >
+      <img
+        :src="item.url"
+        class='w-6 h-6 p-1'
+        @click="() => toolHandler(item)"
       />
-    </div> -->
+    </PixelBorderUltimate>
+    <Export />
   </div>
 </template>

@@ -17,11 +17,11 @@ generatePixelBorder(4, 3);
 
 <template>
   <div class='relative w-full h-full flex items-center justify-center'>
-    <div class="absolute w-full h-full bg-[#7d929e] z-[-2] bg-[#d4cbbe]"></div>
+    <div class="absolute w-full h-full bg-[#6e8f8b] z-[-2] bg-[#d8c6a1]"></div>
     <div class='flex w-[800px] h-[600px]'>
       <PixelBorderSecondary
-        content-cls='bg-[#7d929e] flex flex-col justify-between pt-2.5 pb-2.5 pl-2.5'
-        background='bg-[#7d929e]'
+        content-cls='bg-[#6e8f8b] flex flex-col justify-between pt-2.5 pb-2.5 pl-2.5'
+        background='bg-[#6e8f8b]'
       >
         <div class='flex justify-between border-b-3 border-solid border-black pb-2.5 mr-2.5'>
           <TrafficLights />

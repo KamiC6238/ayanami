@@ -11,7 +11,7 @@ It’s not perfect yet, but I’ll keep improving it—step by step—until it b
 Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/Stardew_Valley) in my free time.
 
 ## 🙏 Special Thanks
-Huge thanks to Luke Morrigan for [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which helped me implement beautiful pixel-style UI components.
+Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which helped me implement beautiful pixel-style UI components.
 
 ## 🎉 Version 0.1.0
 ✏️ Pencil tool
@@ -24,22 +24,21 @@ Huge thanks to Luke Morrigan for [Pixel-Corners](https://github.com/CodeFoodPixe
 
 ⚪ Circle tool
 
-🪣 Bucket tool
+💧 Bucket tool
 
 🌈 Color picker
 
-🔁 Undo & Redo
+🔁 Undo & Redo (with shortcut)
 
 📤 Download and save as PNG
 
 ## 🚧 Version 0.2.0
 - [ ] Support for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 - [ ] Support multiple frames for animation
+- [ ] Download and save as GIF
 - [ ] Support different canvas sizes
 - [ ] Select tool
 - [ ] Gradient tool
-- [ ] Download and save
-  - [ ] as GIF
 
 ## Tech stack
 - [Vue 3](https://vuejs.org/guide/introduction.html)

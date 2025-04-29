@@ -8,8 +8,8 @@ const canvas = useTemplateRef("canvas");
 const previewCanvas = useTemplateRef("previewCanvas");
 const gridCanvas = useTemplateRef("gridCanvas");
 const canvasStyle = ref<CSSProperties>({
-	width: "202px",
-	height: "202px",
+	width: "252px",
+	height: "252px",
 	borderWidth: "1px",
 	borderStyle: "solid",
 	borderColor: "rgba(0,0,0,0.02)",
@@ -38,7 +38,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="w-full h-full bg-[#635561] flex items-center justify-center">
-    <div class="relative w-[202px] h-[202px]">
+    <div class="relative w-[252px] h-[252px]">
       <canvas ref="gridCanvas" :style="canvasStyle" :class="getCanvasCls(8)" />
       <canvas ref="canvas" :style="canvasStyle" :class="getCanvasCls(9)" />
       <canvas ref="previewCanvas" :style="canvasStyle" :class="getCanvasCls(10)" />

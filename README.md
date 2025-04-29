@@ -10,20 +10,27 @@ It’s not perfect yet, but I’ll keep improving it—step by step—until it b
 
 Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/Stardew_Valley) in my free time.
 
-## Big thanks
-I’m truly grateful for Luke Morrigan’s work, [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which has greatly helped me in creating pixel-style borders.
+## 🙏 Special Thanks
+Huge thanks to Luke Morrigan for [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which helped me implement beautiful pixel-style UI components.
 
 ## 🎉 Version 0.1.0
-- [x] Pencil tool
-- [x] Eraser tool
-- [x] Square tool
-- [x] Line tool
-- [x] Circle tool
-- [x] Bucket tool
-- [x] Color picker
-- [x] Undo & Redo
-- [x] Download and save
-  - [x] as PNG
+✏️ Pencil tool
+
+🧽 Eraser tool
+
+🟥 Square tool
+
+📏 Line tool
+
+⚪ Circle tool
+
+🪣 Bucket tool
+
+🌈 Color picker
+
+🔁 Undo & Redo
+
+📤 Download and save as PNG
 
 ## 🚧 Version 0.2.0
 - [ ] Support for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)

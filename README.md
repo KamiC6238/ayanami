@@ -33,10 +33,12 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 📤 Download and save as PNG
 
 ## 🚧 Version 0.2.0
-- [ ] Support for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
-- [ ] Support multiple frames for animation
+- [ ] Supports for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
+- [ ] Supports multiple frames for animation
+- [ ] Supports canvas zooming
+- [ ] Supports canvas preview
+- [ ] Supports different canvas sizes
 - [ ] Download and save as GIF
-- [ ] Support different canvas sizes
 - [ ] Select tool
 - [ ] Gradient tool
 

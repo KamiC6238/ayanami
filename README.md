@@ -13,8 +13,7 @@ Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/
 ## Big thanks
 I’m truly grateful for Luke Morrigan’s work, [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which has greatly helped me in creating pixel-style borders.
 
-## 🚧 Version 0.1.0
-### features
+## 🎉 Version 0.1.0
 - [x] Pencil tool
 - [x] Eraser tool
 - [x] Square tool

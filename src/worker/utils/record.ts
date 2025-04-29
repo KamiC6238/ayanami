@@ -104,20 +104,18 @@ const makeCircleRecord = (
 ): CircleRecord | null => {
 	const {
 		toolType,
-		circleType,
 		circleStartPosition,
 		circleEndPosition,
 		pixelColor,
 		pixelSize,
 	} = payload;
 
-	if (!circleType || !circleStartPosition || !circleEndPosition) {
+	if (!circleStartPosition || !circleEndPosition) {
 		return null;
 	}
 
 	return [
 		toolType,
-		circleType,
 		pixelColor,
 		pixelSize,
 		[
@@ -212,12 +210,17 @@ export const record = (payload: RecordMessagePayload) => {
 		case ToolTypeEnum.Circle:
 			record = makeCircleRecord(payload);
 			break;
+		case ToolTypeEnum.Ellipse:
+			record = makeCircleRecord(payload);
+			break;
 		case ToolTypeEnum.Bucket:
 			record = makeBucketRecord(payload);
 			break;
 	}
 
 	clearRecordPoints();
+
+	console.log(record);
 
 	if (!record) return;
 
@@ -231,4 +234,6 @@ export const record = (payload: RecordMessagePayload) => {
 	// Redo stack represents a possible future. If a new record occurs, that future is no longer valid — like a time paradox.
 	records[tabId].redoStack.length = 0;
 	records[tabId].undoStack.push(record);
+
+	console.log(records);
 };

@@ -5,11 +5,7 @@ export enum ToolTypeEnum {
 	Line = "line",
 	Square = "square",
 	Circle = "circle",
+	Ellipse = "ellipse",
 	Bucket = "bucket",
 	Broom = "broom",
-}
-
-export enum CircleTypeEnum {
-	Circle = "circle",
-	Ellipse = "ellipse",
 }

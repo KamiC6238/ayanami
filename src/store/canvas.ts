@@ -220,12 +220,12 @@ export const useCanvasStore = defineStore("canvas", () => {
 		worker.postMessage({
 			type: "drawCircle",
 			payload: {
+				toolType: configStore.toolType,
 				canvasType: config.canvasType,
 				circleStartPosition: config.circleStartPosition,
 				circleEndPosition: config.circleEndPosition,
 				pixelSize: configStore.pixelSize,
 				pixelColor: configStore.pixelColor,
-				circleType: configStore.circleType,
 			},
 		});
 	};

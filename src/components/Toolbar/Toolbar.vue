@@ -16,7 +16,7 @@ import {
 	useSquareTool,
 } from "@/hooks";
 import { useCanvasStore, useConfigStore } from "@/store";
-import { CircleTypeEnum, ToolTypeEnum } from "@/types";
+import { ToolTypeEnum } from "@/types";
 import Export from "../Export.vue";
 import { PixelBorderUltimate } from "../PixelBorder";
 
@@ -43,8 +43,7 @@ const tools = [
 	},
 	{
 		url: EllipsisCircleIconSrc,
-		type: ToolTypeEnum.Circle,
-		subType: CircleTypeEnum.Ellipse,
+		type: ToolTypeEnum.Ellipse,
 	},
 	{
 		url: SquareIconSrc,
@@ -66,17 +65,10 @@ useLineTool();
 useSquareTool();
 useBucketTool();
 
-const toolHandler = ({
-	type,
-	subType,
-}: { type: ToolTypeEnum; subType?: CircleTypeEnum }) => {
-	switch (type) {
-		case ToolTypeEnum.Circle:
-			subType && configStore.setCircleType(subType);
-			break;
-		case ToolTypeEnum.Broom:
-			canvasStore.clearAllPixels("main");
-			return;
+const toolHandler = (type: ToolTypeEnum) => {
+	if (type === ToolTypeEnum.Broom) {
+		canvasStore.clearAllPixels("main");
+		return;
 	}
 
 	configStore.setToolType(type);
@@ -91,7 +83,7 @@ const toolHandler = ({
       <img
         :src="item.url"
         class='w-6 h-6 p-1'
-        @click="() => toolHandler(item)"
+        @click="() => toolHandler(item.type)"
       />
     </PixelBorderUltimate>
     <Export />

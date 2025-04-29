@@ -1,6 +1,6 @@
 import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
-import type { CircleTypeEnum, ToolTypeEnum } from "./config";
+import type { ToolTypeEnum } from "./config";
 
 export enum ExportTypeEnum {
 	PNG = "png",
@@ -58,7 +58,7 @@ export interface LineMessagePayload {
 
 export interface CircleMessagePayload {
 	canvasType: CanvasType;
-	circleType: CircleTypeEnum;
+	toolType: ToolTypeEnum;
 	circleStartPosition: Position;
 	circleEndPosition: Position;
 	pixelSize: number;
@@ -107,7 +107,6 @@ export interface RecordMessagePayload {
 	squareEndPosition?: Position;
 	circleStartPosition?: Position;
 	circleEndPosition?: Position;
-	circleType?: CircleTypeEnum;
 }
 
 export interface ExportMessagePayload {

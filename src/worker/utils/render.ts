@@ -21,7 +21,7 @@ import type {
 	SquareRecord,
 	StrokeRectMessagePayload,
 } from "@/types";
-import { CircleTypeEnum, ToolTypeEnum } from "@/types";
+import { ToolTypeEnum } from "@/types";
 import {
 	blendHexColors,
 	checkIsValidPosition,
@@ -315,7 +315,7 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 		canvasType,
 		circleStartPosition,
 		circleEndPosition,
-		circleType,
+		toolType,
 		pixelSize,
 		pixelColor,
 	} = payload;
@@ -445,7 +445,7 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 		}
 	};
 
-	if (circleType === CircleTypeEnum.Circle) {
+	if (toolType === ToolTypeEnum.Circle) {
 		drawPerfectCircle(centerX, centerY, radiusX, canvasType);
 	} else {
 		drawEllipseCircle(centerX, centerY, radiusX, radiusY, canvasType);
@@ -497,6 +497,9 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 				replaySquareRecord(record as SquareRecord);
 				break;
 			case ToolTypeEnum.Circle:
+				replayCircleRecord(record as CircleRecord);
+				break;
+			case ToolTypeEnum.Ellipse:
 				replayCircleRecord(record as CircleRecord);
 				break;
 			case ToolTypeEnum.Bucket:
@@ -562,18 +565,18 @@ const replaySquareRecord = (record: SquareRecord) => {
 };
 
 const replayCircleRecord = (record: CircleRecord) => {
-	const [_, circleType, pixelColor, pixelSize, points] = record;
+	const [toolType, pixelColor, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
 
 	drawCircle({
+		toolType,
 		canvasType: "main",
 		circleStartPosition: { x: startX, y: startY },
 		circleEndPosition: { x: endX, y: endY },
 		pixelSize,
 		pixelColor,
-		circleType,
 	});
 };
 

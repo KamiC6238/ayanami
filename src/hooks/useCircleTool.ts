@@ -20,7 +20,7 @@ export function useCircleTool() {
 	const { mouse$, globalMouseUp$ } = storeToRefs(canvasStore);
 
 	watch(toolType, (type) => {
-		if (type === ToolTypeEnum.Circle) {
+		if (type === ToolTypeEnum.Circle || type === ToolTypeEnum.Ellipse) {
 			initCircle();
 		} else {
 			disposeCircle();
@@ -59,7 +59,6 @@ export function useCircleTool() {
 						canvasStore.record({
 							circleStartPosition: { ...circleStartPosition.value },
 							circleEndPosition: { ...circleEndPosition.value },
-							circleType: configStore.circleType,
 						});
 					}
 					onMouseUpHandler();

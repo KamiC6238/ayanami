@@ -9,6 +9,7 @@ import {
 	type Position,
 	type RectConfig,
 	type SquareRectConfig,
+	ToolTypeEnum,
 } from "@/types";
 import CanvasWorker from "@/worker?worker";
 import { defineStore, storeToRefs } from "pinia";
@@ -181,7 +182,10 @@ export const useCanvasStore = defineStore("canvas", () => {
 			payload: {
 				canvasType: "preview",
 				position,
-				pixelColor: DEFAULT_HOVERED_PIXEL_COLOR,
+				pixelColor:
+					configStore.toolType === ToolTypeEnum.Bucket
+						? configStore.pixelColor
+						: DEFAULT_HOVERED_PIXEL_COLOR,
 				pixelSize: configStore.pixelSize,
 			},
 		});

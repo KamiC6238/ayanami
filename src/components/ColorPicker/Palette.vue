@@ -47,7 +47,7 @@ const getTintOrShade = (color: string, type: "tint" | "shade") => {
 <template>
   <PixelBorderSecondary
     wrapper-height="!h-[calc(100%-40px)]"
-    content-cls='flex flex-wrap content-start'
+    content-cls='flex flex-wrap content-start overflow-auto'
   >
     <PixelBorderTertiary
       class='relative cursor-pointer mr-[3px] mb-[3px] !w-8 !h-8'

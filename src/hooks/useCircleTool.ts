@@ -10,7 +10,7 @@ export function useCircleTool() {
 	const isDrawingCircle = ref(false);
 	const circleStartPosition = ref<Position | null>();
 	const circleEndPosition = ref<Position | null>();
-	const circle$ = ref<Subscription>();
+	const circle$ = ref<Subscription | null>();
 
 	const configStore = useConfigStore();
 	const canvasStore = useCanvasStore();
@@ -27,7 +27,10 @@ export function useCircleTool() {
 		}
 	});
 
-	const disposeCircle = () => circle$.value?.unsubscribe();
+	const disposeCircle = () => {
+		circle$.value?.unsubscribe();
+		circle$.value = null;
+	};
 
 	const initCircle = () => {
 		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;

@@ -255,3 +255,13 @@ export const blendHexColors = (baseHex: string, topHex: string): string => {
 
 	return `#${toHex(outR)}${toHex(outG)}${toHex(outB)}${toHex(outAlpha)}`;
 };
+
+export const getTextColorFromRGB = (rgba: RGBA) => {
+	const { r, g, b, a = 1 } = rgba;
+	const _r = Math.round(r * a + 255 * (1 - a));
+	const _g = Math.round(g * a + 255 * (1 - a));
+	const _b = Math.round(b * a + 255 * (1 - a));
+	const brightness = 0.299 * _r + 0.587 * _g + 0.114 * _b;
+
+	return brightness > 128 ? "black" : "white";
+};

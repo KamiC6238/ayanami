@@ -58,7 +58,16 @@ const getTintOrShade = (color: string, type: "tint" | "shade") => {
       :shade="getTintOrShade(color, 'shade')"
       @click="() => onPicked(color, pickedPalette[color].pos)"
     >
-      <div class="absolute w-full h-full bg-[url(@/assets/alpha-background.png)] bg-cover z-[-2] pointer-events-none" />
+      <div class="
+        absolute
+        w-[calc(100%+12px)]
+        h-[calc(100%+12px)]
+        top-[-6px]
+        left-[-6px]
+        bg-[url(@/assets/alpha-background.png)]
+        bg-cover z-[-2]
+        pointer-events-none"
+      />
       <div
         class="h-full"
         :key="color"

@@ -32,7 +32,13 @@ export function useCircleTool() {
 	const initCircle = () => {
 		const { mouseDown$, mouseMove$, mouseUp$, mouseLeave$ } = mouse$.value;
 
-		if (!mouseDown$ || !mouseMove$ || !mouseUp$ || !mouseLeave$) {
+		if (
+			circle$.value ||
+			!mouseDown$ ||
+			!mouseMove$ ||
+			!mouseUp$ ||
+			!mouseLeave$
+		) {
 			return;
 		}
 

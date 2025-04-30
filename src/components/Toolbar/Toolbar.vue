@@ -13,6 +13,7 @@ import {
 	useEraserTool,
 	useLineTool,
 	usePencilTool,
+	useShortcuts,
 	useSquareTool,
 } from "@/hooks";
 import { useCanvasStore, useConfigStore } from "@/store";
@@ -64,6 +65,7 @@ useEraserTool();
 useLineTool();
 useSquareTool();
 useBucketTool();
+useShortcuts();
 
 const toolHandler = (type: ToolTypeEnum) => {
 	if (type === ToolTypeEnum.Broom) {

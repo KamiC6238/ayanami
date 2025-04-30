@@ -14,23 +14,17 @@ Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/
 Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which helped me implement beautiful pixel-style UI components.
 
 ## 🎉 Version 0.1.0
-✏️ Pencil tool
-
-🧽 Eraser tool
-
-🟥 Square tool
-
-📏 Line tool
-
-⚪ Circle tool
-
-💧 Bucket tool
-
-🌈 Color picker
-
-🔁 Undo & Redo (with shortcut)
-
-📤 Download and save as PNG
+|      | Tool Description              |   Shortcut |
+|------|-------------------------------| ------------|
+| ✏️    | Pencil tool                   | P          |
+| 🧽    | Eraser tool                   | E          |
+| 🟥    | Square tool                   | S          |
+| 📏    | Line tool                     | L          |
+| ⚪    | Circle tool                   | C/Shift + C |
+| 💧    | Bucket tool                  |  B          |
+| 🔁    | Undo & Redo                  | ⌘/Ctrl + Z|
+| 📤    | Download and save as PNG     |             |
+| 🌈    | Color picker                 |             |
 
 ## 🚧 Version 0.2.0
 - [ ] Supports for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)

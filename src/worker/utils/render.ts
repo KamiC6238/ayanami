@@ -66,7 +66,7 @@ const setColorPositionMap = (config: SetColorPosition) => {
 			if (type === "add") {
 				const existedColor = colorPositionMap.get(key);
 
-				if (existedColor && existedColor !== pixelColor) {
+				if (existedColor) {
 					colorPositionMap.set(key, blendHexColors(existedColor, pixelColor));
 				} else {
 					colorPositionMap.set(key, pixelColor);

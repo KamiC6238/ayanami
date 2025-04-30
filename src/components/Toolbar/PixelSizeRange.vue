@@ -1,11 +1,23 @@
 <script setup lang="ts">
-import { DEFAULT_PIXEL_SIZE } from "@/constants";
+import {
+	DEFAULT_PIXEL_SIZE,
+	STORAGE_KEY_FOR_LAST_USED_PIXEL_SIZE,
+} from "@/constants";
 import { useConfigStore } from "@/store";
+import { useLocalStorage } from "@vueuse/core";
+import { onMounted } from "vue";
 
 const configStore = useConfigStore();
+const storage = useLocalStorage(STORAGE_KEY_FOR_LAST_USED_PIXEL_SIZE, 5);
+
+onMounted(() => {
+	configStore.setPixelSize(storage.value);
+});
 
 const onPixelSizeChange = (e: Event) => {
-	configStore.setPixelSize(Number((e.target as HTMLInputElement).value));
+	const pixelSize = Number((e.target as HTMLInputElement).value);
+	configStore.setPixelSize(pixelSize);
+	storage.value = pixelSize;
 };
 </script>
 <template>

@@ -1,4 +1,4 @@
-import { GRID_SIZE } from "@/constants";
+import { DEFAULT_PIXEL_SIZE, GRID_SIZE } from "@/constants";
 import type {
 	BucketMessagePayload,
 	BucketRecord,
@@ -37,11 +37,16 @@ let gridCanvas: OffscreenCanvas | null = null;
 let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;
 
-const setColorPositionMap = (
-	color: string,
-	position: Position,
-	type: "add" | "delete",
-) => {
+interface SetColorPosition {
+	pixelColor: string;
+	position: Position;
+	pixelSize: number;
+	type: "add" | "delete";
+}
+
+const setColorPositionMap = (config: SetColorPosition) => {
+	const { pixelColor, position, pixelSize, type } = config;
+
 	if (
 		!mainCanvas ||
 		!colorPositionMap ||
@@ -50,18 +55,26 @@ const setColorPositionMap = (
 		return;
 	}
 
-	const key = makeColorPositionKey(position);
+	const size = pixelSize / DEFAULT_PIXEL_SIZE;
 
-	if (type === "add") {
-		const existedColor = colorPositionMap.get(key);
+	for (let i = 0; i < size; i++) {
+		for (let j = 0; j < size; j++) {
+			const x = i * DEFAULT_PIXEL_SIZE + position.x;
+			const y = j * DEFAULT_PIXEL_SIZE + position.y;
+			const key = makeColorPositionKey({ x, y });
 
-		if (existedColor && existedColor !== color) {
-			colorPositionMap.set(key, blendHexColors(existedColor, color));
-		} else {
-			colorPositionMap.set(key, color);
+			if (type === "add") {
+				const existedColor = colorPositionMap.get(key);
+
+				if (existedColor && existedColor !== pixelColor) {
+					colorPositionMap.set(key, blendHexColors(existedColor, pixelColor));
+				} else {
+					colorPositionMap.set(key, pixelColor);
+				}
+			} else {
+				colorPositionMap.set(key, "");
+			}
 		}
-	} else {
-		colorPositionMap.set(key, "");
 	}
 };
 
@@ -100,7 +113,12 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 
 	if (canvasType === "main") {
 		clearAllPixels({ canvasType: "preview" });
-		setColorPositionMap(pixelColor, position, "add");
+		setColorPositionMap({
+			pixelColor,
+			position,
+			type: "add",
+			pixelSize,
+		});
 	}
 
 	const { x, y } = position;
@@ -142,14 +160,20 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 			[startY, endY] = [endY, startY];
 		}
 
+		const commonConfig: Omit<SetColorPosition, "position"> = {
+			type: "add",
+			pixelSize,
+			pixelColor,
+		};
+
 		for (let x = startX; x <= endX; x += pixelSize) {
-			setColorPositionMap(pixelColor, { x, y: startY }, "add");
-			setColorPositionMap(pixelColor, { x, y: endY }, "add");
+			setColorPositionMap({ position: { x, y: startY }, ...commonConfig });
+			setColorPositionMap({ position: { x, y: endY }, ...commonConfig });
 		}
 
 		for (let y = startY + pixelSize; y < endY; y += pixelSize) {
-			setColorPositionMap(pixelColor, { x: startX, y }, "add");
-			setColorPositionMap(pixelColor, { x: endX, y }, "add");
+			setColorPositionMap({ position: { x: startX, y }, ...commonConfig });
+			setColorPositionMap({ position: { x: endX, y }, ...commonConfig });
 		}
 	};
 
@@ -207,7 +231,13 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 		}
 
 		visited.add(curPositionColorKey);
-		setColorPositionMap(replacementColor, pos, "add");
+
+		setColorPositionMap({
+			pixelColor: replacementColor,
+			position: pos,
+			pixelSize,
+			type: "add",
+		});
 
 		fillRect({
 			position: pos,
@@ -231,7 +261,12 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 
 	const { x, y } = position;
 	context.clearRect(x, y, pixelSize, pixelSize);
-	setColorPositionMap("", position, "delete");
+	setColorPositionMap({
+		pixelColor: "",
+		pixelSize,
+		position,
+		type: "delete",
+	});
 };
 
 export const clearHoverRect = (payload: ClearHoverRectMessagePayload) => {

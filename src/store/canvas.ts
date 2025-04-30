@@ -1,4 +1,4 @@
-import { DEFAULT_HOVERED_PIXEL_COLOR } from "@/constants";
+import { DEFAULT_HOVERED_PIXEL_COLOR, DEFAULT_PIXEL_SIZE } from "@/constants";
 import {
 	type BucketConfig,
 	type CanvasMap,
@@ -177,16 +177,17 @@ export const useCanvasStore = defineStore("canvas", () => {
 		const worker = getCanvasWorker();
 		if (!worker) return;
 
+		const isBucketTool = configStore.toolType === ToolTypeEnum.Bucket;
+
 		worker.postMessage({
 			type: "fillHoverRect",
 			payload: {
 				canvasType: "preview",
 				position,
-				pixelColor:
-					configStore.toolType === ToolTypeEnum.Bucket
-						? configStore.pixelColor
-						: DEFAULT_HOVERED_PIXEL_COLOR,
-				pixelSize: configStore.pixelSize,
+				pixelColor: isBucketTool
+					? configStore.pixelColor
+					: DEFAULT_HOVERED_PIXEL_COLOR,
+				pixelSize: isBucketTool ? DEFAULT_PIXEL_SIZE : configStore.pixelSize,
 			},
 		});
 	};
@@ -259,7 +260,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			payload: {
 				tabId: currentTabId.value,
 				position: config.position,
-				pixelSize: pixelSize.value,
+				pixelSize: DEFAULT_PIXEL_SIZE,
 				replacementColor: pixelColor.value,
 			},
 		});
@@ -274,7 +275,10 @@ export const useCanvasStore = defineStore("canvas", () => {
 			payload: {
 				tabId: currentTabId.value,
 				toolType: toolType.value,
-				pixelSize: pixelSize.value,
+				pixelSize:
+					configStore.toolType === ToolTypeEnum.Bucket
+						? DEFAULT_PIXEL_SIZE
+						: pixelSize.value,
 				pixelColor: pixelColor.value,
 				...extra,
 			},

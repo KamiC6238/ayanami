@@ -1,3 +1,4 @@
+import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import type { Position } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -108,4 +109,16 @@ export const checkIsValidPosition = (
 	if (x < 0 || x > styleWidth) return false;
 	if (y < 0 || y > styleHeight) return false;
 	return true;
+};
+
+export const getOffsetPosition = (position: Position, pixelSize: number) => {
+	const offset =
+		pixelSize === DEFAULT_PIXEL_SIZE ? 0 : Math.floor(pixelSize / 2);
+
+	const offsetGrid = Math.floor(offset / DEFAULT_PIXEL_SIZE);
+
+	return {
+		x: position.x - offsetGrid * DEFAULT_PIXEL_SIZE,
+		y: position.y - offsetGrid * DEFAULT_PIXEL_SIZE,
+	};
 };

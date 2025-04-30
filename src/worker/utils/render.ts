@@ -27,6 +27,7 @@ import {
 	checkIsValidPosition,
 	drawGrid,
 	getAlignedStartAndEndPosition,
+	getOffsetPosition,
 	makeColorPositionKey,
 } from "@/utils";
 
@@ -111,19 +112,20 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 
 	if (!context) return;
 
+	const offsetPosition = getOffsetPosition(position, pixelSize);
+
 	if (canvasType === "main") {
 		clearAllPixels({ canvasType: "preview" });
 		setColorPositionMap({
 			pixelColor,
-			position,
+			position: offsetPosition,
 			type: "add",
 			pixelSize,
 		});
 	}
 
-	const { x, y } = position;
 	context.fillStyle = pixelColor;
-	context.fillRect(x, y, pixelSize, pixelSize);
+	context.fillRect(offsetPosition.x, offsetPosition.y, pixelSize, pixelSize);
 };
 
 export const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
@@ -252,14 +254,14 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 
 	if (!context) return;
 
-	const { x, y } = position;
-	context.clearRect(x, y, pixelSize, pixelSize);
+	const offsetPosition = getOffsetPosition(position, pixelSize);
+	context.clearRect(offsetPosition.x, offsetPosition.y, pixelSize, pixelSize);
 
 	if (canvasType === "main") {
 		setColorPositionMap({
 			pixelColor: "",
 			pixelSize,
-			position,
+			position: offsetPosition,
 			type: "delete",
 		});
 	}

@@ -51,10 +51,10 @@ onBeforeMount(() => {
 <template>
   <div class="flex absolute bottom-2 right-2 gap-2">
     <PixelBorderUltimate @click='canvasStore.undo'>
-      <UndoIcon class='w-6 h-6' />
+      <UndoIcon class='w-6 h-6 p-1' />
     </PixelBorderUltimate>
     <PixelBorderUltimate @click='canvasStore.redo'>
-      <RedoIcon class='w-6 h-6' />
+      <RedoIcon class='w-6 h-6 p-1' />
     </PixelBorderUltimate>
   </div>
 </template>

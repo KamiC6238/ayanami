@@ -6,6 +6,7 @@ import {
 	PixelBorderSecondary,
 	SocialMedia,
 	Toolbar,
+	TopToolbar,
 	TrafficLights,
 	UndoRedo,
 } from "@/components";
@@ -40,7 +41,7 @@ generatePixelBorder(4, 3);
             </VerticalResizer>
           </template>
           <template v-slot:right>
-            <div class='w-10 h-10 pt-2.5 pb-2.5'></div>
+            <TopToolbar />
             <div class='flex w-full h-[calc(100%-40px)]'>
               <PixelBorderSecondary>
                 <Canvas />

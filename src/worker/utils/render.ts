@@ -127,14 +127,7 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 };
 
 export const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
-	const { canvasType, position, pixelSize, pixelColor } = payload;
-	const context = getContext(canvasType);
-
-	if (!context) return;
-
-	const { x, y } = position;
-	context.fillStyle = pixelColor;
-	context.fillRect(x, y, pixelSize, pixelSize);
+	fillRect({ ...payload });
 };
 
 export const strokeRect = (payload: StrokeRectMessagePayload) => {
@@ -261,22 +254,19 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 
 	const { x, y } = position;
 	context.clearRect(x, y, pixelSize, pixelSize);
-	setColorPositionMap({
-		pixelColor: "",
-		pixelSize,
-		position,
-		type: "delete",
-	});
+
+	if (canvasType === "main") {
+		setColorPositionMap({
+			pixelColor: "",
+			pixelSize,
+			position,
+			type: "delete",
+		});
+	}
 };
 
 export const clearHoverRect = (payload: ClearHoverRectMessagePayload) => {
-	const { canvasType, position, pixelSize } = payload;
-	const context = getContext(canvasType);
-
-	if (!context) return;
-
-	const { x, y } = position;
-	context.clearRect(x, y, pixelSize, pixelSize);
+	clearRect({ ...payload });
 };
 
 export const clearAllPixels = (payload: ClearAllPixelsMessagePayload) => {

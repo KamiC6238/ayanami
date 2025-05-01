@@ -532,6 +532,8 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 			case ToolTypeEnum.Bucket:
 				replayBucketRecord(record as BucketRecord);
 				break;
+			case ToolTypeEnum.Broom:
+				replayClearAllPixelsRecord();
 		}
 	}
 };
@@ -616,4 +618,8 @@ const replayBucketRecord = (record: BucketRecord) => {
 		pixelSize,
 		position: { x, y },
 	});
+};
+
+const replayClearAllPixelsRecord = () => {
+	clearAllPixels({ canvasType: "main" });
 };

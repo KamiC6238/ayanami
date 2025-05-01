@@ -68,9 +68,12 @@ useBucketTool();
 useShortcuts();
 
 const toolHandler = (type: ToolTypeEnum) => {
-	type === ToolTypeEnum.Broom
-		? canvasStore.clearAllPixels("main")
-		: configStore.setToolType(type);
+	if (type === ToolTypeEnum.Broom) {
+		canvasStore.clearAllPixels("main");
+		canvasStore.record({ toolType: ToolTypeEnum.Broom });
+	} else {
+		configStore.setToolType(type);
+	}
 };
 </script>
 <template>

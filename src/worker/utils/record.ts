@@ -1,4 +1,5 @@
 import type {
+	BroomRecord,
 	BucketRecord,
 	CircleRecord,
 	ClearRectMessagePayload,
@@ -135,6 +136,10 @@ const makeBucketRecord = (
 	return [toolType, pixelColor, pixelSize, [position.x, position.y]];
 };
 
+const makeBroomRecord = (): BroomRecord => {
+	return [ToolTypeEnum.Broom];
+};
+
 const updatePencilPointsRecord = (position: Position) => {
 	let saveAsNewPoint = true;
 
@@ -215,6 +220,9 @@ export const record = (payload: RecordMessagePayload) => {
 			break;
 		case ToolTypeEnum.Bucket:
 			record = makeBucketRecord(payload);
+			break;
+		case ToolTypeEnum.Broom:
+			record = makeBroomRecord();
 			break;
 	}
 

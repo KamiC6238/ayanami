@@ -46,13 +46,16 @@ export type BucketRecord = [
 	[number, number],
 ];
 
+export type BroomRecord = [ToolTypeEnum];
+
 export type Record =
 	| PencilRecord
 	| EraserRecord
 	| LineRecord
 	| SquareRecord
 	| CircleRecord
-	| BucketRecord;
+	| BucketRecord
+	| BroomRecord;
 
 export type RecordStack = {
 	undoStack: Record[];

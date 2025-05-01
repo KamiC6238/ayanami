@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { PixelBorderSecondary } from "@/components";
-import { STORAGE_KEY_FOR_LAST_PICKED_COLOR } from "@/constants";
+import {
+	DEFAULT_LAST_PICKED_COLOR,
+	STORAGE_KEY_FOR_LAST_PICKED_COLOR,
+} from "@/constants";
 import { useColorPickerStore } from "@/store";
 import { drawHSLPalette } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
@@ -11,7 +14,11 @@ import HSLPalette from "./HSLPalette.vue";
 import Hue from "./Hue.vue";
 import Preview from "./Preview.vue";
 
-const storage = useLocalStorage(STORAGE_KEY_FOR_LAST_PICKED_COLOR, "{}");
+const storage = useLocalStorage(
+	STORAGE_KEY_FOR_LAST_PICKED_COLOR,
+	DEFAULT_LAST_PICKED_COLOR,
+);
+
 const colorpickerStore = useColorPickerStore();
 const { palette } = storeToRefs(colorpickerStore);
 
@@ -19,7 +26,7 @@ onMounted(() => {
 	if (!storage.value) return;
 
 	const ctx = palette.value?.getContext("2d");
-	const { hsl, alpha, pickedColor, hslPalettePos } = JSON.parse(storage.value);
+	const { hsl, alpha, pickedColor, hslPalettePos } = storage.value;
 	hsl && colorpickerStore.setHSL(hsl);
 	alpha && colorpickerStore.setAlpha(alpha);
 	pickedColor && colorpickerStore.setPickedColor(pickedColor);

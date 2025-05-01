@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { PixelBorderSecondary } from "@/components";
-import { STORAGE_KEY_FOR_COLOR_PALETTE } from "@/constants";
+import {
+	DEFAULT_COLOR_PALETTE,
+	STORAGE_KEY_FOR_COLOR_PALETTE,
+} from "@/constants";
 import { useColorPickerStore } from "@/store";
-import type { Position } from "@/types";
+import type { PickedPalette, Position } from "@/types";
 import { drawHSLPalette, rgbToHsl } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
@@ -16,10 +19,13 @@ const {
 	pickedColor: currentPickedColor,
 } = storeToRefs(colorPickerStore);
 
-const storage = useLocalStorage(STORAGE_KEY_FOR_COLOR_PALETTE, "{}");
+const storage = useLocalStorage(
+	STORAGE_KEY_FOR_COLOR_PALETTE,
+	DEFAULT_COLOR_PALETTE,
+);
 
 onMounted(() => {
-	colorPickerStore.setPickedPalette(JSON.parse(storage.value));
+	colorPickerStore.setPickedPalette(storage.value);
 });
 
 const onPicked = (pickedColor: string, position: Position) => {

@@ -1,4 +1,6 @@
 import {
+	DEFAULT_COLOR_PALETTE,
+	DEFAULT_LAST_PICKED_COLOR,
 	STORAGE_KEY_FOR_COLOR_PALETTE,
 	STORAGE_KEY_FOR_LAST_PICKED_COLOR,
 } from "@/constants";
@@ -21,15 +23,13 @@ export const useColorPickerStore = defineStore("colorPicker", () => {
 
 	const storage = useLocalStorage(
 		STORAGE_KEY_FOR_COLOR_PALETTE,
-		pickedPalette.value,
+		DEFAULT_COLOR_PALETTE as PickedPalette,
 	);
 
-	const storageForLPC = useLocalStorage(STORAGE_KEY_FOR_LAST_PICKED_COLOR, {
-		hslPalettePos: mousePosOnHSLPalette.value,
-		hsl: hsl.value,
-		alpha: 1,
-		pickedColor: pickedColor.value,
-	});
+	const storageForLPC = useLocalStorage(
+		STORAGE_KEY_FOR_LAST_PICKED_COLOR,
+		DEFAULT_LAST_PICKED_COLOR,
+	);
 
 	watch([() => rgb.value, () => alpha.value], ([rgb, alpha]) => {
 		setPickedColor(`${makeRGBA({ ...rgb, a: alpha })}`);

@@ -5,7 +5,7 @@ import {
 	STORAGE_KEY_FOR_COLOR_PALETTE,
 } from "@/constants";
 import { useColorPickerStore } from "@/store";
-import type { PickedPalette, Position } from "@/types";
+import type { Position } from "@/types";
 import { drawHSLPalette, rgbToHsl } from "@/utils";
 import { useLocalStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";

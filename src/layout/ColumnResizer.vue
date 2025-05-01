@@ -19,7 +19,7 @@ onMounted(() => {
       <slot name='left' />
     </div>
     <div data-item-type='BAR' class='cursor-col-resize bg-[#6e8f8b]' />
-    <div data-item-type='SECTION'>
+    <div data-item-type='SECTION' :style='{...(resizer?.styles.section({ minSize: 530 }) ?? {})}'>
       <slot name='right' />
     </div>
   </div>

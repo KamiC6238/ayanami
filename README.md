@@ -1,6 +1,8 @@
 # About this project
 It's a free online pixel art drawing tool.
 
+![alt text](image.png)
+
 ## Why I made it?
 I bought [Octopath Traveler II](https://en.wikipedia.org/wiki/Octopath_Traveler_II) in 2024. The game’s scenery captivated me, and at that moment, a thought came to mind: maybe I could make a pixel art tool by myself one day.
 

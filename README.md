@@ -20,11 +20,12 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 |------|-------------------------------| ------------|
 | ✏️    | Pencil tool                   | P          |
 | 🧽    | Eraser tool                   | E          |
-| 🟥    | Square tool                   | S          |
+| 💧    | Bucket tool                  |  B          |
 | 📏    | Line tool                     | L          |
 | ⚪    | Circle tool                   | C/Shift + C |
-| 💧    | Bucket tool                  |  B          |
+| 🟥    | Square tool                   | S          |
 | 🔁    | Undo & Redo                  | ⌘/Ctrl + Z|
+| 🧹    | Broom                        | |
 | 📤    | Download and save as PNG     |             |
 | 🌈    | Color picker                 |             |
 

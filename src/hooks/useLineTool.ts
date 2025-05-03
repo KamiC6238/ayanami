@@ -112,6 +112,7 @@ export function useLineTool() {
 		}
 
 		canvasStore.drawLine({
+			toolType: ToolTypeEnum.Line,
 			canvasType,
 			lineStartPosition: { ...lineStartPosition.value },
 			lineEndPosition: { ...lineEndPosition.value },

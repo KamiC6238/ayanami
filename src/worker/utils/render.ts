@@ -148,7 +148,8 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 
 	if (!context) return;
 
-	let { x: startX, y: startY } = squareStartPosition;
+	const offsetPosition = getOffsetPosition(squareStartPosition, pixelSize);
+	let { x: startX, y: startY } = offsetPosition;
 	let { x: endX, y: endY } = squareEndPosition;
 
 	const updateColorPositionMap = () => {

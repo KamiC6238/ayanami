@@ -48,28 +48,6 @@ export function drawGrid(
 	return colorPositionMap;
 }
 
-// for line tool
-export const getAlignedStartAndEndPosition = (
-	lineStartPosition: Position,
-	lineEndPosition: Position,
-	pixelSize: number,
-) => {
-	let { x: startX, y: startY } = lineStartPosition;
-	let { x: endX, y: endY } = lineEndPosition;
-
-	startX = Math.floor(startX / pixelSize) * pixelSize;
-	startY = Math.floor(startY / pixelSize) * pixelSize;
-	endX = Math.floor(endX / pixelSize) * pixelSize;
-	endY = Math.floor(endY / pixelSize) * pixelSize;
-
-	return {
-		startX,
-		startY,
-		endX,
-		endY,
-	};
-};
-
 export const saveAsPNG = (blob: Blob, filename: string) => {
 	const url = URL.createObjectURL(blob);
 

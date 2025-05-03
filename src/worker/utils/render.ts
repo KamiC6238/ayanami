@@ -26,7 +26,6 @@ import {
 	blendHexColors,
 	checkIsValidPosition,
 	drawGrid,
-	getAlignedStartAndEndPosition,
 	getOffsetPosition,
 	makeColorPositionKey,
 } from "@/utils";
@@ -296,16 +295,13 @@ export const drawBresenhamLine = (payload: LineMessagePayload) => {
 		clearAllPixels({ canvasType });
 	}
 
-	let { startX, startY, endX, endY } = getAlignedStartAndEndPosition(
-		lineStartPosition,
-		lineEndPosition,
-		pixelSize,
-	);
+	let { x: startX, y: startY } = lineStartPosition;
+	const { x: endX, y: endY } = lineEndPosition;
 
 	const dx = Math.abs(endX - startX);
 	const dy = Math.abs(endY - startY);
-	const sx = startX < endX ? pixelSize : -pixelSize;
-	const sy = startY < endY ? pixelSize : -pixelSize;
+	const sx = startX < endX ? DEFAULT_PIXEL_SIZE : -DEFAULT_PIXEL_SIZE;
+	const sy = startY < endY ? DEFAULT_PIXEL_SIZE : -DEFAULT_PIXEL_SIZE;
 	let err = dx - dy;
 
 	while (true) {

@@ -242,6 +242,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		worker.postMessage({
 			type: "drawBresenhamLine",
 			payload: {
+				toolType: config.toolType,
 				canvasType: config.canvasType,
 				lineStartPosition: config.lineStartPosition,
 				lineEndPosition: config.lineEndPosition,

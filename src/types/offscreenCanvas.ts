@@ -49,6 +49,7 @@ export interface StrokeRectMessagePayload {
 }
 
 export interface LineMessagePayload {
+	toolType: ToolTypeEnum;
 	canvasType: CanvasType;
 	lineStartPosition: Position;
 	lineEndPosition: Position;

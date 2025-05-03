@@ -29,6 +29,7 @@ import {
 	getOffsetPosition,
 	makeColorPositionKey,
 } from "@/utils";
+import * as recordUtils from "./record";
 
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
@@ -106,7 +107,7 @@ export const getContext = (canvasType: CanvasType) => {
 };
 
 export const fillRect = (payload: FillRectMessagePayload) => {
-	const { canvasType, position, pixelColor, pixelSize } = payload;
+	const { toolType, canvasType, position, pixelColor, pixelSize } = payload;
 	const context = getContext(canvasType);
 
 	if (!context) return;
@@ -125,6 +126,10 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 
 	context.fillStyle = pixelColor;
 	context.fillRect(offsetPosition.x, offsetPosition.y, pixelSize, pixelSize);
+
+	if (toolType === ToolTypeEnum.Pencil) {
+		recordUtils.updatePointsRecord({ toolType, position });
+	}
 };
 
 export const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
@@ -284,6 +289,7 @@ export const clearAllPixels = (payload: ClearAllPixelsMessagePayload) => {
 
 export const drawBresenhamLine = (payload: LineMessagePayload) => {
 	const {
+		toolType,
 		canvasType,
 		lineStartPosition,
 		lineEndPosition,
@@ -306,6 +312,7 @@ export const drawBresenhamLine = (payload: LineMessagePayload) => {
 
 	while (true) {
 		fillRect({
+			toolType,
 			position: { x: startX, y: startY },
 			canvasType,
 			pixelSize,
@@ -566,6 +573,7 @@ const replayLineRecord = (record: LineRecord) => {
 	const [endX, endY] = endPoint;
 
 	drawBresenhamLine({
+		toolType: ToolTypeEnum.Line,
 		canvasType: "main",
 		lineStartPosition: { x: startX, y: startY },
 		lineEndPosition: { x: endX, y: endY },

@@ -27,9 +27,7 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.initOffScreenCanvas(payload as InitMessagePayload);
 			break;
 		case "fillRect": {
-			const _payload = payload as FillRectMessagePayload;
-			renderUtils.fillRect(_payload);
-			recordUtils.updatePointsRecord(_payload);
+			renderUtils.fillRect(payload as FillRectMessagePayload);
 			break;
 		}
 		case "fillHoverRect":

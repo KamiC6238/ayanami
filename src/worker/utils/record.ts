@@ -177,7 +177,9 @@ const updateEraserPointsRecord = (position: Position) => {
 };
 
 export const updatePointsRecord = (
-	payload: FillRectMessagePayload | ClearRectMessagePayload,
+	payload:
+		| Pick<FillRectMessagePayload, "toolType" | "position">
+		| Pick<ClearRectMessagePayload, "toolType" | "position">,
 ) => {
 	const { toolType, position } = payload;
 

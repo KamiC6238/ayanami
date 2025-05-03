@@ -1,5 +1,6 @@
 import type { Observable } from "rxjs";
 import type { Position } from "./common";
+import type { ToolTypeEnum } from "./config";
 
 export type CanvasType = "main" | "preview" | "grid";
 export type CanvasMouseEventType =
@@ -26,6 +27,7 @@ export type CircleConfig = {
 };
 
 export type LineConfig = {
+	toolType: ToolTypeEnum;
 	canvasType: CanvasType;
 	lineStartPosition: Position;
 	lineEndPosition: Position;

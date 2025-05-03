@@ -1,5 +1,6 @@
+import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import { useCanvasStore, useConfigStore } from "@/store";
-import { ToolTypeEnum } from "@/types";
+import { type Position, ToolTypeEnum } from "@/types";
 import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
 import { type Subscription, merge, tap } from "rxjs";
@@ -9,6 +10,7 @@ import { useHoverPixel } from "./useHover";
 export function usePencilTool() {
 	const isDrawing = ref(false);
 	const draw$ = ref<Subscription>();
+	const prePosition = ref<Position | null>(null);
 
 	const configTool = useConfigStore();
 	const canvasStore = useCanvasStore();
@@ -37,14 +39,24 @@ export function usePencilTool() {
 		draw$.value = merge(
 			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
+					const canvas = canvasStore.getCanvas("preview");
+					if (!canvas) return;
+
+					const position = getPixelPosition(canvas, event);
 					isDrawing.value = true;
-					drawPixel(event);
+					drawPixel(position);
+					prePosition.value = position;
 				}),
 			),
 			mouseMove$.pipe(
 				tap((event: MouseEvent) => {
 					if (isDrawing.value) {
-						drawPixel(event);
+						const canvas = canvasStore.getCanvas("preview");
+						if (!canvas) return;
+
+						const position = getPixelPosition(canvas, event);
+						drawPixel(position);
+						drawLineIfPointsDisconnected(position);
 					} else {
 						drawHoverPixel(event);
 					}
@@ -65,16 +77,33 @@ export function usePencilTool() {
 		).subscribe();
 	};
 
-	const drawPixel = (event: MouseEvent) => {
-		const canvas = canvasStore.getCanvas("preview");
+	const drawLineIfPointsDisconnected = (position: Position | null) => {
+		if (!position || !prePosition.value) return;
 
-		if (canvas) {
-			const position = getPixelPosition(canvas, event);
+		const { x: curX, y: curY } = position;
+		const { x: preX, y: preY } = prePosition.value;
 
-			canvasStore.fillRect({
-				position,
+		if (
+			Math.abs(curX - preX) > DEFAULT_PIXEL_SIZE ||
+			Math.abs(curY - preY) > DEFAULT_PIXEL_SIZE
+		) {
+			canvasStore.drawLine({
+				toolType: ToolTypeEnum.Pencil,
 				canvasType: "main",
+				lineStartPosition: { ...position },
+				lineEndPosition: { ...prePosition.value },
 			});
 		}
+
+		prePosition.value = position;
+	};
+
+	const drawPixel = (position: Position | null) => {
+		if (!position) return;
+
+		canvasStore.fillRect({
+			position,
+			canvasType: "main",
+		});
 	};
 }

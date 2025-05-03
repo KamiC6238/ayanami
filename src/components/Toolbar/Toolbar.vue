@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import BroomIconSrc from "@/assets/icons/broom.png";
-import BucketIconSrc from "@/assets/icons/bucket.png";
-import CircleIconSrc from "@/assets/icons/circle.png";
-import EllipsisCircleIconSrc from "@/assets/icons/ellipsis.png";
-import EraserIconSrc from "@/assets/icons/eraser.png";
-import LineIconSrc from "@/assets/icons/line.png";
-import PencilIconSrc from "@/assets/icons/pencil.png";
-import SquareIconSrc from "@/assets/icons/square.png";
+import { STORAGE_KEY_FOR_LAST_USED_TOOL } from "@/constants";
 import {
 	useBucketTool,
 	useCircleTool,
@@ -18,46 +11,18 @@ import {
 } from "@/hooks";
 import { useCanvasStore, useConfigStore } from "@/store";
 import { ToolTypeEnum } from "@/types";
+import { useLocalStorage } from "@vueuse/core";
+import { onMounted } from "vue";
 import Export from "../Export.vue";
 import { PixelBorderUltimate } from "../PixelBorder";
-
-const tools = [
-	{
-		url: PencilIconSrc,
-		type: ToolTypeEnum.Pencil,
-	},
-	{
-		url: EraserIconSrc,
-		type: ToolTypeEnum.Eraser,
-	},
-	{
-		url: BucketIconSrc,
-		type: ToolTypeEnum.Bucket,
-	},
-	{
-		url: LineIconSrc,
-		type: ToolTypeEnum.Line,
-	},
-	{
-		url: CircleIconSrc,
-		type: ToolTypeEnum.Circle,
-	},
-	{
-		url: EllipsisCircleIconSrc,
-		type: ToolTypeEnum.Ellipse,
-	},
-	{
-		url: SquareIconSrc,
-		type: ToolTypeEnum.Square,
-	},
-	{
-		url: BroomIconSrc,
-		type: ToolTypeEnum.Broom,
-	},
-];
+import tools from "./tools";
 
 const configStore = useConfigStore();
 const canvasStore = useCanvasStore();
+const storage = useLocalStorage(
+	STORAGE_KEY_FOR_LAST_USED_TOOL,
+	ToolTypeEnum.Pencil,
+);
 
 useCircleTool();
 usePencilTool();
@@ -67,12 +32,17 @@ useSquareTool();
 useBucketTool();
 useShortcuts();
 
+onMounted(() => {
+	configStore.setToolType(storage.value as ToolTypeEnum);
+});
+
 const toolHandler = (type: ToolTypeEnum) => {
 	if (type === ToolTypeEnum.Broom) {
 		canvasStore.clearAllPixels("main");
 		canvasStore.record({ toolType: ToolTypeEnum.Broom });
 	} else {
 		configStore.setToolType(type);
+		storage.value = type;
 	}
 };
 </script>

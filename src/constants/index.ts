@@ -9,6 +9,7 @@ export const STORAGE_KEY_FOR_COLOR_PALETTE = "ayanami__color-palette";
 export const STORAGE_KEY_FOR_LAST_PICKED_COLOR = "ayanami__last-picked-color";
 export const STORAGE_KEY_FOR_LAST_USED_PIXEL_SIZE =
 	"ayanami__last-used-pixel-size";
+export const STORAGE_KEY_FOR_LAST_USED_TOOL = "ayanami__last-used-tool";
 
 export const DEFAULT_LAST_PICKED_COLOR = {
 	alpha: 0.94,

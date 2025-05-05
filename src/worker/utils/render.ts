@@ -127,8 +127,7 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 	}
 
 	/**
-	 * 通过 redo 或者 undo 回放操作时，不需要记录绘制的 record,
-	 * 否则会污染不同笔之间的绘制数据
+	 * do not update point record during redo or undo
 	 * */
 	if (!isReplay && toolType === ToolTypeEnum.Pencil) {
 		recordUtils.updatePointsRecord({
@@ -141,19 +140,22 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 	const size = pixelSize / DEFAULT_PIXEL_SIZE;
 	context.fillStyle = pixelColor;
 
-	if (toolType === ToolTypeEnum.Pencil || toolType === ToolTypeEnum.Line) {
+	if (
+		toolType === ToolTypeEnum.Pencil ||
+		toolType === ToolTypeEnum.Line ||
+		toolType === ToolTypeEnum.Circle ||
+		toolType === ToolTypeEnum.Ellipse
+	) {
 		for (let i = 0; i < size; i++) {
 			for (let j = 0; j < size; j++) {
 				const _x = i * DEFAULT_PIXEL_SIZE + x;
 				const _y = j * DEFAULT_PIXEL_SIZE + y;
 				const key = makeColorPositionKey({ x: _x, y: _y });
 
-				if (visited.has(key)) continue;
-
-				context.fillRect(_x, _y, DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_SIZE);
-				visited.add(key);
-
 				if (canvasType === "main") {
+					if (visited.has(key)) continue;
+					visited.add(key);
+
 					const existedColor = colorPositionMap?.get(key);
 
 					if (existedColor) {
@@ -165,10 +167,11 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 						colorPositionMap?.set(key, pixelColor);
 					}
 				}
+
+				context.fillRect(_x, _y, DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_SIZE);
 			}
 		}
 	} else {
-		// draw hover pixel
 		context.fillRect(x, y, pixelSize, pixelSize);
 	}
 };
@@ -343,6 +346,10 @@ export const drawBresenhamLine = (payload: LineMessagePayload) => {
 		clearAllPixels({ canvasType });
 	}
 
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
+	}
+
 	let { x: startX, y: startY } = lineStartPosition;
 	const { x: endX, y: endY } = lineEndPosition;
 
@@ -375,10 +382,6 @@ export const drawBresenhamLine = (payload: LineMessagePayload) => {
 			err += dx;
 			startY += sy;
 		}
-	}
-
-	if (canvasType === "main") {
-		clearAllPixels({ canvasType: "preview" });
 	}
 };
 

@@ -53,17 +53,7 @@ export function useLineTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(
-				tap(() => {
-					if (lineStartPosition.value && lineEndPosition.value) {
-						canvasStore.record({
-							lineStartPosition: { ...lineStartPosition.value },
-							lineEndPosition: { ...lineEndPosition.value },
-						});
-					}
-					onMouseUpHandler();
-				}),
-			),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
@@ -72,6 +62,14 @@ export function useLineTool() {
 	const onMouseUpHandler = () => {
 		drawBresenhamLine("main");
 		isDrawingLine.value = false;
+
+		if (lineStartPosition.value && lineEndPosition.value) {
+			canvasStore.record({
+				lineStartPosition: { ...lineStartPosition.value },
+				lineEndPosition: { ...lineEndPosition.value },
+			});
+		}
+
 		lineStartPosition.value = null;
 		lineEndPosition.value = null;
 	};

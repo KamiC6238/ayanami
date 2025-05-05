@@ -58,6 +58,7 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
 			break;
 		case "record":
+			renderUtils.clearVisitedPosition();
 			recordUtils.record(payload as RecordMessagePayload);
 			break;
 		case "redo": {

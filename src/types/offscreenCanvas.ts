@@ -31,6 +31,7 @@ export interface FillRectMessagePayload {
 	pixelColor: string;
 	pixelSize: number;
 	toolType?: ToolTypeEnum;
+	isReplay?: boolean;
 }
 
 export interface FillHoverRectMessagePayload {

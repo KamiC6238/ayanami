@@ -38,6 +38,11 @@ let gridCanvas: OffscreenCanvas | null = null;
 let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;
 
+const visited = new Set<string>();
+export const clearVisitedPosition = () => {
+	visited.clear();
+};
+
 interface SetColorPosition {
 	pixelColor: string;
 	position: Position;
@@ -107,28 +112,64 @@ export const getContext = (canvasType: CanvasType) => {
 };
 
 export const fillRect = (payload: FillRectMessagePayload) => {
-	const { toolType, canvasType, position, pixelColor, pixelSize } = payload;
+	const { toolType, canvasType, position, pixelColor, pixelSize, isReplay } =
+		payload;
 	const context = getContext(canvasType);
 
 	if (!context) return;
 
-	const offsetPosition = getOffsetPosition(position, pixelSize);
+	const offsetPosition = isReplay
+		? position
+		: getOffsetPosition(position, pixelSize);
 
 	if (canvasType === "main") {
 		clearAllPixels({ canvasType: "preview" });
-		setColorPositionMap({
-			pixelColor,
+	}
+
+	/**
+	 * 通过 redo 或者 undo 回放操作时，不需要记录绘制的 record,
+	 * 否则会污染不同笔之间的绘制数据
+	 * */
+	if (!isReplay && toolType === ToolTypeEnum.Pencil) {
+		recordUtils.updatePointsRecord({
+			toolType,
 			position: offsetPosition,
-			type: "add",
-			pixelSize,
 		});
 	}
 
+	const { x, y } = offsetPosition;
+	const size = pixelSize / DEFAULT_PIXEL_SIZE;
 	context.fillStyle = pixelColor;
-	context.fillRect(offsetPosition.x, offsetPosition.y, pixelSize, pixelSize);
 
-	if (toolType === ToolTypeEnum.Pencil) {
-		recordUtils.updatePointsRecord({ toolType, position });
+	if (toolType === ToolTypeEnum.Pencil || toolType === ToolTypeEnum.Line) {
+		for (let i = 0; i < size; i++) {
+			for (let j = 0; j < size; j++) {
+				const _x = i * DEFAULT_PIXEL_SIZE + x;
+				const _y = j * DEFAULT_PIXEL_SIZE + y;
+				const key = makeColorPositionKey({ x: _x, y: _y });
+
+				if (visited.has(key)) continue;
+
+				context.fillRect(_x, _y, DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_SIZE);
+				visited.add(key);
+
+				if (canvasType === "main") {
+					const existedColor = colorPositionMap?.get(key);
+
+					if (existedColor) {
+						colorPositionMap?.set(
+							key,
+							blendHexColors(existedColor, pixelColor),
+						);
+					} else {
+						colorPositionMap?.set(key, pixelColor);
+					}
+				}
+			}
+		}
+	} else {
+		// draw hover pixel
+		context.fillRect(x, y, pixelSize, pixelSize);
 	}
 };
 
@@ -493,7 +534,9 @@ export const redo = (recordStack: RecordStack) => {
 	if (!record) return;
 
 	recordStack.undoStack.push(record);
-	replayRecords("redo", [record]);
+	colorPositionMap = new Map(colorPositionMapBackup);
+	visited.clear();
+	replayRecords(recordStack.undoStack);
 };
 
 export const undo = (recordStack: RecordStack) => {
@@ -503,13 +546,12 @@ export const undo = (recordStack: RecordStack) => {
 
 	recordStack.redoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
-	replayRecords("undo", recordStack.undoStack);
+	visited.clear();
+	replayRecords(recordStack.undoStack);
 };
 
-export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
-	if (type === "undo") {
-		clearAllPixels({ canvasType: "main" });
-	}
+export const replayRecords = (records: Record[]) => {
+	clearAllPixels({ canvasType: "main" });
 
 	for (const record of records) {
 		const [toolType] = record;
@@ -539,6 +581,8 @@ export const replayRecords = (type: "redo" | "undo", records: Record[]) => {
 			case ToolTypeEnum.Broom:
 				replayClearAllPixelsRecord();
 		}
+
+		visited.clear();
 	}
 };
 
@@ -547,10 +591,12 @@ const replayPencilRecord = (record: PencilRecord) => {
 	for (const [x, y, drawCounts] of points) {
 		for (let i = 0; i < drawCounts; i++) {
 			fillRect({
+				toolType: ToolTypeEnum.Pencil,
 				position: { x, y },
 				canvasType: "main",
 				pixelSize,
 				pixelColor,
+				isReplay: true,
 			});
 		}
 	}

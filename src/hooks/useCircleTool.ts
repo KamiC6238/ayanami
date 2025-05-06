@@ -62,17 +62,7 @@ export function useCircleTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(
-				tap(() => {
-					if (circleStartPosition.value && circleEndPosition.value) {
-						canvasStore.record({
-							circleStartPosition: { ...circleStartPosition.value },
-							circleEndPosition: { ...circleEndPosition.value },
-						});
-					}
-					onMouseUpHandler();
-				}),
-			),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
@@ -80,8 +70,15 @@ export function useCircleTool() {
 
 	const onMouseUpHandler = () => {
 		drawCircle("main");
-		canvasStore.clearAllPixels("preview");
 		isDrawingCircle.value = false;
+
+		if (circleStartPosition.value && circleEndPosition.value) {
+			canvasStore.record({
+				circleStartPosition: { ...circleStartPosition.value },
+				circleEndPosition: { ...circleEndPosition.value },
+			});
+		}
+
 		circleStartPosition.value = null;
 		circleEndPosition.value = null;
 	};

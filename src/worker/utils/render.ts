@@ -402,8 +402,14 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 		pixelColor,
 	} = payload;
 
+	tempVisited.clear();
+
 	if (canvasType === "preview") {
 		clearAllPixels({ canvasType });
+	}
+
+	if (canvasType === "main") {
+		clearAllPixels({ canvasType: "preview" });
 	}
 
 	const { x: endX, y: endY } = circleEndPosition;
@@ -417,6 +423,7 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 
 	const drawPixel = (x: number, y: number, canvasType: CanvasType) => {
 		fillRect({
+			toolType: ToolTypeEnum.Circle,
 			position: {
 				x: x * GRID_SIZE,
 				y: y * GRID_SIZE,
@@ -531,10 +538,6 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 		drawPerfectCircle(centerX, centerY, radiusX, canvasType);
 	} else {
 		drawEllipseCircle(centerX, centerY, radiusX, radiusY, canvasType);
-	}
-
-	if (canvasType === "main") {
-		clearAllPixels({ canvasType: "preview" });
 	}
 };
 

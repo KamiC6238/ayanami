@@ -147,7 +147,8 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 		toolType === ToolTypeEnum.Line ||
 		toolType === ToolTypeEnum.Circle ||
 		toolType === ToolTypeEnum.Ellipse ||
-		toolType === ToolTypeEnum.Square
+		toolType === ToolTypeEnum.Square ||
+		toolType === ToolTypeEnum.Bucket
 	) {
 		for (let i = 0; i < size; i++) {
 			for (let j = 0; j < size; j++) {
@@ -262,14 +263,8 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 
 		visited.add(curPositionColorKey);
 
-		setColorPositionMap({
-			pixelColor: replacementColor,
-			position: pos,
-			pixelSize,
-			type: "add",
-		});
-
 		fillRect({
+			toolType: ToolTypeEnum.Bucket,
 			position: pos,
 			canvasType: "main",
 			pixelColor: replacementColor,

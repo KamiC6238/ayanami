@@ -39,8 +39,10 @@ let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;
 
 const visited = new Set<string>();
+const tempVisited = new Set<string>();
 export const clearVisitedPosition = () => {
 	visited.clear();
+	tempVisited.clear();
 };
 
 interface SetColorPosition {
@@ -166,6 +168,9 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 					} else {
 						colorPositionMap?.set(key, pixelColor);
 					}
+				} else {
+					if (tempVisited.has(key)) continue;
+					tempVisited.add(key);
 				}
 
 				context.fillRect(_x, _y, DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_SIZE);
@@ -341,6 +346,8 @@ export const drawBresenhamLine = (payload: LineMessagePayload) => {
 		pixelColor,
 		pixelSize,
 	} = payload;
+
+	tempVisited.clear();
 
 	if (canvasType === "preview") {
 		clearAllPixels({ canvasType });

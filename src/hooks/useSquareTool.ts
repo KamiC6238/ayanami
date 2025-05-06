@@ -53,17 +53,7 @@ export function useSquareTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(
-				tap(() => {
-					if (squareStartPosition.value && squareEndPosition.value) {
-						canvasStore.record({
-							squareStartPosition: { ...squareStartPosition.value },
-							squareEndPosition: { ...squareEndPosition.value },
-						});
-					}
-					onMouseUpHandler();
-				}),
-			),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
@@ -72,6 +62,14 @@ export function useSquareTool() {
 	const onMouseUpHandler = () => {
 		drawSquare("main");
 		isDrawingSquare.value = false;
+
+		if (squareStartPosition.value && squareEndPosition.value) {
+			canvasStore.record({
+				squareStartPosition: { ...squareStartPosition.value },
+				squareEndPosition: { ...squareEndPosition.value },
+			});
+		}
+
 		squareStartPosition.value = null;
 		squareEndPosition.value = null;
 	};

@@ -117,7 +117,7 @@ export function useSquareTool() {
 				canvasType,
 			});
 		} else {
-			canvasStore.strokeRect({
+			canvasStore.drawSquare({
 				squareStartPosition: { ...squareStartPosition.value },
 				squareEndPosition: { ...squareEndPosition.value },
 				canvasType,

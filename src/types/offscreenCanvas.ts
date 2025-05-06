@@ -8,21 +8,18 @@ export enum ExportTypeEnum {
 
 export type MessageType =
 	| "init"
-	// render utils
 	| "fillRect"
 	| "fillHoverRect"
 	| "drawBresenhamLine"
 	| "drawCircle"
-	| "strokeRect"
+	| "drawSquare"
 	| "fillBucket"
 	| "clearRect"
 	| "clearHoverRect"
 	| "clearAllPixels"
-	// record utils
 	| "record"
 	| "redo"
 	| "undo"
-	// export utils
 	| "export";
 
 export interface FillRectMessagePayload {
@@ -41,7 +38,7 @@ export interface FillHoverRectMessagePayload {
 	pixelSize: number;
 }
 
-export interface StrokeRectMessagePayload {
+export interface SquareMessagePayload {
 	canvasType: CanvasType;
 	squareStartPosition: Position;
 	squareEndPosition: Position;
@@ -125,7 +122,7 @@ export type MessagePayload =
 	| FillHoverRectMessagePayload
 	| LineMessagePayload
 	| CircleMessagePayload
-	| StrokeRectMessagePayload
+	| SquareMessagePayload
 	| BucketMessagePayload
 	| ClearRectMessagePayload
 	| ClearHoverRectMessagePayload

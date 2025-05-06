@@ -126,12 +126,12 @@ export const useCanvasStore = defineStore("canvas", () => {
 		setTabId(tabId);
 	};
 
-	const strokeRect = (config: SquareRectConfig) => {
+	const drawSquare = (config: SquareRectConfig) => {
 		const worker = getCanvasWorker();
 		if (!worker) return;
 
 		worker.postMessage({
-			type: "strokeRect",
+			type: "drawSquare",
 			payload: {
 				canvasType: config.canvasType,
 				squareStartPosition: config.squareStartPosition,
@@ -329,7 +329,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		getCanvasWorker,
 		getCanvas,
 		initCanvas,
-		strokeRect,
+		drawSquare,
 		fillRect,
 		clearRect,
 		fillHoverRect,

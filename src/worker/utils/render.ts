@@ -18,8 +18,8 @@ import type {
 	Position,
 	Record,
 	RecordStack,
+	SquareMessagePayload,
 	SquareRecord,
-	StrokeRectMessagePayload,
 } from "@/types";
 import { ToolTypeEnum } from "@/types";
 import {
@@ -146,7 +146,8 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 		toolType === ToolTypeEnum.Pencil ||
 		toolType === ToolTypeEnum.Line ||
 		toolType === ToolTypeEnum.Circle ||
-		toolType === ToolTypeEnum.Ellipse
+		toolType === ToolTypeEnum.Ellipse ||
+		toolType === ToolTypeEnum.Square
 	) {
 		for (let i = 0; i < size; i++) {
 			for (let j = 0; j < size; j++) {
@@ -185,7 +186,7 @@ export const fillHoverRect = (payload: FillHoverRectMessagePayload) => {
 	fillRect({ ...payload });
 };
 
-export const strokeRect = (payload: StrokeRectMessagePayload) => {
+export const drawSquare = (payload: SquareMessagePayload) => {
 	const {
 		canvasType,
 		squareStartPosition,
@@ -193,59 +194,39 @@ export const strokeRect = (payload: StrokeRectMessagePayload) => {
 		pixelSize,
 		pixelColor,
 	} = payload;
-	const context = getContext(canvasType);
 
-	if (!context) return;
-
-	const offsetPosition = getOffsetPosition(squareStartPosition, pixelSize);
-	let { x: startX, y: startY } = offsetPosition;
-	let { x: endX, y: endY } = squareEndPosition;
-
-	const updateColorPositionMap = () => {
-		if (startX > endX) {
-			[startX, endX] = [endX, startX];
-		}
-		if (startY > endY) {
-			[startY, endY] = [endY, startY];
-		}
-
-		const commonConfig: Omit<SetColorPosition, "position"> = {
-			type: "add",
-			pixelSize,
-			pixelColor,
-		};
-
-		for (let x = startX; x <= endX; x += pixelSize) {
-			setColorPositionMap({ position: { x, y: startY }, ...commonConfig });
-			setColorPositionMap({ position: { x, y: endY }, ...commonConfig });
-		}
-
-		for (let y = startY + pixelSize; y < endY; y += pixelSize) {
-			setColorPositionMap({ position: { x: startX, y }, ...commonConfig });
-			setColorPositionMap({ position: { x: endX, y }, ...commonConfig });
-		}
-	};
+	tempVisited.clear();
 
 	if (canvasType === "main") {
 		clearAllPixels({ canvasType: "preview" });
-		updateColorPositionMap();
 	}
-
-	context.strokeStyle = pixelColor;
-	context.lineWidth = pixelSize;
-
-	const offset = pixelSize / 2;
 
 	if (canvasType === "preview") {
 		clearAllPixels({ canvasType });
 	}
 
-	context.strokeRect(
-		startX + offset,
-		startY + offset,
-		endX - startX,
-		endY - startY,
-	);
+	let { x: startX, y: startY } = squareStartPosition;
+	let { x: endX, y: endY } = squareEndPosition;
+
+	if (startX > endX) [startX, endX] = [endX, startX];
+	if (startY > endY) [startY, endY] = [endY, startY];
+
+	const commonConfig = {
+		toolType: ToolTypeEnum.Square,
+		canvasType,
+		pixelSize,
+		pixelColor,
+	};
+
+	for (let x = startX; x <= endX; x += DEFAULT_PIXEL_SIZE) {
+		fillRect({ position: { x, y: startY }, ...commonConfig });
+		fillRect({ position: { x, y: endY }, ...commonConfig });
+	}
+
+	for (let y = startY + pixelSize; y <= endY; y += DEFAULT_PIXEL_SIZE) {
+		fillRect({ position: { x: startX, y }, ...commonConfig });
+		fillRect({ position: { x: endX, y }, ...commonConfig });
+	}
 };
 
 export const fillBucket = (payload: BucketMessagePayload) => {
@@ -648,7 +629,7 @@ const replaySquareRecord = (record: SquareRecord) => {
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
 
-	strokeRect({
+	drawSquare({
 		canvasType: "main",
 		squareStartPosition: { x: startX, y: startY },
 		squareEndPosition: { x: endX, y: endY },

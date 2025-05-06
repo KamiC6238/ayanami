@@ -13,7 +13,7 @@ import {
 	type OffscreenCanvasWorkerMessage,
 	type RecordMessagePayload,
 	type RedoOrUndoMessagePayload,
-	type StrokeRectMessagePayload,
+	type SquareMessagePayload,
 } from "@/types";
 import * as exportUtils from "./utils/export";
 import * as recordUtils from "./utils/record";
@@ -39,8 +39,8 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "drawCircle":
 			renderUtils.drawCircle(payload as CircleMessagePayload);
 			break;
-		case "strokeRect":
-			renderUtils.strokeRect(payload as StrokeRectMessagePayload);
+		case "drawSquare":
+			renderUtils.drawSquare(payload as SquareMessagePayload);
 			break;
 		case "fillBucket":
 			renderUtils.fillBucket(payload as BucketMessagePayload);

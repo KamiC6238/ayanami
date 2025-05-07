@@ -81,6 +81,7 @@ export interface ClearRectMessagePayload {
 	position: Position;
 	pixelSize: number;
 	toolType?: ToolTypeEnum;
+	isReplay?: boolean;
 }
 
 export interface ClearAllPixelsMessagePayload {

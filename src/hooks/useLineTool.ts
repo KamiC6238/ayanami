@@ -1,10 +1,10 @@
 import { useCanvasStore, useConfigStore } from "@/store";
 import { type CanvasType, type Position, ToolTypeEnum } from "@/types";
-import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
 import { type Subscription, merge, tap, throttleTime } from "rxjs";
 import { ref, watch } from "vue";
 import { useHoverPixel } from "./useHover";
+import { useToolsCommon } from "./useToolsCommon";
 
 export function useLineTool() {
 	const isDrawingLine = ref(false);
@@ -14,6 +14,7 @@ export function useLineTool() {
 
 	const configStore = useConfigStore();
 	const canvasStore = useCanvasStore();
+	const { getMousePosition } = useToolsCommon();
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configStore);
@@ -53,17 +54,7 @@ export function useLineTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(
-				tap(() => {
-					if (lineStartPosition.value && lineEndPosition.value) {
-						canvasStore.record({
-							lineStartPosition: { ...lineStartPosition.value },
-							lineEndPosition: { ...lineEndPosition.value },
-						});
-					}
-					onMouseUpHandler();
-				}),
-			),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
@@ -72,38 +63,41 @@ export function useLineTool() {
 	const onMouseUpHandler = () => {
 		drawBresenhamLine("main");
 		isDrawingLine.value = false;
+
+		if (lineStartPosition.value && lineEndPosition.value) {
+			canvasStore.record({
+				lineStartPosition: { ...lineStartPosition.value },
+				lineEndPosition: { ...lineEndPosition.value },
+			});
+		}
+
 		lineStartPosition.value = null;
 		lineEndPosition.value = null;
 	};
 
 	const drawLineStart = (event: MouseEvent) => {
-		const canvas = canvasStore.getCanvas("preview");
+		const position = getMousePosition(event);
+		if (!position) return;
 
-		if (canvas) {
-			const position = getPixelPosition(canvas, event);
-			lineStartPosition.value = position;
-			lineEndPosition.value = position;
-		}
+		lineStartPosition.value = position;
+		lineEndPosition.value = position;
 	};
 
 	const drawLineEnd = (event: MouseEvent) => {
-		const canvas = canvasStore.getCanvas("preview");
-
 		if (!lineStartPosition.value) return;
 
-		if (canvas) {
-			const newLineEndPosition = getPixelPosition(canvas, event);
+		const newLineEndPosition = getMousePosition(event);
 
-			if (
-				newLineEndPosition.x === lineEndPosition.value?.x &&
-				newLineEndPosition.y === lineEndPosition.value?.y
-			) {
-				return;
-			}
-
-			lineEndPosition.value = newLineEndPosition;
-			drawBresenhamLine("preview");
+		if (
+			!newLineEndPosition ||
+			(newLineEndPosition.x === lineEndPosition.value?.x &&
+				newLineEndPosition.y === lineEndPosition.value?.y)
+		) {
+			return;
 		}
+
+		lineEndPosition.value = newLineEndPosition;
+		drawBresenhamLine("preview");
 	};
 
 	const drawBresenhamLine = (canvasType: CanvasType) => {

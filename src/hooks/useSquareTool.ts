@@ -1,10 +1,10 @@
 import { useCanvasStore, useConfigStore } from "@/store";
 import { type CanvasType, type Position, ToolTypeEnum } from "@/types";
-import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
 import { type Subscription, merge, tap, throttleTime } from "rxjs";
 import { ref, watch } from "vue";
 import { useHoverPixel } from "./useHover";
+import { useToolsCommon } from "./useToolsCommon";
 
 export function useSquareTool() {
 	const isDrawingSquare = ref(false);
@@ -14,6 +14,7 @@ export function useSquareTool() {
 
 	const configTool = useConfigStore();
 	const canvasStore = useCanvasStore();
+	const { getMousePosition } = useToolsCommon();
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configTool);
@@ -53,17 +54,7 @@ export function useSquareTool() {
 					}
 				}),
 			),
-			mouseUp$.pipe(
-				tap(() => {
-					if (squareStartPosition.value && squareEndPosition.value) {
-						canvasStore.record({
-							squareStartPosition: { ...squareStartPosition.value },
-							squareEndPosition: { ...squareEndPosition.value },
-						});
-					}
-					onMouseUpHandler();
-				}),
-			),
+			mouseUp$.pipe(tap(() => onMouseUpHandler())),
 			mouseLeave$.pipe(tap(() => setHoveredPixel(null))),
 			globalMouseUp$.value.pipe(tap(() => onMouseUpHandler())),
 		).subscribe();
@@ -72,38 +63,41 @@ export function useSquareTool() {
 	const onMouseUpHandler = () => {
 		drawSquare("main");
 		isDrawingSquare.value = false;
+
+		if (squareStartPosition.value && squareEndPosition.value) {
+			canvasStore.record({
+				squareStartPosition: { ...squareStartPosition.value },
+				squareEndPosition: { ...squareEndPosition.value },
+			});
+		}
+
 		squareStartPosition.value = null;
 		squareEndPosition.value = null;
 	};
 
 	const drawSquareStart = (event: MouseEvent) => {
-		const canvas = canvasStore.getCanvas("preview");
+		const position = getMousePosition(event);
+		if (!position) return;
 
-		if (canvas) {
-			const position = getPixelPosition(canvas, event);
-			squareStartPosition.value = position;
-			squareEndPosition.value = position;
-		}
+		squareStartPosition.value = position;
+		squareEndPosition.value = position;
 	};
 
 	const drawSquareEnd = (event: MouseEvent) => {
-		const canvas = canvasStore.getCanvas("preview");
-
 		if (!squareStartPosition.value) return;
 
-		if (canvas) {
-			const newSqureEndPosition = getPixelPosition(canvas, event);
+		const newSqureEndPosition = getMousePosition(event);
 
-			if (
-				newSqureEndPosition.x === squareEndPosition.value?.x &&
-				newSqureEndPosition.y === squareEndPosition.value?.y
-			) {
-				return;
-			}
-
-			squareEndPosition.value = newSqureEndPosition;
-			drawSquare("preview");
+		if (
+			!newSqureEndPosition ||
+			(newSqureEndPosition.x === squareEndPosition.value?.x &&
+				newSqureEndPosition.y === squareEndPosition.value?.y)
+		) {
+			return;
 		}
+
+		squareEndPosition.value = newSqureEndPosition;
+		drawSquare("preview");
 	};
 
 	const drawSquare = (canvasType: CanvasType) => {
@@ -117,7 +111,7 @@ export function useSquareTool() {
 				canvasType,
 			});
 		} else {
-			canvasStore.strokeRect({
+			canvasStore.drawSquare({
 				squareStartPosition: { ...squareStartPosition.value },
 				squareEndPosition: { ...squareEndPosition.value },
 				canvasType,

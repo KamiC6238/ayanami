@@ -13,7 +13,7 @@ import {
 	type OffscreenCanvasWorkerMessage,
 	type RecordMessagePayload,
 	type RedoOrUndoMessagePayload,
-	type StrokeRectMessagePayload,
+	type SquareMessagePayload,
 } from "@/types";
 import * as exportUtils from "./utils/export";
 import * as recordUtils from "./utils/record";
@@ -39,8 +39,8 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "drawCircle":
 			renderUtils.drawCircle(payload as CircleMessagePayload);
 			break;
-		case "strokeRect":
-			renderUtils.strokeRect(payload as StrokeRectMessagePayload);
+		case "drawSquare":
+			renderUtils.drawSquare(payload as SquareMessagePayload);
 			break;
 		case "fillBucket":
 			renderUtils.fillBucket(payload as BucketMessagePayload);
@@ -48,7 +48,6 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "clearRect": {
 			const _payload = payload as ClearRectMessagePayload;
 			renderUtils.clearRect(_payload);
-			recordUtils.updatePointsRecord(_payload);
 			break;
 		}
 		case "clearHoverRect":
@@ -58,6 +57,7 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
 			break;
 		case "record":
+			renderUtils.clearVisitedPosition();
 			recordUtils.record(payload as RecordMessagePayload);
 			break;
 		case "redo": {

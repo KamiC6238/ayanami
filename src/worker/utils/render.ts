@@ -24,7 +24,6 @@ import type {
 import { ToolTypeEnum } from "@/types";
 import {
 	blendHexColors,
-	checkIsValidPosition,
 	drawGrid,
 	getOffsetPosition,
 	makeColorPositionKey,
@@ -101,14 +100,7 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 	const size = pixelSize / DEFAULT_PIXEL_SIZE;
 	context.fillStyle = pixelColor;
 
-	if (
-		toolType === ToolTypeEnum.Pencil ||
-		toolType === ToolTypeEnum.Line ||
-		toolType === ToolTypeEnum.Circle ||
-		toolType === ToolTypeEnum.Ellipse ||
-		toolType === ToolTypeEnum.Square ||
-		toolType === ToolTypeEnum.Bucket
-	) {
+	if (toolType && toolType !== ToolTypeEnum.Broom) {
 		for (let i = 0; i < size; i++) {
 			for (let j = 0; j < size; j++) {
 				const _x = i * DEFAULT_PIXEL_SIZE + x;
@@ -130,6 +122,10 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 						colorPositionMap?.set(key, pixelColor);
 					}
 				} else {
+					/**
+					 * for tools need preview before drawing at mainCanvas
+					 * like line/circle/square
+					 */
 					if (tempVisited.has(key)) continue;
 					tempVisited.add(key);
 				}
@@ -138,6 +134,7 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 			}
 		}
 	} else {
+		// for fill hover rect during mousemove
 		context.fillRect(x, y, pixelSize, pixelSize);
 	}
 };
@@ -553,6 +550,7 @@ export const replayRecords = (records: Record[]) => {
 				break;
 			case ToolTypeEnum.Broom:
 				replayClearAllPixelsRecord();
+				break;
 		}
 
 		visited.clear();

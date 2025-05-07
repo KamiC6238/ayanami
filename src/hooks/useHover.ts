@@ -1,20 +1,19 @@
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import { useCanvasStore } from "@/store";
 import type { Position } from "@/types";
-import { getPixelPosition, isPixelPositionChanged } from "@/utils";
+import { isPixelPositionChanged } from "@/utils";
 import { ref } from "vue";
+import { useToolsCommon } from "./useToolsCommon";
 
 export function useHoverPixel() {
 	const hoveredPixel = ref<Position | null>(null);
 
 	const canvasStore = useCanvasStore();
+	const { getMousePosition } = useToolsCommon();
 
 	const drawHoverPixel = (event: MouseEvent) => {
-		const canvas = canvasStore.getCanvas("preview");
-
-		if (!canvas) return;
-
-		const position = getPixelPosition(canvas, event, DEFAULT_PIXEL_SIZE);
+		const position = getMousePosition(event, DEFAULT_PIXEL_SIZE);
+		if (!position) return;
 
 		clearPreHoveredPixel(position);
 		setHoveredPixel(position);

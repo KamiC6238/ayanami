@@ -1,11 +1,10 @@
-import { DEFAULT_PIXEL_SIZE } from "@/constants";
 import { useCanvasStore, useConfigStore } from "@/store";
 import { type Position, ToolTypeEnum } from "@/types";
-import { getPixelPosition } from "@/utils";
 import { storeToRefs } from "pinia";
 import { type Subscription, merge, tap } from "rxjs";
 import { ref, watch } from "vue";
 import { useHoverPixel } from "./useHover";
+import { useToolsCommon } from "./useToolsCommon";
 
 export function useEraserTool() {
 	const isErasing = ref(false);
@@ -14,6 +13,7 @@ export function useEraserTool() {
 
 	const configTool = useConfigStore();
 	const canvasStore = useCanvasStore();
+	const { getMousePosition, eraseLineIfPointsDisconnected } = useToolsCommon();
 	const { drawHoverPixel, setHoveredPixel } = useHoverPixel();
 
 	const { toolType } = storeToRefs(configTool);
@@ -39,24 +39,23 @@ export function useEraserTool() {
 		erase$.value = merge(
 			mouseDown$.pipe(
 				tap((event: MouseEvent) => {
-					const canvas = canvasStore.getCanvas("preview");
-					if (!canvas) return;
+					const position = getMousePosition(event);
+					if (!position) return;
 
-					const position = getPixelPosition(canvas, event);
 					isErasing.value = true;
-					erasePixel(position);
 					prePosition.value = position;
+					erasePixel(position);
 				}),
 			),
 			mouseMove$.pipe(
 				tap((event: MouseEvent) => {
 					if (isErasing.value) {
-						const canvas = canvasStore.getCanvas("preview");
-						if (!canvas) return;
+						const position = getMousePosition(event);
+						if (!position) return;
 
-						const position = getPixelPosition(canvas, event);
 						erasePixel(position);
-						eraseLineIfPointsDisconnected(position);
+						eraseLineIfPointsDisconnected(position, prePosition.value);
+						prePosition.value = position;
 					} else {
 						drawHoverPixel(event);
 					}
@@ -75,27 +74,6 @@ export function useEraserTool() {
 				}),
 			),
 		).subscribe();
-	};
-
-	const eraseLineIfPointsDisconnected = (position: Position | null) => {
-		if (!position || !prePosition.value) return;
-
-		const { x: curX, y: curY } = position;
-		const { x: preX, y: preY } = prePosition.value;
-
-		if (
-			Math.abs(curX - preX) > DEFAULT_PIXEL_SIZE ||
-			Math.abs(curY - preY) > DEFAULT_PIXEL_SIZE
-		) {
-			canvasStore.drawLine({
-				toolType: ToolTypeEnum.Eraser,
-				canvasType: "main",
-				lineStartPosition: { ...position },
-				lineEndPosition: { ...prePosition.value },
-			});
-		}
-
-		prePosition.value = position;
 	};
 
 	const erasePixel = (position: Position | null) => {

@@ -11,7 +11,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },
-    ui: true,
+    // ui: true,
   },
   resolve: {
 		alias: [

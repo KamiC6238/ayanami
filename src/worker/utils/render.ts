@@ -37,6 +37,30 @@ let gridCanvas: OffscreenCanvas | null = null;
 let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;
 
+const setColorPositionMap = (key: string, color: string) => {
+	const [x, y] = key.split("_");
+	const position = {
+		x: Number(x),
+		y: Number(y),
+	};
+	const checkIsValidPosition = (position: Position) => {
+		if (!mainCanvas) return false;
+
+		const { width, height } = mainCanvas;
+		const styleWidth = width / 2;
+		const styleHeight = height / 2;
+		const { x, y } = position;
+
+		if (x < 0 || x > styleWidth) return false;
+		if (y < 0 || y > styleHeight) return false;
+		return true;
+	};
+
+	if (checkIsValidPosition(position)) {
+		colorPositionMap?.set(key, color);
+	}
+};
+
 const visited = new Set<string>();
 const tempVisited = new Set<string>();
 export const clearVisitedPosition = () => {
@@ -114,12 +138,9 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 					const existedColor = colorPositionMap?.get(key);
 
 					if (existedColor) {
-						colorPositionMap?.set(
-							key,
-							blendHexColors(existedColor, pixelColor),
-						);
+						setColorPositionMap(key, blendHexColors(existedColor, pixelColor));
 					} else {
-						colorPositionMap?.set(key, pixelColor);
+						setColorPositionMap(key, pixelColor);
 					}
 				} else {
 					/**

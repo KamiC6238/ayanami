@@ -33,7 +33,8 @@ export function useShortcuts() {
 						isUndo ||
 						isRedo ||
 						isEllipsisCircle(e) ||
-						["p", "e", "b", "l", "s", "c"].includes(e.key.toLowerCase())
+						(!(e.ctrlKey || e.metaKey) &&
+							["p", "e", "b", "l", "s", "c"].includes(e.key.toLowerCase()))
 					);
 				}),
 			)

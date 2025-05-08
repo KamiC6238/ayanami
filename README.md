@@ -53,6 +53,3 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 - [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
 - [OffscreenCanvas](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas)
 - [Vite](https://vite.dev/guide/)
-
-## License
-Licensed under the MIT License.

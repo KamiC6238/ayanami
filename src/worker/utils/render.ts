@@ -579,7 +579,7 @@ export const replayRecords = (records: Record[]) => {
 };
 
 const replayPencilRecord = (record: PencilRecord) => {
-	const [_, pixelColor, pixelSize, points] = record;
+	const [_, colorIndex, pixelSize, points] = record;
 	for (const [x, y, drawCounts] of points) {
 		for (let i = 0; i < drawCounts; i++) {
 			fillRect({
@@ -587,7 +587,7 @@ const replayPencilRecord = (record: PencilRecord) => {
 				position: { x, y },
 				canvasType: "main",
 				pixelSize,
-				pixelColor,
+				pixelColor: recordUtils.getColor(colorIndex),
 				isReplay: true,
 			});
 		}
@@ -608,7 +608,7 @@ const replayEraserRecord = (record: EraserRecord) => {
 };
 
 const replayLineRecord = (record: LineRecord) => {
-	const [_, pixelColor, pixelSize, points] = record;
+	const [_, colorIndex, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
@@ -618,13 +618,13 @@ const replayLineRecord = (record: LineRecord) => {
 		canvasType: "main",
 		lineStartPosition: { x: startX, y: startY },
 		lineEndPosition: { x: endX, y: endY },
-		pixelColor,
+		pixelColor: recordUtils.getColor(colorIndex),
 		pixelSize,
 	});
 };
 
 const replaySquareRecord = (record: SquareRecord) => {
-	const [_, pixelColor, pixelSize, points] = record;
+	const [_, colorIndex, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
@@ -634,12 +634,12 @@ const replaySquareRecord = (record: SquareRecord) => {
 		squareStartPosition: { x: startX, y: startY },
 		squareEndPosition: { x: endX, y: endY },
 		pixelSize,
-		pixelColor,
+		pixelColor: recordUtils.getColor(colorIndex),
 	});
 };
 
 const replayCircleRecord = (record: CircleRecord) => {
-	const [toolType, pixelColor, pixelSize, points] = record;
+	const [toolType, colorIndex, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
@@ -650,16 +650,16 @@ const replayCircleRecord = (record: CircleRecord) => {
 		circleStartPosition: { x: startX, y: startY },
 		circleEndPosition: { x: endX, y: endY },
 		pixelSize,
-		pixelColor,
+		pixelColor: recordUtils.getColor(colorIndex),
 	});
 };
 
 const replayBucketRecord = (record: BucketRecord) => {
-	const [_, replacementColor, pixelSize, point] = record;
+	const [_, colorIndex, pixelSize, point] = record;
 	const [x, y] = point;
 
 	fillBucket({
-		replacementColor,
+		replacementColor: recordUtils.getColor(colorIndex),
 		pixelSize,
 		position: { x, y },
 	});

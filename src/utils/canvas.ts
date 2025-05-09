@@ -48,12 +48,12 @@ export function drawGrid(
 	return colorPositionMap;
 }
 
-export const saveAsPNG = (blob: Blob, filename: string) => {
+export const save = (blob: Blob, filename: string) => {
 	const url = URL.createObjectURL(blob);
 
 	const a = document.createElement("a");
 	a.href = url;
-	a.download = filename;
+	a.download = `${filename}.ayanami`;
 	a.style.display = "none";
 
 	document.body.appendChild(a);

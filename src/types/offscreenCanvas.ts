@@ -4,6 +4,7 @@ import type { ToolTypeEnum } from "./config";
 
 export enum ExportTypeEnum {
 	PNG = "png",
+	Source = "source",
 }
 
 export type MessageType =
@@ -110,6 +111,7 @@ export interface RecordMessagePayload {
 }
 
 export interface ExportMessagePayload {
+	tabId: string;
 	exportType: ExportTypeEnum;
 }
 

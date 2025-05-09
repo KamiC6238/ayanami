@@ -74,11 +74,24 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		}
 		case "export": {
 			const _payload = payload as ExportMessagePayload;
-			const { exportType } = _payload;
+			const { exportType, tabId } = _payload;
+			const canvas = renderUtils.getCanvas("main");
+			if (!canvas) return;
 
-			if (exportType === ExportTypeEnum.PNG) {
-				const canvas = renderUtils.getCanvas("main");
-				canvas && exportUtils.exportToPNG(canvas, self);
+			switch (exportType) {
+				case ExportTypeEnum.PNG:
+					canvas && exportUtils.exportToPNG(canvas, self);
+					break;
+				case ExportTypeEnum.Source: {
+					const { undoStack } = recordUtils.getUndoAndRedoStack(tabId);
+					exportUtils.exportToSource(
+						canvas,
+						recordUtils.getColorsIndex(),
+						undoStack,
+						self,
+					);
+					break;
+				}
 			}
 		}
 	}

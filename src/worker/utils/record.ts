@@ -18,8 +18,28 @@ import type {
 import { ToolTypeEnum } from "@/types";
 
 const records: Records = {};
+const colorsIndex: string[] = [];
 let pencilRecordPoints: PencilPointRecord[] = [];
 let eraserRecordPoints: EraserPointRecord[] = [];
+
+export const getColor = (colorIndex: number) => {
+	return colorsIndex[colorIndex] ?? "";
+};
+
+export const getColorsIndex = () => {
+	return [...colorsIndex];
+};
+
+const getColorIndex = (pixelColor: string) => {
+	let colorIndex = colorsIndex.findIndex((color) => color === pixelColor);
+
+	if (colorIndex === -1) {
+		colorsIndex.push(pixelColor);
+		colorIndex = colorsIndex.length - 1;
+	}
+
+	return colorIndex;
+};
 
 const clearRecordPoints = () => {
 	pencilRecordPoints.length = 0;
@@ -35,7 +55,8 @@ const makePencilRecord = (
 		return null;
 	}
 
-	return [toolType, pixelColor, pixelSize, [...pencilRecordPoints]];
+	const colorIndex = getColorIndex(pixelColor);
+	return [toolType, colorIndex, pixelSize, [...pencilRecordPoints]];
 };
 
 const makeEraserRecord = (
@@ -63,9 +84,10 @@ const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
 		return null;
 	}
 
+	const colorIndex = getColorIndex(pixelColor);
 	return [
 		toolType,
-		pixelColor,
+		colorIndex,
 		pixelSize,
 		[
 			[lineStartPosition.x, lineStartPosition.y],
@@ -89,9 +111,10 @@ const makeSquareRecord = (
 		return null;
 	}
 
+	const colorIndex = getColorIndex(pixelColor);
 	return [
 		toolType,
-		pixelColor,
+		colorIndex,
 		pixelSize,
 		[
 			[squareStartPosition.x, squareStartPosition.y],
@@ -115,9 +138,10 @@ const makeCircleRecord = (
 		return null;
 	}
 
+	const colorIndex = getColorIndex(pixelColor);
 	return [
 		toolType,
-		pixelColor,
+		colorIndex,
 		pixelSize,
 		[
 			[circleStartPosition.x, circleStartPosition.y],
@@ -133,7 +157,8 @@ const makeBucketRecord = (
 
 	if (!position) return null;
 
-	return [toolType, pixelColor, pixelSize, [position.x, position.y]];
+	const colorIndex = getColorIndex(pixelColor);
+	return [toolType, colorIndex, pixelSize, [position.x, position.y]];
 };
 
 const makeBroomRecord = (): BroomRecord => {
@@ -194,7 +219,12 @@ export const updatePointsRecord = (
 };
 
 export const getUndoAndRedoStack = (tabId: string) => {
-	return records[tabId] ?? [];
+	return (
+		records[tabId] ?? {
+			undoStack: [],
+			redoStack: [],
+		}
+	);
 };
 
 export const record = (payload: RecordMessagePayload) => {

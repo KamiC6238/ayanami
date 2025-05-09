@@ -1,5 +1,7 @@
 import { ExportTypeEnum } from "@/types";
-import type { Record, SourceFile } from "@/types";
+import type { ExportMessagePayload, Record, SourceFile } from "@/types";
+import * as recordUtils from "./record";
+import * as renderUtils from "./render";
 
 export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 	const blob = await canvas.convertToBlob({
@@ -16,7 +18,7 @@ export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 	});
 };
 
-export const exportToSource = async (
+export const exportToSource = (
 	canvas: OffscreenCanvas,
 	colorsIndex: string[],
 	records: Record[],
@@ -38,4 +40,21 @@ export const exportToSource = async (
 			blob,
 		},
 	});
+};
+
+export const exportFile = (payload: ExportMessagePayload) => {
+	const { exportType, tabId } = payload;
+	const canvas = renderUtils.getCanvas("main");
+	if (!canvas) return;
+
+	switch (exportType) {
+		case ExportTypeEnum.PNG:
+			exportToPNG(canvas, self);
+			break;
+		case ExportTypeEnum.Source: {
+			const { undoStack } = recordUtils.getUndoAndRedoStack(tabId);
+			exportToSource(canvas, recordUtils.getColorsIndex(), undoStack, self);
+			break;
+		}
+	}
 };

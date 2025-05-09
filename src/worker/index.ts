@@ -1,19 +1,18 @@
-import {
-	type BucketMessagePayload,
-	type CircleMessagePayload,
-	type ClearAllPixelsMessagePayload,
-	type ClearHoverRectMessagePayload,
-	type ClearRectMessagePayload,
-	type ExportMessagePayload,
-	ExportTypeEnum,
-	type FillHoverRectMessagePayload,
-	type FillRectMessagePayload,
-	type InitMessagePayload,
-	type LineMessagePayload,
-	type OffscreenCanvasWorkerMessage,
-	type RecordMessagePayload,
-	type RedoOrUndoMessagePayload,
-	type SquareMessagePayload,
+import type {
+	BucketMessagePayload,
+	CircleMessagePayload,
+	ClearAllPixelsMessagePayload,
+	ClearHoverRectMessagePayload,
+	ClearRectMessagePayload,
+	ExportMessagePayload,
+	FillHoverRectMessagePayload,
+	FillRectMessagePayload,
+	InitMessagePayload,
+	LineMessagePayload,
+	OffscreenCanvasWorkerMessage,
+	RecordMessagePayload,
+	RedoOrUndoMessagePayload,
+	SquareMessagePayload,
 } from "@/types";
 import * as exportUtils from "./utils/export";
 import * as recordUtils from "./utils/record";
@@ -72,27 +71,8 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.undo(recordStack);
 			break;
 		}
-		case "export": {
-			const _payload = payload as ExportMessagePayload;
-			const { exportType, tabId } = _payload;
-			const canvas = renderUtils.getCanvas("main");
-			if (!canvas) return;
-
-			switch (exportType) {
-				case ExportTypeEnum.PNG:
-					canvas && exportUtils.exportToPNG(canvas, self);
-					break;
-				case ExportTypeEnum.Source: {
-					const { undoStack } = recordUtils.getUndoAndRedoStack(tabId);
-					exportUtils.exportToSource(
-						canvas,
-						recordUtils.getColorsIndex(),
-						undoStack,
-						self,
-					);
-					break;
-				}
-			}
-		}
+		case "export":
+			exportUtils.exportFile(payload as ExportMessagePayload);
+			break;
 	}
 };

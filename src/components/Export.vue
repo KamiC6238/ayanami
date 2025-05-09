@@ -34,7 +34,13 @@ watch(
     <PixelBorderUltimate @click='visible = true'>
       <img :src='Download' class='w-6 h-6 p-1' />
     </PixelBorderUltimate>
-    <Dialog :visible title='Save' width='w-[260px]' height='h-[150px]'>
+    <Dialog
+      :visible
+      title='Save'
+      width='w-[260px]'
+      height='h-[130px]'
+      @close='visible = false'
+    >
       <div
         class='text-[12px] leading-6 cursor-pointer mb-2'
         @click='() => canvasStore.exportFile(ExportTypeEnum.PNG)'

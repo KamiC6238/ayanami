@@ -8,6 +8,9 @@ interface Props {
 	height: string;
 }
 
+type Emits = (event: "close") => void;
+
+const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 </script>
 <template>
@@ -19,7 +22,10 @@ const props = defineProps<Props>();
         content-cls="bg-[#6e8f8b] flex flex-col justify-between p-2.5"
         background='bg-[#6e8f8b]'
       >
-        <div class='text-sm'>{{ props.title }}</div>
+        <div class='text-sm flex items-center justify-between'>
+          <span>{{ props.title }}</span>
+          <div class='cursor-pointer text-[12px]' @click="emit('close')">X</div>
+        </div>
         <div>
           <slot />
         </div>

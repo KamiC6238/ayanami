@@ -63,5 +63,8 @@ export type RecordStack = {
 };
 
 export interface Records {
-	[tabId: string]: RecordStack;
+	[tabId: string]: RecordStack & {
+		colorsIndex: string[];
+		tabId: string;
+	};
 }

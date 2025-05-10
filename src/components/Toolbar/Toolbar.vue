@@ -13,7 +13,7 @@ import { useCanvasStore, useConfigStore } from "@/store";
 import { ToolTypeEnum } from "@/types";
 import { useLocalStorage } from "@vueuse/core";
 import { onMounted } from "vue";
-import Export from "../Export.vue";
+import ImportExport from "../ImportExport.vue";
 import { PixelBorderUltimate } from "../PixelBorder";
 import tools from "./tools";
 
@@ -58,6 +58,6 @@ const toolHandler = (type: ToolTypeEnum) => {
         @click="() => toolHandler(item.type)"
       />
     </PixelBorderUltimate>
-    <Export />
+    <ImportExport />
   </div>
 </template>

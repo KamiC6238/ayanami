@@ -6,3 +6,8 @@ export interface SourceFile {
 	colorsIndex: string[];
 	records: Record[];
 }
+
+export interface ImportFileConfig {
+	undoStack: Record[];
+	colorsIndex: string[];
+}

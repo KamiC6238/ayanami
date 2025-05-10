@@ -7,6 +7,7 @@ import type {
 	ExportMessagePayload,
 	FillHoverRectMessagePayload,
 	FillRectMessagePayload,
+	ImportMessagePayload,
 	InitMessagePayload,
 	LineMessagePayload,
 	OffscreenCanvasWorkerMessage,
@@ -14,7 +15,7 @@ import type {
 	RedoOrUndoMessagePayload,
 	SquareMessagePayload,
 } from "@/types";
-import * as exportUtils from "./utils/export";
+import * as fileUtils from "./utils/file";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
 
@@ -60,19 +61,20 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			recordUtils.record(payload as RecordMessagePayload);
 			break;
 		case "redo": {
-			const _payload = payload as RedoOrUndoMessagePayload;
-			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
-			renderUtils.redo(recordStack);
+			const { tabId } = payload as RedoOrUndoMessagePayload;
+			renderUtils.redo(tabId);
 			break;
 		}
 		case "undo": {
-			const _payload = payload as RedoOrUndoMessagePayload;
-			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
-			renderUtils.undo(recordStack);
+			const { tabId } = payload as RedoOrUndoMessagePayload;
+			renderUtils.undo(tabId);
 			break;
 		}
 		case "export":
-			exportUtils.exportFile(payload as ExportMessagePayload);
+			fileUtils.exportFile(payload as ExportMessagePayload);
+			break;
+		case "import":
+			fileUtils.importFile(payload as ImportMessagePayload);
 			break;
 	}
 };

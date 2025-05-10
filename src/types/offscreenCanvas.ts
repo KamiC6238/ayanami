@@ -21,7 +21,8 @@ export type MessageType =
 	| "record"
 	| "redo"
 	| "undo"
-	| "export";
+	| "export"
+	| "import";
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
@@ -113,6 +114,11 @@ export interface RecordMessagePayload {
 export interface ExportMessagePayload {
 	tabId: string;
 	exportType: ExportTypeEnum;
+}
+
+export interface ImportMessagePayload {
+	tabId: string;
+	file: File;
 }
 
 export interface RedoOrUndoMessagePayload {

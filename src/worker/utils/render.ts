@@ -17,7 +17,6 @@ import type {
 	PencilRecord,
 	Position,
 	Record,
-	RecordStack,
 	SquareMessagePayload,
 	SquareRecord,
 } from "@/types";
@@ -519,7 +518,8 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 	}
 };
 
-export const redo = (recordStack: RecordStack) => {
+export const redo = (tabId: string) => {
+	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
 	const record = recordStack.redoStack.pop();
 
 	if (!record) return;
@@ -527,10 +527,11 @@ export const redo = (recordStack: RecordStack) => {
 	recordStack.undoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
 	visited.clear();
-	replayRecords(recordStack.undoStack);
+	replayRecords(tabId, recordStack.undoStack);
 };
 
-export const undo = (recordStack: RecordStack) => {
+export const undo = (tabId: string) => {
+	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
 	const record = recordStack.undoStack.pop();
 
 	if (!record) return;
@@ -538,10 +539,10 @@ export const undo = (recordStack: RecordStack) => {
 	recordStack.redoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
 	visited.clear();
-	replayRecords(recordStack.undoStack);
+	replayRecords(tabId, recordStack.undoStack);
 };
 
-export const replayRecords = (records: Record[]) => {
+export const replayRecords = (tabId: string, records: Record[]) => {
 	clearAllPixels({ canvasType: "main" });
 
 	for (const record of records) {
@@ -549,25 +550,25 @@ export const replayRecords = (records: Record[]) => {
 
 		switch (toolType) {
 			case ToolTypeEnum.Pencil:
-				replayPencilRecord(record as PencilRecord);
+				replayPencilRecord(tabId, record as PencilRecord);
 				break;
 			case ToolTypeEnum.Eraser:
 				replayEraserRecord(record as EraserRecord);
 				break;
 			case ToolTypeEnum.Line:
-				replayLineRecord(record as LineRecord);
+				replayLineRecord(tabId, record as LineRecord);
 				break;
 			case ToolTypeEnum.Square:
-				replaySquareRecord(record as SquareRecord);
+				replaySquareRecord(tabId, record as SquareRecord);
 				break;
 			case ToolTypeEnum.Circle:
-				replayCircleRecord(record as CircleRecord);
+				replayCircleRecord(tabId, record as CircleRecord);
 				break;
 			case ToolTypeEnum.Ellipse:
-				replayCircleRecord(record as CircleRecord);
+				replayCircleRecord(tabId, record as CircleRecord);
 				break;
 			case ToolTypeEnum.Bucket:
-				replayBucketRecord(record as BucketRecord);
+				replayBucketRecord(tabId, record as BucketRecord);
 				break;
 			case ToolTypeEnum.Broom:
 				replayClearAllPixelsRecord();
@@ -578,7 +579,7 @@ export const replayRecords = (records: Record[]) => {
 	}
 };
 
-const replayPencilRecord = (record: PencilRecord) => {
+const replayPencilRecord = (tabId: string, record: PencilRecord) => {
 	const [_, colorIndex, pixelSize, points] = record;
 	for (const [x, y, drawCounts] of points) {
 		for (let i = 0; i < drawCounts; i++) {
@@ -587,7 +588,7 @@ const replayPencilRecord = (record: PencilRecord) => {
 				position: { x, y },
 				canvasType: "main",
 				pixelSize,
-				pixelColor: recordUtils.getColor(colorIndex),
+				pixelColor: recordUtils.getColor(tabId, colorIndex),
 				isReplay: true,
 			});
 		}
@@ -607,7 +608,7 @@ const replayEraserRecord = (record: EraserRecord) => {
 	}
 };
 
-const replayLineRecord = (record: LineRecord) => {
+const replayLineRecord = (tabId: string, record: LineRecord) => {
 	const [_, colorIndex, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
@@ -618,12 +619,12 @@ const replayLineRecord = (record: LineRecord) => {
 		canvasType: "main",
 		lineStartPosition: { x: startX, y: startY },
 		lineEndPosition: { x: endX, y: endY },
-		pixelColor: recordUtils.getColor(colorIndex),
+		pixelColor: recordUtils.getColor(tabId, colorIndex),
 		pixelSize,
 	});
 };
 
-const replaySquareRecord = (record: SquareRecord) => {
+const replaySquareRecord = (tabId: string, record: SquareRecord) => {
 	const [_, colorIndex, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
@@ -634,11 +635,11 @@ const replaySquareRecord = (record: SquareRecord) => {
 		squareStartPosition: { x: startX, y: startY },
 		squareEndPosition: { x: endX, y: endY },
 		pixelSize,
-		pixelColor: recordUtils.getColor(colorIndex),
+		pixelColor: recordUtils.getColor(tabId, colorIndex),
 	});
 };
 
-const replayCircleRecord = (record: CircleRecord) => {
+const replayCircleRecord = (tabId: string, record: CircleRecord) => {
 	const [toolType, colorIndex, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
@@ -650,16 +651,16 @@ const replayCircleRecord = (record: CircleRecord) => {
 		circleStartPosition: { x: startX, y: startY },
 		circleEndPosition: { x: endX, y: endY },
 		pixelSize,
-		pixelColor: recordUtils.getColor(colorIndex),
+		pixelColor: recordUtils.getColor(tabId, colorIndex),
 	});
 };
 
-const replayBucketRecord = (record: BucketRecord) => {
+const replayBucketRecord = (tabId: string, record: BucketRecord) => {
 	const [_, colorIndex, pixelSize, point] = record;
 	const [x, y] = point;
 
 	fillBucket({
-		replacementColor: recordUtils.getColor(colorIndex),
+		replacementColor: recordUtils.getColor(tabId, colorIndex),
 		pixelSize,
 		position: { x, y },
 	});

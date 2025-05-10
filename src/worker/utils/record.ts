@@ -6,6 +6,7 @@ import type {
 	EraserPointRecord,
 	EraserRecord,
 	FillRectMessagePayload,
+	ImportFileConfig,
 	LineRecord,
 	PencilPointRecord,
 	PencilRecord,
@@ -18,25 +19,58 @@ import type {
 import { ToolTypeEnum } from "@/types";
 
 const records: Records = {};
-const colorsIndex: string[] = [];
 let pencilRecordPoints: PencilPointRecord[] = [];
 let eraserRecordPoints: EraserPointRecord[] = [];
 
-export const getColor = (colorIndex: number) => {
-	return colorsIndex[colorIndex] ?? "";
+const initRecords = (tabId: string) => {
+	records[tabId] = {
+		undoStack: [],
+		redoStack: [],
+		colorsIndex: [],
+		tabId,
+	};
 };
 
-export const getColorsIndex = () => {
-	return [...colorsIndex];
+export const setRecordsFromImportFile = (
+	tabId: string,
+	config: ImportFileConfig,
+) => {
+	records[tabId] = {
+		redoStack: [],
+		undoStack: [...config.undoStack],
+		colorsIndex: [...config.colorsIndex],
+		tabId,
+	};
 };
 
-const getColorIndex = (pixelColor: string) => {
+export const getColor = (tabId: string, colorIndex: number) => {
+	if (records[tabId]) {
+		return records[tabId].colorsIndex[colorIndex];
+	}
+	return "";
+};
+
+export const getColorsIndex = (tabId: string) => {
+	if (records[tabId]) {
+		return [...records[tabId].colorsIndex];
+	}
+	return [];
+};
+
+const getColorIndex = (tabId: string, pixelColor: string) => {
+	if (!records[tabId]) {
+		initRecords(tabId);
+	}
+
+	const colorsIndex = [...records[tabId].colorsIndex];
+
 	let colorIndex = colorsIndex.findIndex((color) => color === pixelColor);
-
 	if (colorIndex === -1) {
 		colorsIndex.push(pixelColor);
 		colorIndex = colorsIndex.length - 1;
 	}
+
+	records[tabId].colorsIndex = [...colorsIndex];
 
 	return colorIndex;
 };
@@ -49,13 +83,13 @@ const clearRecordPoints = () => {
 const makePencilRecord = (
 	payload: RecordMessagePayload,
 ): PencilRecord | null => {
-	const { toolType, pixelColor, pixelSize } = payload;
+	const { tabId, toolType, pixelColor, pixelSize } = payload;
 
 	if (!pencilRecordPoints.length) {
 		return null;
 	}
 
-	const colorIndex = getColorIndex(pixelColor);
+	const colorIndex = getColorIndex(tabId, pixelColor);
 	return [toolType, colorIndex, pixelSize, [...pencilRecordPoints]];
 };
 
@@ -73,6 +107,7 @@ const makeEraserRecord = (
 
 const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
 	const {
+		tabId,
 		toolType,
 		lineStartPosition,
 		lineEndPosition,
@@ -84,7 +119,7 @@ const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
 		return null;
 	}
 
-	const colorIndex = getColorIndex(pixelColor);
+	const colorIndex = getColorIndex(tabId, pixelColor);
 	return [
 		toolType,
 		colorIndex,
@@ -100,6 +135,7 @@ const makeSquareRecord = (
 	payload: RecordMessagePayload,
 ): SquareRecord | null => {
 	const {
+		tabId,
 		toolType,
 		squareStartPosition,
 		squareEndPosition,
@@ -111,7 +147,7 @@ const makeSquareRecord = (
 		return null;
 	}
 
-	const colorIndex = getColorIndex(pixelColor);
+	const colorIndex = getColorIndex(tabId, pixelColor);
 	return [
 		toolType,
 		colorIndex,
@@ -127,6 +163,7 @@ const makeCircleRecord = (
 	payload: RecordMessagePayload,
 ): CircleRecord | null => {
 	const {
+		tabId,
 		toolType,
 		circleStartPosition,
 		circleEndPosition,
@@ -138,7 +175,7 @@ const makeCircleRecord = (
 		return null;
 	}
 
-	const colorIndex = getColorIndex(pixelColor);
+	const colorIndex = getColorIndex(tabId, pixelColor);
 	return [
 		toolType,
 		colorIndex,
@@ -153,11 +190,11 @@ const makeCircleRecord = (
 const makeBucketRecord = (
 	payload: RecordMessagePayload,
 ): BucketRecord | null => {
-	const { toolType, pixelColor, pixelSize, position } = payload;
+	const { tabId, toolType, pixelColor, pixelSize, position } = payload;
 
 	if (!position) return null;
 
-	const colorIndex = getColorIndex(pixelColor);
+	const colorIndex = getColorIndex(tabId, pixelColor);
 	return [toolType, colorIndex, pixelSize, [position.x, position.y]];
 };
 
@@ -263,10 +300,7 @@ export const record = (payload: RecordMessagePayload) => {
 	if (!record) return;
 
 	if (!records[tabId]) {
-		records[tabId] = {
-			undoStack: [],
-			redoStack: [],
-		};
+		initRecords(tabId);
 	}
 
 	// Redo stack represents a possible future. If a new record occurs, that future is no longer valid — like a time paradox.

@@ -323,6 +323,19 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
+	const importFile = (file: File) => {
+		const worker = getCanvasWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "import",
+			payload: {
+				tabId: currentTabId.value,
+				file,
+			},
+		});
+	};
+
 	return {
 		redo,
 		undo,
@@ -345,6 +358,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		currentTabId,
 		setTabId,
 		exportFile,
+		importFile,
 		canvasWorker,
 	};
 });

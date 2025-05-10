@@ -1,5 +1,10 @@
 import { ExportTypeEnum } from "@/types";
-import type { ExportMessagePayload, Record, SourceFile } from "@/types";
+import type {
+	ExportMessagePayload,
+	ImportMessagePayload,
+	Record,
+	SourceFile,
+} from "@/types";
 import * as recordUtils from "./record";
 import * as renderUtils from "./render";
 
@@ -52,9 +57,34 @@ export const exportFile = (payload: ExportMessagePayload) => {
 			exportToPNG(canvas, self);
 			break;
 		case ExportTypeEnum.Source: {
-			const { undoStack } = recordUtils.getUndoAndRedoStack(tabId);
-			exportToSource(canvas, recordUtils.getColorsIndex(), undoStack, self);
+			const { undoStack, colorsIndex } = recordUtils.getUndoAndRedoStack(tabId);
+			exportToSource(canvas, colorsIndex, undoStack, self);
 			break;
 		}
 	}
+};
+
+export const importFile = (payload: ImportMessagePayload) => {
+	const { tabId, file } = payload;
+	const reader = new FileReader();
+
+	reader.onload = (e) => {
+		try {
+			const content = e.target?.result as string;
+			const data = JSON.parse(content) as SourceFile;
+			const { colorsIndex, records } = data;
+
+			recordUtils.setRecordsFromImportFile(tabId, {
+				undoStack: records,
+				colorsIndex,
+			});
+			renderUtils.replayRecords(tabId, records);
+		} catch {}
+	};
+
+	reader.onerror = () => {
+		console.error("Reading file failed.");
+	};
+
+	reader.readAsText(file);
 };

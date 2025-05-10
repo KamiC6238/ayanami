@@ -18,7 +18,7 @@ generatePixelBorder(4, 3);
 
 <template>
   <div class='relative w-full h-full flex items-center justify-center'>
-    <div class="absolute w-full h-full bg-[#6e8f8b] z-[-2] bg-[#d8c6a1]"></div>
+    <div class="absolute w-full h-full z-[-2] bg-[#d8c6a1]"></div>
     <div class='flex w-[800px] h-[600px]'>
       <PixelBorderSecondary
         content-cls='bg-[#6e8f8b] flex flex-col justify-between pt-2.5 pb-2.5 pl-2.5'

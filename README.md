@@ -41,7 +41,10 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 - [ ] Supports canvas zooming
 - [ ] Supports canvas preview
 - [ ] Supports different canvas sizes
-- [ ] Download and save as GIF
+- [ ] Download and save
+  - [ ] as GIF
+  - [x] as Source file
+- [x] Supports importing a single source file and editing it afterward. Undo & redo still works as well!!
 - [ ] Select tool
 - [ ] Gradient tool
 

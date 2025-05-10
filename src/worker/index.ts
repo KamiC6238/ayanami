@@ -1,21 +1,21 @@
-import {
-	type BucketMessagePayload,
-	type CircleMessagePayload,
-	type ClearAllPixelsMessagePayload,
-	type ClearHoverRectMessagePayload,
-	type ClearRectMessagePayload,
-	type ExportMessagePayload,
-	ExportTypeEnum,
-	type FillHoverRectMessagePayload,
-	type FillRectMessagePayload,
-	type InitMessagePayload,
-	type LineMessagePayload,
-	type OffscreenCanvasWorkerMessage,
-	type RecordMessagePayload,
-	type RedoOrUndoMessagePayload,
-	type SquareMessagePayload,
+import type {
+	BucketMessagePayload,
+	CircleMessagePayload,
+	ClearAllPixelsMessagePayload,
+	ClearHoverRectMessagePayload,
+	ClearRectMessagePayload,
+	ExportMessagePayload,
+	FillHoverRectMessagePayload,
+	FillRectMessagePayload,
+	ImportMessagePayload,
+	InitMessagePayload,
+	LineMessagePayload,
+	OffscreenCanvasWorkerMessage,
+	RecordMessagePayload,
+	RedoOrUndoMessagePayload,
+	SquareMessagePayload,
 } from "@/types";
-import * as exportUtils from "./utils/export";
+import * as fileUtils from "./utils/file";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
 
@@ -61,25 +61,20 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			recordUtils.record(payload as RecordMessagePayload);
 			break;
 		case "redo": {
-			const _payload = payload as RedoOrUndoMessagePayload;
-			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
-			renderUtils.redo(recordStack);
+			const { tabId } = payload as RedoOrUndoMessagePayload;
+			renderUtils.redo(tabId);
 			break;
 		}
 		case "undo": {
-			const _payload = payload as RedoOrUndoMessagePayload;
-			const recordStack = recordUtils.getUndoAndRedoStack(_payload.tabId);
-			renderUtils.undo(recordStack);
+			const { tabId } = payload as RedoOrUndoMessagePayload;
+			renderUtils.undo(tabId);
 			break;
 		}
-		case "export": {
-			const _payload = payload as ExportMessagePayload;
-			const { exportType } = _payload;
-
-			if (exportType === ExportTypeEnum.PNG) {
-				const canvas = renderUtils.getCanvas("main");
-				canvas && exportUtils.exportToPNG(canvas, self);
-			}
-		}
+		case "export":
+			fileUtils.exportFile(payload as ExportMessagePayload);
+			break;
+		case "import":
+			fileUtils.importFile(payload as ImportMessagePayload);
+			break;
 	}
 };

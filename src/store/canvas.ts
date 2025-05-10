@@ -4,7 +4,7 @@ import {
 	type CanvasMap,
 	type CanvasType,
 	type CircleConfig,
-	ExportTypeEnum,
+	type ExportTypeEnum,
 	type LineConfig,
 	type Position,
 	type RectConfig,
@@ -310,14 +310,28 @@ export const useCanvasStore = defineStore("canvas", () => {
 		});
 	};
 
-	const exportToPNG = () => {
+	const exportFile = (exportType: ExportTypeEnum) => {
 		const worker = getCanvasWorker();
 		if (!worker) return;
 
 		worker.postMessage({
 			type: "export",
 			payload: {
-				exportType: ExportTypeEnum.PNG,
+				tabId: currentTabId.value,
+				exportType,
+			},
+		});
+	};
+
+	const importFile = (file: File) => {
+		const worker = getCanvasWorker();
+		if (!worker) return;
+
+		worker.postMessage({
+			type: "import",
+			payload: {
+				tabId: currentTabId.value,
+				file,
 			},
 		});
 	};
@@ -343,7 +357,8 @@ export const useCanvasStore = defineStore("canvas", () => {
 		tabs,
 		currentTabId,
 		setTabId,
-		exportToPNG,
+		exportFile,
+		importFile,
 		canvasWorker,
 	};
 });

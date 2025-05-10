@@ -19,7 +19,7 @@ import type { ToolTypeEnum } from "./config";
 export type PencilPointRecord = [number, number, number];
 export type PencilRecord = [
 	ToolTypeEnum,
-	string,
+	number,
 	number,
 	Array<PencilPointRecord>,
 ];
@@ -28,18 +28,18 @@ export type EraserPointRecord = [number, number];
 export type EraserRecord = [ToolTypeEnum, number, Array<EraserPointRecord>];
 
 export type LinePointRecord = [[number, number], [number, number]];
-export type LineRecord = [ToolTypeEnum, string, number, LinePointRecord];
+export type LineRecord = [ToolTypeEnum, number, number, LinePointRecord];
 
 export type SquarePointRecord = [[number, number], [number, number]];
-export type SquareRecord = [ToolTypeEnum, string, number, SquarePointRecord];
+export type SquareRecord = [ToolTypeEnum, number, number, SquarePointRecord];
 
 export type CirclePointRecord = [[number, number], [number, number]];
-export type CircleRecord = [ToolTypeEnum, string, number, CirclePointRecord];
+export type CircleRecord = [ToolTypeEnum, number, number, CirclePointRecord];
 
 export type BucketRecord = [
 	ToolTypeEnum,
 	// replacementColor
-	string,
+	number,
 	// pixelSize
 	number,
 	// position
@@ -63,5 +63,8 @@ export type RecordStack = {
 };
 
 export interface Records {
-	[tabId: string]: RecordStack;
+	[tabId: string]: RecordStack & {
+		colorsIndex: string[];
+		tabId: string;
+	};
 }

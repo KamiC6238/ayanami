@@ -1,7 +1,5 @@
 <div align="center">
-  <a href="https://deepwiki.com/KamiC6238/ayanami">
-    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
-  </a>
+  <a href="https://deepwiki.com/KamiC6238/ayanami"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </div>
 
 # About this project

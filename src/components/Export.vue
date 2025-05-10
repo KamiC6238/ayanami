@@ -7,8 +7,19 @@ import { ref, watch } from "vue";
 import Dialog from "./Dialog.vue";
 import { PixelBorderUltimate } from "./PixelBorder";
 
-const visible = ref(false);
+const exportOptions = [
+	{
+		exportType: ExportTypeEnum.PNG,
+		text: "as PNG",
+	},
+	{
+		exportType: ExportTypeEnum.Source,
+		text: "as Ayanami",
+	},
+];
 
+const visible = ref(false);
+const hoverIndex = ref(-1);
 const canvasStore = useCanvasStore();
 
 watch(
@@ -38,18 +49,23 @@ watch(
       :visible
       title='Save'
       width='w-[260px]'
-      height='h-[130px]'
+      height='h-[120px]'
       @close='visible = false'
     >
       <div
-        class='text-[12px] leading-6 cursor-pointer mb-2'
-        @click='() => canvasStore.exportFile(ExportTypeEnum.PNG)'
-      >Save as PNG
+        v-for='({ exportType, text }, index) of exportOptions'
+        :key='index'
+        class='flex items-center justify-between text-[12px] leading-6 cursor-pointer'
+        @click='() => canvasStore.exportFile(exportType)'
+        @mouseover='hoverIndex = index'
+        @mouseleave='hoverIndex = -1'
+      >
+        <span>{{ text }}</span>
+        <span
+          v-show='hoverIndex === index'
+          class='text-[#ffd700]'
+          >*</span>
       </div>
-      <div
-        class='text-[12px] leading-6 cursor-pointer'
-        @click='() => canvasStore.exportFile(ExportTypeEnum.Source)'
-      >Save as Ayanami</div>
     </Dialog>
   </div>
 </template>

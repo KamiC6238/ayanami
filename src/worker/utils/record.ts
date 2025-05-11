@@ -8,10 +8,10 @@ import type {
 	FillRectMessagePayload,
 	ImportFileConfig,
 	LineRecord,
+	OpRecord,
 	PencilPointRecord,
 	PencilRecord,
 	Position,
-	Record,
 	RecordMessagePayload,
 	Records,
 	SquareRecord,
@@ -266,7 +266,7 @@ export const getUndoAndRedoStack = (tabId: string) => {
 
 export const record = (payload: RecordMessagePayload) => {
 	const { tabId, toolType } = payload;
-	let record: Record | null = null;
+	let record: OpRecord | null = null;
 
 	switch (toolType) {
 		case ToolTypeEnum.Pencil:

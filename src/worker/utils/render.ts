@@ -14,9 +14,9 @@ import type {
 	InitMessagePayload,
 	LineMessagePayload,
 	LineRecord,
+	OpRecord,
 	PencilRecord,
 	Position,
-	Record,
 	SquareMessagePayload,
 	SquareRecord,
 } from "@/types";
@@ -540,7 +540,7 @@ export const undo = (tabId: string) => {
 	replayRecords(tabId, recordStack.undoStack);
 };
 
-export const replayRecords = (tabId: string, records: Record[]) => {
+export const replayRecords = (tabId: string, records: OpRecord[]) => {
 	clearAllPixels({ canvasType: "main" });
 
 	for (const record of records) {

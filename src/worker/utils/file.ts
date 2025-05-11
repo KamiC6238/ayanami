@@ -2,7 +2,7 @@ import { ExportTypeEnum } from "@/types";
 import type {
 	ExportMessagePayload,
 	ImportMessagePayload,
-	Record,
+	OpRecord,
 	SourceFile,
 } from "@/types";
 import * as recordUtils from "./record";
@@ -26,7 +26,7 @@ export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 export const exportToSource = (
 	canvas: OffscreenCanvas,
 	colorsIndex: string[],
-	records: Record[],
+	records: OpRecord[],
 	self: Window,
 ) => {
 	const data: SourceFile = {

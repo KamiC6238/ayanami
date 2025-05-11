@@ -48,7 +48,7 @@ export type BucketRecord = [
 
 export type BroomRecord = [ToolTypeEnum];
 
-export type Record =
+export type OpRecord =
 	| PencilRecord
 	| EraserRecord
 	| LineRecord
@@ -57,14 +57,27 @@ export type Record =
 	| BucketRecord
 	| BroomRecord;
 
-export type RecordStack = {
-	undoStack: Record[];
-	redoStack: Record[];
+export interface Records {
+	[tabId: string]: {
+		tabId: string;
+		colorsIndex: string[];
+		undoStack: OpRecord[];
+		redoStack: OpRecord[];
+	};
+}
+
+export type Frame = {
+	tabId: string;
+	frameId: string;
+	undoStack: OpRecord[];
+	redoStack: OpRecord[];
 };
 
-export interface Records {
-	[tabId: string]: RecordStack & {
+export type FrameMap = Record<string, Frame>;
+
+export interface CanvasRecords {
+	[tabId: string]: {
 		colorsIndex: string[];
-		tabId: string;
+		frames: FrameMap;
 	};
 }

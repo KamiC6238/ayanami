@@ -1,4 +1,4 @@
-<a href="https://deepwiki.com/KamiC6238/ayanami"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/KamiC6238/ayanami)
 
 # About this project
 It's a free online pixel art drawing tool. Feel free to share your drawing with me at [danzzzzsama@gmail.com](mailto:danzzzzsama@gmail.com) — I’d love to feature it on a special website!

@@ -1,5 +1,5 @@
 import { DEFAULT_PIXEL_SIZE } from "@/constants";
-import type { Position } from "@/types";
+import { ExportTypeEnum, type Position } from "@/types";
 
 export function scaleCanvasByDPR(canvas: HTMLCanvasElement) {
 	const dpr = Math.floor(window.devicePixelRatio) || 1;
@@ -48,12 +48,20 @@ export function drawGrid(
 	return colorPositionMap;
 }
 
-export const saveAsPNG = (blob: Blob, filename: string) => {
+export const save = (
+	blob: Blob,
+	config: {
+		filename: string;
+		exportType: ExportTypeEnum;
+	},
+) => {
+	const { filename, exportType } = config;
 	const url = URL.createObjectURL(blob);
 
 	const a = document.createElement("a");
 	a.href = url;
-	a.download = filename;
+	a.download =
+		exportType === ExportTypeEnum.Source ? `${filename}.ayanami` : filename;
 	a.style.display = "none";
 
 	document.body.appendChild(a);

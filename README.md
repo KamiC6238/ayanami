@@ -3,7 +3,7 @@
 # About this project
 It's a free online pixel art drawing tool. Feel free to share your drawing with me at [danzzzzsama@gmail.com](mailto:danzzzzsama@gmail.com) — I’d love to feature it on a special website!
 
-![alt text](image.png)
+<img width="1454" alt="image" src="https://github.com/user-attachments/assets/e059bd4d-e725-4a9f-a364-9c9a1d53e81a" />
 
 ## Why I made it?
 I bought [Octopath Traveler II](https://en.wikipedia.org/wiki/Octopath_Traveler_II) in 2024. The game’s scenery captivated me, and at that moment, a thought came to mind: maybe I could make a pixel art tool by myself one day.
@@ -17,7 +17,7 @@ Lately, I’ve also been playing [Stardew Valley](https://en.wikipedia.org/wiki/
 ## 🙏 Special Thanks
 Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Corners](https://github.com/CodeFoodPixels/pixel-corners), which helped me implement beautiful pixel-style UI components.
 
-## 🎉 Version 0.1.0
+## 🎉 Version 1.0.0
 |      | Tool Description              |   Shortcut |
 |------|-------------------------------| ------------|
 | ✏️    | Pencil tool                   | P          |
@@ -28,10 +28,11 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 | 🟥    | Square tool                   | S          |
 | 🔁    | Undo & Redo                  | ⌘/Ctrl + Z|
 | 🧹    | Broom                        | |
-| 📤    | Download and save as PNG     |             |
+| 📤    | Export as PNG     |             |
+| 📤    | Import Source file/Export as Source file     |             |
 | 🌈    | Color picker                 |             |
 
-## 🚧 Version 0.2.0
+## 🚧 Version 2.0.0
 - [ ] Supports for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 - [ ] Supports multiple frames for animation
 - [ ] Supports canvas zooming
@@ -39,8 +40,6 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 - [ ] Supports different canvas sizes
 - [ ] Download and save
   - [ ] as GIF
-  - [x] as Source file
-- [x] Supports importing a single source file and editing it afterward. Undo & redo still works as well!!
 - [ ] Select tool
 - [ ] Gradient tool
 

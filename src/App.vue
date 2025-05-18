@@ -2,6 +2,7 @@
 import {
 	Canvas,
 	ColorPicker,
+	Frames,
 	Palette,
 	PixelBorderSecondary,
 	SocialMedia,
@@ -18,6 +19,7 @@ generatePixelBorder(4, 3);
 
 <template>
   <div class='relative w-full h-full flex items-center justify-center'>
+    <Frames />
     <div class="absolute w-full h-full z-[-2] bg-[#d8c6a1]"></div>
     <div class='flex w-[800px] h-[600px]'>
       <PixelBorderSecondary

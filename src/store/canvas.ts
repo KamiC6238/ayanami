@@ -70,6 +70,14 @@ export const useCanvasStore = defineStore("canvas", () => {
 		};
 	});
 
+	const frames = computed(() => {
+		if (!currentTabId.value) {
+			return {};
+		}
+
+		return tabs.value[currentTabId.value].frames;
+	});
+
 	const setTabId = (tabId: string) => {
 		currentTabId.value = tabId;
 	};
@@ -116,6 +124,11 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
+				frames: {
+					[`${tabId}_1`]: {},
+					[`${tabId}_2`]: {},
+					[`${tabId}_3`]: {},
+				},
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
 				mouseMove$: fromEvent<MouseEvent>(document, "mousemove"),
 				mouseUp$: fromEvent<MouseEvent>(document, "mouseup"),
@@ -360,5 +373,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 		exportFile,
 		importFile,
 		canvasWorker,
+		frames,
 	};
 });

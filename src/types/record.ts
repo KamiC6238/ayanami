@@ -65,19 +65,3 @@ export interface Records {
 		redoStack: OpRecord[];
 	};
 }
-
-export type Frame = {
-	tabId: string;
-	frameId: string;
-	undoStack: OpRecord[];
-	redoStack: OpRecord[];
-};
-
-export type FrameMap = Record<string, Frame>;
-
-export interface CanvasRecords {
-	[tabId: string]: {
-		colorsIndex: string[];
-		frames: FrameMap;
-	};
-}

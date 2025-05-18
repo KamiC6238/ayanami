@@ -17,6 +17,7 @@ import { type Observable, fromEvent } from "rxjs";
 import { v4 as uuidV4 } from "uuid";
 import { computed, ref, watch } from "vue";
 import { useConfigStore } from "./config";
+import { useFramesStore } from "./frames";
 
 export const useCanvasStore = defineStore("canvas", () => {
 	const tabs = ref<Record<string, CanvasMap>>({});
@@ -26,6 +27,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		fromEvent<MouseEvent>(document, "mouseup"),
 	);
 
+	const framesStore = useFramesStore();
 	const configStore = useConfigStore();
 	const { toolType, pixelColor, pixelSize } = storeToRefs(configStore);
 
@@ -68,14 +70,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 			mouseUp$: _?.mouseUp$ ?? null,
 			mouseLeave$: _?.mouseLeave$ ?? null,
 		};
-	});
-
-	const frames = computed(() => {
-		if (!currentTabId.value) {
-			return {};
-		}
-
-		return tabs.value[currentTabId.value].frames;
 	});
 
 	const setTabId = (tabId: string) => {
@@ -124,11 +118,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
-				frames: {
-					[`${tabId}_1`]: {},
-					[`${tabId}_2`]: {},
-					[`${tabId}_3`]: {},
-				},
+				frames: framesStore.createFrame(),
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
 				mouseMove$: fromEvent<MouseEvent>(document, "mousemove"),
 				mouseUp$: fromEvent<MouseEvent>(document, "mouseup"),
@@ -373,6 +363,5 @@ export const useCanvasStore = defineStore("canvas", () => {
 		exportFile,
 		importFile,
 		canvasWorker,
-		frames,
 	};
 });

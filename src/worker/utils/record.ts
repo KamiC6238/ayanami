@@ -27,6 +27,7 @@ const initRecords = (tabId: string) => {
 		undoStack: [],
 		redoStack: [],
 		colorsIndex: [],
+		framesIndex: [],
 		tabId,
 	};
 };
@@ -39,6 +40,7 @@ export const setRecordsFromImportFile = (
 		redoStack: [],
 		undoStack: [...config.undoStack],
 		colorsIndex: [...config.colorsIndex],
+		framesIndex: [...config.framesIndex],
 		tabId,
 	};
 };
@@ -75,6 +77,24 @@ const getColorIndex = (tabId: string, pixelColor: string) => {
 	return colorIndex;
 };
 
+const getFrameIndex = (tabId: string, frameId: string) => {
+	if (!records[tabId]) {
+		initRecords(tabId);
+	}
+
+	const framesIndex = [...records[tabId].framesIndex];
+
+	let frameIndex = framesIndex.findIndex((color) => color === frameId);
+	if (frameIndex === -1) {
+		framesIndex.push(frameId);
+		frameIndex = framesIndex.length - 1;
+	}
+
+	records[tabId].framesIndex = [...framesIndex];
+
+	return frameIndex;
+};
+
 const clearRecordPoints = () => {
 	pencilRecordPoints.length = 0;
 	eraserRecordPoints.length = 0;
@@ -83,31 +103,36 @@ const clearRecordPoints = () => {
 const makePencilRecord = (
 	payload: RecordMessagePayload,
 ): PencilRecord | null => {
-	const { tabId, toolType, pixelColor, pixelSize } = payload;
+	const { tabId, frameId, toolType, pixelColor, pixelSize } = payload;
+
+	console.log(payload);
 
 	if (!pencilRecordPoints.length) {
 		return null;
 	}
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
-	return [toolType, colorIndex, pixelSize, [...pencilRecordPoints]];
+	const frameIndex = getFrameIndex(tabId, frameId);
+	return [toolType, colorIndex, frameIndex, pixelSize, [...pencilRecordPoints]];
 };
 
 const makeEraserRecord = (
 	payload: RecordMessagePayload,
 ): EraserRecord | null => {
-	const { toolType, pixelSize } = payload;
+	const { tabId, frameId, toolType, pixelSize } = payload;
 
 	if (!eraserRecordPoints.length) {
 		return null;
 	}
 
-	return [toolType, pixelSize, [...eraserRecordPoints]];
+	const frameIndex = getFrameIndex(tabId, frameId);
+	return [toolType, frameIndex, pixelSize, [...eraserRecordPoints]];
 };
 
 const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
 	const {
 		tabId,
+		frameId,
 		toolType,
 		lineStartPosition,
 		lineEndPosition,
@@ -120,9 +145,11 @@ const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
 	}
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
+	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
 		colorIndex,
+		frameIndex,
 		pixelSize,
 		[
 			[lineStartPosition.x, lineStartPosition.y],
@@ -136,6 +163,7 @@ const makeSquareRecord = (
 ): SquareRecord | null => {
 	const {
 		tabId,
+		frameId,
 		toolType,
 		squareStartPosition,
 		squareEndPosition,
@@ -148,9 +176,11 @@ const makeSquareRecord = (
 	}
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
+	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
 		colorIndex,
+		frameIndex,
 		pixelSize,
 		[
 			[squareStartPosition.x, squareStartPosition.y],
@@ -164,6 +194,7 @@ const makeCircleRecord = (
 ): CircleRecord | null => {
 	const {
 		tabId,
+		frameId,
 		toolType,
 		circleStartPosition,
 		circleEndPosition,
@@ -176,9 +207,11 @@ const makeCircleRecord = (
 	}
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
+	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
 		colorIndex,
+		frameIndex,
 		pixelSize,
 		[
 			[circleStartPosition.x, circleStartPosition.y],
@@ -190,12 +223,19 @@ const makeCircleRecord = (
 const makeBucketRecord = (
 	payload: RecordMessagePayload,
 ): BucketRecord | null => {
-	const { tabId, toolType, pixelColor, pixelSize, position } = payload;
+	const { tabId, frameId, toolType, pixelColor, pixelSize, position } = payload;
 
 	if (!position) return null;
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
-	return [toolType, colorIndex, pixelSize, [position.x, position.y]];
+	const frameIndex = getFrameIndex(tabId, frameId);
+	return [
+		toolType,
+		colorIndex,
+		frameIndex,
+		pixelSize,
+		[position.x, position.y],
+	];
 };
 
 const makeBroomRecord = (): BroomRecord => {
@@ -260,6 +300,7 @@ export const getUndoAndRedoStack = (tabId: string) => {
 		records[tabId] ?? {
 			undoStack: [],
 			redoStack: [],
+			framesIndex: [],
 		}
 	);
 };

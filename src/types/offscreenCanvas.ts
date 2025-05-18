@@ -99,6 +99,7 @@ export interface InitMessagePayload {
 
 export interface RecordMessagePayload {
 	tabId: string;
+	frameId: string;
 	toolType: ToolTypeEnum;
 	pixelSize: number;
 	pixelColor: string;

@@ -75,7 +75,7 @@ export type BucketRecord = [
 	[number, number],
 ];
 
-export type BroomRecord = [ToolTypeEnum];
+export type BroomRecord = [ToolTypeEnum, number];
 
 export type OpRecord =
 	| PencilRecord

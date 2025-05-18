@@ -14,6 +14,7 @@ const { frames } = storeToRefs(framesStore);
       class='mb-2'
       v-for='frameId of Object.keys(frames)'
       :key='frameId'
+      :snapshot='frames[frameId].snapshot'
       @click='() => framesStore.switchFrame(frameId)'
     />
     <div

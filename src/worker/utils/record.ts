@@ -77,7 +77,7 @@ const getColorIndex = (tabId: string, pixelColor: string) => {
 	return colorIndex;
 };
 
-const getFrameIndex = (tabId: string, frameId: string) => {
+export const getFrameIndex = (tabId: string, frameId: string) => {
 	if (!records[tabId]) {
 		initRecords(tabId);
 	}
@@ -236,8 +236,10 @@ const makeBucketRecord = (
 	];
 };
 
-const makeBroomRecord = (): BroomRecord => {
-	return [ToolTypeEnum.Broom];
+const makeBroomRecord = (payload: RecordMessagePayload): BroomRecord => {
+	const { tabId, frameId } = payload;
+	const frameIndex = getFrameIndex(tabId, frameId);
+	return [ToolTypeEnum.Broom, frameIndex];
 };
 
 const updatePencilPointsRecord = (position: Position) => {
@@ -330,13 +332,13 @@ export const record = (payload: RecordMessagePayload) => {
 			record = makeBucketRecord(payload);
 			break;
 		case ToolTypeEnum.Broom:
-			record = makeBroomRecord();
+			record = makeBroomRecord(payload);
 			break;
 	}
 
 	clearRecordPoints();
 
-	if (!record) return;
+	if (!record) return false;
 
 	if (!records[tabId]) {
 		initRecords(tabId);
@@ -345,4 +347,5 @@ export const record = (payload: RecordMessagePayload) => {
 	// Redo stack represents a possible future. If a new record occurs, that future is no longer valid — like a time paradox.
 	records[tabId].redoStack.length = 0;
 	records[tabId].undoStack.push(record);
+	return true;
 };

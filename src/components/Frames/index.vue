@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { useCanvasStore } from "@/store";
+import { useFramesStore } from "@/store";
 import { storeToRefs } from "pinia";
 import Frame from "./frame.vue";
 
-const canvasStore = useCanvasStore();
-const { frames } = storeToRefs(canvasStore);
+const framesStore = useFramesStore();
+const { frames } = storeToRefs(framesStore);
 </script>
 <template>
   <div class='mr-2'>
-    <Frame v-for='frameId of Object.keys(frames)' class='mb-2' :key='frameId' />
+    <Frame
+      class='mb-2'
+      v-for='frameId of Object.keys(frames)'
+      :key='frameId'
+      @click='() => framesStore.switchFrame(frameId)'
+    />
   </div>
 </template>

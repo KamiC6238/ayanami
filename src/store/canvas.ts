@@ -76,6 +76,8 @@ export const useCanvasStore = defineStore("canvas", () => {
 		currentTabId.value = tabId;
 	};
 
+	const getCurrentTabId = () => currentTabId.value;
+
 	const getCanvasWorker = () => {
 		return canvasWorker.value;
 	};
@@ -118,7 +120,6 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
-				frames: framesStore.createFrame(),
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
 				mouseMove$: fromEvent<MouseEvent>(document, "mousemove"),
 				mouseUp$: fromEvent<MouseEvent>(document, "mouseup"),
@@ -127,6 +128,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		}
 
 		setTabId(tabId);
+		framesStore.createFrame(tabId);
 	};
 
 	const drawSquare = (config: SquareRectConfig) => {
@@ -360,6 +362,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		mouse$,
 		tabs,
 		currentTabId,
+		getCurrentTabId,
 		setTabId,
 		exportFile,
 		importFile,

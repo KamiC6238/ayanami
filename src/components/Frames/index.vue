@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { useFramesStore } from "@/store";
+import { useCanvasStore, useFramesStore } from "@/store";
 import { storeToRefs } from "pinia";
 import Frame from "./frame.vue";
 
+const canvasStore = useCanvasStore();
 const framesStore = useFramesStore();
+const { currentTabId } = storeToRefs(canvasStore);
 const { frames } = storeToRefs(framesStore);
 </script>
 <template>
@@ -14,5 +16,9 @@ const { frames } = storeToRefs(framesStore);
       :key='frameId'
       @click='() => framesStore.switchFrame(frameId)'
     />
+    <div
+      class='text-[10px] cursor-pointer'
+      @click='() => framesStore.createFrame(currentTabId)'
+    >add frame</div>
   </div>
 </template>

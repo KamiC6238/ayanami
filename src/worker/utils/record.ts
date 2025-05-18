@@ -105,8 +105,6 @@ const makePencilRecord = (
 ): PencilRecord | null => {
 	const { tabId, frameId, toolType, pixelColor, pixelSize } = payload;
 
-	console.log(payload);
-
 	if (!pencilRecordPoints.length) {
 		return null;
 	}

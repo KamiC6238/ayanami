@@ -26,6 +26,7 @@ export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 export const exportToSource = (
 	canvas: OffscreenCanvas,
 	colorsIndex: string[],
+	framesIndex: string[],
 	records: OpRecord[],
 	self: Window,
 ) => {
@@ -33,6 +34,7 @@ export const exportToSource = (
 		width: canvas.width,
 		height: canvas.height,
 		colorsIndex,
+		framesIndex,
 		records,
 	};
 
@@ -57,8 +59,9 @@ export const exportFile = (payload: ExportMessagePayload) => {
 			exportToPNG(canvas, self);
 			break;
 		case ExportTypeEnum.Source: {
-			const { undoStack, colorsIndex } = recordUtils.getUndoAndRedoStack(tabId);
-			exportToSource(canvas, colorsIndex, undoStack, self);
+			const { undoStack, colorsIndex, framesIndex } =
+				recordUtils.getUndoAndRedoStack(tabId);
+			exportToSource(canvas, colorsIndex, framesIndex, undoStack, self);
 			break;
 		}
 	}
@@ -72,11 +75,12 @@ export const importFile = (payload: ImportMessagePayload) => {
 		try {
 			const content = e.target?.result as string;
 			const data = JSON.parse(content) as SourceFile;
-			const { colorsIndex, records } = data;
+			const { colorsIndex, framesIndex, records } = data;
 
 			recordUtils.setRecordsFromImportFile(tabId, {
 				undoStack: records,
 				colorsIndex,
+				framesIndex,
 			});
 			renderUtils.replayRecords(tabId, records);
 		} catch {}

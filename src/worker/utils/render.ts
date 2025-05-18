@@ -580,7 +580,7 @@ export const replayRecords = (tabId: string, records: OpRecord[]) => {
 };
 
 const replayPencilRecord = (tabId: string, record: PencilRecord) => {
-	const [_, colorIndex, pixelSize, points] = record;
+	const [_, colorIndex, __, pixelSize, points] = record;
 	for (const [x, y, drawCounts] of points) {
 		for (let i = 0; i < drawCounts; i++) {
 			fillRect({
@@ -596,7 +596,7 @@ const replayPencilRecord = (tabId: string, record: PencilRecord) => {
 };
 
 const replayEraserRecord = (record: EraserRecord) => {
-	const [_, pixelSize, points] = record;
+	const [_, __, pixelSize, points] = record;
 	for (const [x, y] of points) {
 		clearRect({
 			toolType: ToolTypeEnum.Eraser,
@@ -609,7 +609,7 @@ const replayEraserRecord = (record: EraserRecord) => {
 };
 
 const replayLineRecord = (tabId: string, record: LineRecord) => {
-	const [_, colorIndex, pixelSize, points] = record;
+	const [_, colorIndex, __, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
@@ -625,7 +625,7 @@ const replayLineRecord = (tabId: string, record: LineRecord) => {
 };
 
 const replaySquareRecord = (tabId: string, record: SquareRecord) => {
-	const [_, colorIndex, pixelSize, points] = record;
+	const [_, colorIndex, __, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
@@ -640,7 +640,7 @@ const replaySquareRecord = (tabId: string, record: SquareRecord) => {
 };
 
 const replayCircleRecord = (tabId: string, record: CircleRecord) => {
-	const [toolType, colorIndex, pixelSize, points] = record;
+	const [toolType, colorIndex, __, pixelSize, points] = record;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
@@ -656,7 +656,7 @@ const replayCircleRecord = (tabId: string, record: CircleRecord) => {
 };
 
 const replayBucketRecord = (tabId: string, record: BucketRecord) => {
-	const [_, colorIndex, pixelSize, point] = record;
+	const [_, colorIndex, __, pixelSize, point] = record;
 	const [x, y] = point;
 
 	fillBucket({

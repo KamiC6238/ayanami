@@ -278,6 +278,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "record",
 			payload: {
 				tabId: currentTabId.value,
+				frameId: framesStore.getCurrentFrameId(),
 				toolType: toolType.value,
 				pixelSize:
 					configStore.toolType === ToolTypeEnum.Bucket

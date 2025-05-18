@@ -17,6 +17,8 @@ export const useFramesStore = defineStore("frames", () => {
 		return tabs.value[currentTabId.value].frames;
 	});
 
+	const getCurrentFrameId = () => currentFrameId.value;
+
 	const createFrame = () => {
 		const frameId = uuidV4();
 
@@ -34,6 +36,7 @@ export const useFramesStore = defineStore("frames", () => {
 	return {
 		frames,
 		currentFrameId,
+		getCurrentFrameId,
 		createFrame,
 		switchFrame,
 	};

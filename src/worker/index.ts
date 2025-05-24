@@ -62,19 +62,19 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.clearVisitedPosition();
 			const _payload = payload as RecordMessagePayload;
 			const recorded = recordUtils.record(_payload);
-			recorded && frameUtils.generateFrameSnapshot(_payload);
+			recorded && frameUtils.generateSnapshot(_payload);
 			break;
 		}
 		case "redo": {
 			const _payload = payload as RedoOrUndoMessagePayload;
 			renderUtils.redo(_payload);
-			frameUtils.generateFrameSnapshot(_payload);
+			frameUtils.generateSnapshot(_payload);
 			break;
 		}
 		case "undo": {
 			const _payload = payload as RedoOrUndoMessagePayload;
 			renderUtils.undo(_payload);
-			frameUtils.generateFrameSnapshot(_payload);
+			frameUtils.generateSnapshot(_payload);
 			break;
 		}
 		case "export":

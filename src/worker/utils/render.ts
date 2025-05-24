@@ -33,30 +33,12 @@ import * as recordUtils from "./record";
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
 let gridCanvas: OffscreenCanvas | null = null;
-let snapshotCanvas: OffscreenCanvas | null = null;
+const snapshotCanvas: OffscreenCanvas | null = null;
 
 let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;
 
-let snapshotColorPositionMap: Map<string, string> | null = null;
-const snapshotColorPositionMapBackup: Map<string, string> | null = null;
-
-const getColorPositionMap = (canvasType: CanvasType) => {
-	switch (canvasType) {
-		case "main":
-			return colorPositionMap;
-		case "snapshot":
-			return snapshotColorPositionMap;
-	}
-	return null;
-};
-
-const setColorPositionMap = (
-	canvasType: CanvasType,
-	key: string,
-	color: string,
-) => {
-	const _colorPositionMap = getColorPositionMap(canvasType);
+const setColorPositionMap = (key: string, color: string) => {
 	const [x, y] = key.split("_");
 	const position = {
 		x: Number(x),
@@ -76,7 +58,7 @@ const setColorPositionMap = (
 	};
 
 	if (checkIsValidPosition(position)) {
-		_colorPositionMap?.set(key, color);
+		colorPositionMap?.set(key, color);
 	}
 };
 
@@ -94,9 +76,8 @@ export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 	mainCanvas = canvasList[0];
 	previewCanvas = canvasList[1];
 	gridCanvas = canvasList[2];
-	snapshotCanvas = new OffscreenCanvas(clientWidth, clientHeight);
 
-	for (const canvas of [...canvasList, snapshotCanvas]) {
+	for (const canvas of canvasList) {
 		canvas.width = clientWidth * dpr;
 		canvas.height = clientHeight * dpr;
 		canvas.getContext("2d")?.scale(dpr, dpr);
@@ -107,21 +88,11 @@ export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 };
 
 export const getCanvas = (canvasType: CanvasType) => {
-	if (canvasType === "snapshot") {
-		return snapshotCanvas;
-	}
 	return canvasType === "main" ? mainCanvas : previewCanvas;
 };
 
 export const getContext = (canvasType: CanvasType) => {
-	let canvas: OffscreenCanvas | null = null;
-
-	if (canvasType === "snapshot") {
-		canvas = snapshotCanvas;
-	} else {
-		canvas = canvasType === "main" ? mainCanvas : previewCanvas;
-	}
-
+	const canvas = canvasType === "main" ? mainCanvas : previewCanvas;
 	return canvas?.getContext("2d");
 };
 
@@ -129,7 +100,6 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 	const { toolType, canvasType, position, pixelColor, pixelSize, isReplay } =
 		payload;
 	const context = getContext(canvasType);
-	const _colorPositionMap = getColorPositionMap(canvasType);
 
 	if (!context) return;
 
@@ -162,20 +132,16 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 				const _y = j * DEFAULT_PIXEL_SIZE + y;
 				const key = makeColorPositionKey({ x: _x, y: _y });
 
-				if (canvasType === "main" || canvasType === "snapshot") {
+				if (canvasType === "main") {
 					if (visited.has(key)) continue;
 					visited.add(key);
 
-					const existedColor = _colorPositionMap?.get(key);
+					const existedColor = colorPositionMap?.get(key);
 
 					if (existedColor) {
-						setColorPositionMap(
-							canvasType,
-							key,
-							blendHexColors(existedColor, pixelColor),
-						);
+						setColorPositionMap(key, blendHexColors(existedColor, pixelColor));
 					} else {
-						setColorPositionMap(canvasType, key, pixelColor);
+						setColorPositionMap(key, pixelColor);
 					}
 				} else {
 					/**
@@ -243,30 +209,22 @@ export const drawSquare = (payload: SquareMessagePayload) => {
 };
 
 export const fillBucket = (payload: BucketMessagePayload) => {
-	const { canvasType, position, replacementColor, pixelSize } = payload;
-	const canvas = getCanvas(canvasType);
-	const context = getContext(canvasType);
-	const _colorPositionMap = getColorPositionMap(canvasType);
+	if (!colorPositionMap || !mainCanvas) return;
+	const context = getContext("main");
+	if (!context) return;
 
-	if (
-		(canvasType !== "main" && canvasType !== "snapshot") ||
-		!canvas ||
-		!context ||
-		!_colorPositionMap
-	) {
-		return;
-	}
+	const { position, replacementColor, pixelSize } = payload;
 
-	const { width, height } = canvas;
+	const { width, height } = mainCanvas;
 	const queue = [{ x: position.x, y: position.y }];
-	const targetColor = _colorPositionMap.get(makeColorPositionKey(position));
+	const targetColor = colorPositionMap.get(makeColorPositionKey(position));
 	const visited = new Set<string>();
 
 	while (queue.length > 0) {
 		const pos = queue.pop() as Position;
 		const { x, y } = pos;
 		const curPositionColorKey = makeColorPositionKey(pos);
-		const curPositionColor = _colorPositionMap.get(curPositionColorKey);
+		const curPositionColor = colorPositionMap.get(curPositionColorKey);
 
 		if (
 			x < 0 ||
@@ -284,7 +242,7 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 		fillRect({
 			toolType: ToolTypeEnum.Bucket,
 			position: pos,
-			canvasType,
+			canvasType: "main",
 			pixelColor: replacementColor,
 			pixelSize,
 		});
@@ -316,7 +274,7 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 		});
 	}
 
-	if (canvasType === "main" || canvasType === "snapshot") {
+	if (canvasType === "main") {
 		const size = pixelSize / DEFAULT_PIXEL_SIZE;
 
 		for (let i = 0; i < size; i++) {
@@ -345,9 +303,6 @@ export const clearAllPixels = (payload: ClearAllPixelsMessagePayload) => {
 
 	if (canvasType === "main") {
 		colorPositionMap = new Map(colorPositionMapBackup);
-	}
-	if (canvasType === "snapshot") {
-		snapshotColorPositionMap = new Map(snapshotColorPositionMapBackup);
 	}
 };
 
@@ -582,7 +537,6 @@ export const redo = (payload: RedoOrUndoMessagePayload) => {
 
 	recordStack.undoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
-	snapshotColorPositionMap = new Map(snapshotColorPositionMapBackup);
 	visited.clear();
 	replayRecords(recordStack.undoStack, {
 		tabId,
@@ -599,7 +553,6 @@ export const undo = (payload: RedoOrUndoMessagePayload) => {
 
 	recordStack.redoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
-	snapshotColorPositionMap = new Map(snapshotColorPositionMapBackup);
 	visited.clear();
 	replayRecords(recordStack.undoStack, {
 		tabId,
@@ -616,7 +569,7 @@ export const replayRecords = (
 	records: OpRecord[],
 	config: ReplayRecordsConfig,
 ) => {
-	clearAllPixels({ canvasType: config.canvasType || "main" });
+	clearAllPixels({ canvasType: "main" });
 
 	for (const record of records) {
 		const [toolType] = record;
@@ -644,7 +597,7 @@ export const replayRecords = (
 				replayBucketRecord(record as BucketRecord, config);
 				break;
 			case ToolTypeEnum.Broom:
-				replayClearAllPixelsRecord(config);
+				replayClearAllPixelsRecord();
 				break;
 		}
 
@@ -761,6 +714,6 @@ const replayBucketRecord = (
 	});
 };
 
-const replayClearAllPixelsRecord = (config: ReplayRecordsConfig) => {
-	clearAllPixels({ canvasType: config.canvasType || "main" });
+const replayClearAllPixelsRecord = () => {
+	clearAllPixels({ canvasType: "main" });
 };

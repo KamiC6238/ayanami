@@ -6,8 +6,8 @@ defineProps<Frame>();
 </script>
 <template>
   <PixelBorderSecondary
-    wrapper-width="w-25"
-    wrapper-height="h-25"
+    wrapper-width="w-50"
+    wrapper-height="h-50"
   >
     <img :src="snapshot" />
   </PixelBorderSecondary>

@@ -82,7 +82,8 @@ export const importFile = (payload: ImportMessagePayload) => {
 				colorsIndex,
 				framesIndex,
 			});
-			renderUtils.replayRecords(tabId, records);
+			// TODO: FIXME
+			renderUtils.replayRecords(records, { tabId, frameId: "" });
 		} catch {}
 	};
 

@@ -16,6 +16,7 @@ import type {
 	SquareMessagePayload,
 } from "@/types";
 import * as fileUtils from "./utils/file";
+import * as frameUtils from "./utils/frame";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
 
@@ -56,10 +57,13 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "clearAllPixels":
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
 			break;
-		case "record":
+		case "record": {
 			renderUtils.clearVisitedPosition();
-			recordUtils.record(payload as RecordMessagePayload);
+			const _payload = payload as RecordMessagePayload;
+			const recorded = recordUtils.record(_payload);
+			recorded && frameUtils.exportFrameSnapshot(_payload);
 			break;
+		}
 		case "redo": {
 			const { tabId } = payload as RedoOrUndoMessagePayload;
 			renderUtils.redo(tabId);

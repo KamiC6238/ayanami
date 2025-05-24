@@ -58,6 +58,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			main: _.main,
 			grid: _.grid,
 			preview: _.preview,
+			snapshot: null,
 		};
 	});
 
@@ -120,6 +121,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 				main: mainCanvas,
 				preview: previewCanvas,
 				grid: gridCanvas,
+				snapshot: null,
 				mouseDown$: fromEvent<MouseEvent>(previewCanvas, "mousedown"),
 				mouseMove$: fromEvent<MouseEvent>(document, "mousemove"),
 				mouseUp$: fromEvent<MouseEvent>(document, "mouseup"),
@@ -264,6 +266,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		worker.postMessage({
 			type: "fillBucket",
 			payload: {
+				canvasType: "main",
 				tabId: currentTabId.value,
 				position: config.position,
 				pixelSize: DEFAULT_PIXEL_SIZE,

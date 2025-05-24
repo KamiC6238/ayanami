@@ -2,7 +2,7 @@ import type { Observable } from "rxjs";
 import type { Position } from "./common";
 import type { ToolTypeEnum } from "./config";
 
-export type CanvasType = "main" | "preview" | "grid";
+export type CanvasType = "main" | "preview" | "grid" | "snapshot";
 export type CanvasMouseEventType =
 	| "mouseDown$"
 	| "mouseMove$"

@@ -67,6 +67,7 @@ export interface CircleMessagePayload {
 }
 
 export interface BucketMessagePayload {
+	canvasType: CanvasType;
 	replacementColor: string;
 	position: Position;
 	pixelSize: number;

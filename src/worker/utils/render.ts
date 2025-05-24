@@ -33,7 +33,6 @@ import * as recordUtils from "./record";
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
 let gridCanvas: OffscreenCanvas | null = null;
-const snapshotCanvas: OffscreenCanvas | null = null;
 
 let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;

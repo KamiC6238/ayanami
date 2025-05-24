@@ -58,6 +58,14 @@ export const useFramesStore = defineStore("frames", () => {
 
 	const switchFrame = (frameId: string) => {
 		currentFrameId.value = frameId;
+
+		canvasStore.canvasWorker?.postMessage({
+			type: "switchFrame",
+			payload: {
+				tabId: canvasStore.getCurrentTabId(),
+				frameId,
+			},
+		});
 	};
 
 	const updateSnapshot = (tabId: string, frameId: string, snapshot: string) => {

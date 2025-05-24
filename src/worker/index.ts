@@ -14,6 +14,7 @@ import type {
 	RecordMessagePayload,
 	RedoOrUndoMessagePayload,
 	SquareMessagePayload,
+	SwitchFrameMessagePayload,
 } from "@/types";
 import * as fileUtils from "./utils/file";
 import * as frameUtils from "./utils/frame";
@@ -61,7 +62,7 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.clearVisitedPosition();
 			const _payload = payload as RecordMessagePayload;
 			const recorded = recordUtils.record(_payload);
-			recorded && frameUtils.exportFrameSnapshot(_payload);
+			recorded && frameUtils.generateFrameSnapshot(_payload);
 			break;
 		}
 		case "redo": {
@@ -79,6 +80,9 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "import":
 			fileUtils.importFile(payload as ImportMessagePayload);
+			break;
+		case "switchFrame":
+			frameUtils.switchFrame(payload as SwitchFrameMessagePayload);
 			break;
 	}
 };

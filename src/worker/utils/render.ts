@@ -562,6 +562,16 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 	}
 };
 
+export const getRecordsWithFrameId = (tabId: string, frameId: string) => {
+	const records = recordUtils.getUndoAndRedoStack(tabId);
+	return records.undoStack.filter((record) => {
+		const [toolType] = record;
+		const frameIndex = toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
+		const _frameIndex = recordUtils.getFrameIndex(tabId, frameId);
+		return _frameIndex === frameIndex;
+	});
+};
+
 export const redo = (tabId: string) => {
 	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
 	const record = recordStack.redoStack.pop();

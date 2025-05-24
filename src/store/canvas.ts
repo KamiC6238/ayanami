@@ -303,6 +303,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "redo",
 			payload: {
 				tabId: currentTabId.value,
+				frameId: framesStore.getCurrentFrameId(),
 			},
 		});
 	};
@@ -315,6 +316,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "undo",
 			payload: {
 				tabId: currentTabId.value,
+				frameId: framesStore.getCurrentFrameId(),
 			},
 		});
 	};

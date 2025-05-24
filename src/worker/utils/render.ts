@@ -17,6 +17,7 @@ import type {
 	OpRecord,
 	PencilRecord,
 	Position,
+	RedoOrUndoMessagePayload,
 	SquareMessagePayload,
 	SquareRecord,
 } from "@/types";
@@ -572,7 +573,8 @@ export const getRecordsWithFrameId = (tabId: string, frameId: string) => {
 	});
 };
 
-export const redo = (tabId: string) => {
+export const redo = (payload: RedoOrUndoMessagePayload) => {
+	const { tabId, frameId } = payload;
 	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
 	const record = recordStack.redoStack.pop();
 
@@ -584,11 +586,12 @@ export const redo = (tabId: string) => {
 	visited.clear();
 	replayRecords(recordStack.undoStack, {
 		tabId,
-		frameId: "",
+		frameId,
 	});
 };
 
-export const undo = (tabId: string) => {
+export const undo = (payload: RedoOrUndoMessagePayload) => {
+	const { tabId, frameId } = payload;
 	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
 	const record = recordStack.undoStack.pop();
 
@@ -600,7 +603,7 @@ export const undo = (tabId: string) => {
 	visited.clear();
 	replayRecords(recordStack.undoStack, {
 		tabId,
-		frameId: "",
+		frameId,
 	});
 };
 

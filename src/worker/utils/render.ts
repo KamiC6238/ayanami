@@ -32,11 +32,30 @@ import * as recordUtils from "./record";
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
 let gridCanvas: OffscreenCanvas | null = null;
+let snapshotCanvas: OffscreenCanvas | null = null;
 
 let colorPositionMap: Map<string, string> | null = null;
 let colorPositionMapBackup: Map<string, string> | null = null;
 
-const setColorPositionMap = (key: string, color: string) => {
+let snapshotColorPositionMap: Map<string, string> | null = null;
+const snapshotColorPositionMapBackup: Map<string, string> | null = null;
+
+const getColorPositionMap = (canvasType: CanvasType) => {
+	switch (canvasType) {
+		case "main":
+			return colorPositionMap;
+		case "snapshot":
+			return snapshotColorPositionMap;
+	}
+	return null;
+};
+
+const setColorPositionMap = (
+	canvasType: CanvasType,
+	key: string,
+	color: string,
+) => {
+	const _colorPositionMap = getColorPositionMap(canvasType);
 	const [x, y] = key.split("_");
 	const position = {
 		x: Number(x),
@@ -56,7 +75,7 @@ const setColorPositionMap = (key: string, color: string) => {
 	};
 
 	if (checkIsValidPosition(position)) {
-		colorPositionMap?.set(key, color);
+		_colorPositionMap?.set(key, color);
 	}
 };
 
@@ -74,8 +93,9 @@ export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 	mainCanvas = canvasList[0];
 	previewCanvas = canvasList[1];
 	gridCanvas = canvasList[2];
+	snapshotCanvas = new OffscreenCanvas(clientWidth, clientHeight);
 
-	for (const canvas of canvasList) {
+	for (const canvas of [...canvasList, snapshotCanvas]) {
 		canvas.width = clientWidth * dpr;
 		canvas.height = clientHeight * dpr;
 		canvas.getContext("2d")?.scale(dpr, dpr);
@@ -86,11 +106,21 @@ export const initOffScreenCanvas = (payload: InitMessagePayload) => {
 };
 
 export const getCanvas = (canvasType: CanvasType) => {
+	if (canvasType === "snapshot") {
+		return snapshotCanvas;
+	}
 	return canvasType === "main" ? mainCanvas : previewCanvas;
 };
 
 export const getContext = (canvasType: CanvasType) => {
-	const canvas = canvasType === "main" ? mainCanvas : previewCanvas;
+	let canvas: OffscreenCanvas | null = null;
+
+	if (canvasType === "snapshot") {
+		canvas = snapshotCanvas;
+	} else {
+		canvas = canvasType === "main" ? mainCanvas : previewCanvas;
+	}
+
 	return canvas?.getContext("2d");
 };
 
@@ -98,6 +128,7 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 	const { toolType, canvasType, position, pixelColor, pixelSize, isReplay } =
 		payload;
 	const context = getContext(canvasType);
+	const _colorPositionMap = getColorPositionMap(canvasType);
 
 	if (!context) return;
 
@@ -130,16 +161,20 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 				const _y = j * DEFAULT_PIXEL_SIZE + y;
 				const key = makeColorPositionKey({ x: _x, y: _y });
 
-				if (canvasType === "main") {
+				if (canvasType === "main" || canvasType === "snapshot") {
 					if (visited.has(key)) continue;
 					visited.add(key);
 
-					const existedColor = colorPositionMap?.get(key);
+					const existedColor = _colorPositionMap?.get(key);
 
 					if (existedColor) {
-						setColorPositionMap(key, blendHexColors(existedColor, pixelColor));
+						setColorPositionMap(
+							canvasType,
+							key,
+							blendHexColors(existedColor, pixelColor),
+						);
 					} else {
-						setColorPositionMap(key, pixelColor);
+						setColorPositionMap(canvasType, key, pixelColor);
 					}
 				} else {
 					/**
@@ -207,22 +242,30 @@ export const drawSquare = (payload: SquareMessagePayload) => {
 };
 
 export const fillBucket = (payload: BucketMessagePayload) => {
-	if (!colorPositionMap || !mainCanvas) return;
-	const context = getContext("main");
-	if (!context) return;
+	const { canvasType, position, replacementColor, pixelSize } = payload;
+	const canvas = getCanvas(canvasType);
+	const context = getContext(canvasType);
+	const _colorPositionMap = getColorPositionMap(canvasType);
 
-	const { position, replacementColor, pixelSize } = payload;
+	if (
+		(canvasType !== "main" && canvasType !== "snapshot") ||
+		!canvas ||
+		!context ||
+		!_colorPositionMap
+	) {
+		return;
+	}
 
-	const { width, height } = mainCanvas;
+	const { width, height } = canvas;
 	const queue = [{ x: position.x, y: position.y }];
-	const targetColor = colorPositionMap.get(makeColorPositionKey(position));
+	const targetColor = _colorPositionMap.get(makeColorPositionKey(position));
 	const visited = new Set<string>();
 
 	while (queue.length > 0) {
 		const pos = queue.pop() as Position;
 		const { x, y } = pos;
 		const curPositionColorKey = makeColorPositionKey(pos);
-		const curPositionColor = colorPositionMap.get(curPositionColorKey);
+		const curPositionColor = _colorPositionMap.get(curPositionColorKey);
 
 		if (
 			x < 0 ||
@@ -240,7 +283,7 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 		fillRect({
 			toolType: ToolTypeEnum.Bucket,
 			position: pos,
-			canvasType: "main",
+			canvasType,
 			pixelColor: replacementColor,
 			pixelSize,
 		});
@@ -272,7 +315,7 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 		});
 	}
 
-	if (canvasType === "main") {
+	if (canvasType === "main" || canvasType === "snapshot") {
 		const size = pixelSize / DEFAULT_PIXEL_SIZE;
 
 		for (let i = 0; i < size; i++) {
@@ -301,6 +344,9 @@ export const clearAllPixels = (payload: ClearAllPixelsMessagePayload) => {
 
 	if (canvasType === "main") {
 		colorPositionMap = new Map(colorPositionMapBackup);
+	}
+	if (canvasType === "snapshot") {
+		snapshotColorPositionMap = new Map(snapshotColorPositionMapBackup);
 	}
 };
 
@@ -524,8 +570,12 @@ export const redo = (tabId: string) => {
 
 	recordStack.undoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
+	snapshotColorPositionMap = new Map(snapshotColorPositionMapBackup);
 	visited.clear();
-	replayRecords(tabId, recordStack.undoStack);
+	replayRecords(recordStack.undoStack, {
+		tabId,
+		frameId: "",
+	});
 };
 
 export const undo = (tabId: string) => {
@@ -536,40 +586,52 @@ export const undo = (tabId: string) => {
 
 	recordStack.redoStack.push(record);
 	colorPositionMap = new Map(colorPositionMapBackup);
+	snapshotColorPositionMap = new Map(snapshotColorPositionMapBackup);
 	visited.clear();
-	replayRecords(tabId, recordStack.undoStack);
+	replayRecords(recordStack.undoStack, {
+		tabId,
+		frameId: "",
+	});
 };
 
-export const replayRecords = (tabId: string, records: OpRecord[]) => {
-	clearAllPixels({ canvasType: "main" });
+interface ReplayRecordsConfig {
+	tabId: string;
+	frameId: string;
+	canvasType?: CanvasType;
+}
+export const replayRecords = (
+	records: OpRecord[],
+	config: ReplayRecordsConfig,
+) => {
+	clearAllPixels({ canvasType: config.canvasType || "main" });
 
 	for (const record of records) {
 		const [toolType] = record;
 
 		switch (toolType) {
 			case ToolTypeEnum.Pencil:
-				replayPencilRecord(tabId, record as PencilRecord);
+				replayPencilRecord(record as PencilRecord, config);
 				break;
 			case ToolTypeEnum.Eraser:
-				replayEraserRecord(record as EraserRecord);
+				replayEraserRecord(record as EraserRecord, config);
 				break;
 			case ToolTypeEnum.Line:
-				replayLineRecord(tabId, record as LineRecord);
+				replayLineRecord(record as LineRecord, config);
 				break;
 			case ToolTypeEnum.Square:
-				replaySquareRecord(tabId, record as SquareRecord);
+				replaySquareRecord(record as SquareRecord, config);
 				break;
 			case ToolTypeEnum.Circle:
-				replayCircleRecord(tabId, record as CircleRecord);
+				replayCircleRecord(record as CircleRecord, config);
 				break;
 			case ToolTypeEnum.Ellipse:
-				replayCircleRecord(tabId, record as CircleRecord);
+				replayCircleRecord(record as CircleRecord, config);
 				break;
 			case ToolTypeEnum.Bucket:
-				replayBucketRecord(tabId, record as BucketRecord);
+				replayBucketRecord(record as BucketRecord, config);
 				break;
 			case ToolTypeEnum.Broom:
-				replayClearAllPixelsRecord();
+				replayClearAllPixelsRecord(config);
 				break;
 		}
 
@@ -577,14 +639,18 @@ export const replayRecords = (tabId: string, records: OpRecord[]) => {
 	}
 };
 
-const replayPencilRecord = (tabId: string, record: PencilRecord) => {
+const replayPencilRecord = (
+	record: PencilRecord,
+	config: ReplayRecordsConfig,
+) => {
 	const [_, colorIndex, __, pixelSize, points] = record;
+	const { tabId, canvasType = "main" } = config;
 	for (const [x, y, drawCounts] of points) {
 		for (let i = 0; i < drawCounts; i++) {
 			fillRect({
 				toolType: ToolTypeEnum.Pencil,
 				position: { x, y },
-				canvasType: "main",
+				canvasType,
 				pixelSize,
 				pixelColor: recordUtils.getColor(tabId, colorIndex),
 				isReplay: true,
@@ -593,28 +659,33 @@ const replayPencilRecord = (tabId: string, record: PencilRecord) => {
 	}
 };
 
-const replayEraserRecord = (record: EraserRecord) => {
+const replayEraserRecord = (
+	record: EraserRecord,
+	config: ReplayRecordsConfig,
+) => {
 	const [_, __, pixelSize, points] = record;
+	const { canvasType = "main" } = config;
 	for (const [x, y] of points) {
 		clearRect({
 			toolType: ToolTypeEnum.Eraser,
 			position: { x, y },
-			canvasType: "main",
+			canvasType,
 			pixelSize,
 			isReplay: true,
 		});
 	}
 };
 
-const replayLineRecord = (tabId: string, record: LineRecord) => {
+const replayLineRecord = (record: LineRecord, config: ReplayRecordsConfig) => {
 	const [_, colorIndex, __, pixelSize, points] = record;
+	const { tabId, canvasType = "main" } = config;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
 
 	drawBresenhamLine({
 		toolType: ToolTypeEnum.Line,
-		canvasType: "main",
+		canvasType,
 		lineStartPosition: { x: startX, y: startY },
 		lineEndPosition: { x: endX, y: endY },
 		pixelColor: recordUtils.getColor(tabId, colorIndex),
@@ -622,14 +693,18 @@ const replayLineRecord = (tabId: string, record: LineRecord) => {
 	});
 };
 
-const replaySquareRecord = (tabId: string, record: SquareRecord) => {
+const replaySquareRecord = (
+	record: SquareRecord,
+	config: ReplayRecordsConfig,
+) => {
 	const [_, colorIndex, __, pixelSize, points] = record;
+	const { tabId, canvasType = "main" } = config;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
 
 	drawSquare({
-		canvasType: "main",
+		canvasType,
 		squareStartPosition: { x: startX, y: startY },
 		squareEndPosition: { x: endX, y: endY },
 		pixelSize,
@@ -637,15 +712,19 @@ const replaySquareRecord = (tabId: string, record: SquareRecord) => {
 	});
 };
 
-const replayCircleRecord = (tabId: string, record: CircleRecord) => {
+const replayCircleRecord = (
+	record: CircleRecord,
+	config: ReplayRecordsConfig,
+) => {
 	const [toolType, colorIndex, __, pixelSize, points] = record;
+	const { tabId, canvasType = "main" } = config;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
 	const [endX, endY] = endPoint;
 
 	drawCircle({
 		toolType,
-		canvasType: "main",
+		canvasType,
 		circleStartPosition: { x: startX, y: startY },
 		circleEndPosition: { x: endX, y: endY },
 		pixelSize,
@@ -653,17 +732,22 @@ const replayCircleRecord = (tabId: string, record: CircleRecord) => {
 	});
 };
 
-const replayBucketRecord = (tabId: string, record: BucketRecord) => {
+const replayBucketRecord = (
+	record: BucketRecord,
+	config: ReplayRecordsConfig,
+) => {
 	const [_, colorIndex, __, pixelSize, point] = record;
+	const { tabId, canvasType = "main" } = config;
 	const [x, y] = point;
 
 	fillBucket({
+		canvasType,
 		replacementColor: recordUtils.getColor(tabId, colorIndex),
 		pixelSize,
 		position: { x, y },
 	});
 };
 
-const replayClearAllPixelsRecord = () => {
-	clearAllPixels({ canvasType: "main" });
+const replayClearAllPixelsRecord = (config: ReplayRecordsConfig) => {
+	clearAllPixels({ canvasType: config.canvasType || "main" });
 };

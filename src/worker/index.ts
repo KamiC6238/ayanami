@@ -66,13 +66,15 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		}
 		case "redo": {
-			const { tabId } = payload as RedoOrUndoMessagePayload;
-			renderUtils.redo(tabId);
+			const _payload = payload as RedoOrUndoMessagePayload;
+			renderUtils.redo(_payload);
+			frameUtils.generateFrameSnapshot(_payload);
 			break;
 		}
 		case "undo": {
-			const { tabId } = payload as RedoOrUndoMessagePayload;
-			renderUtils.undo(tabId);
+			const _payload = payload as RedoOrUndoMessagePayload;
+			renderUtils.undo(_payload);
+			frameUtils.generateFrameSnapshot(_payload);
 			break;
 		}
 		case "export":

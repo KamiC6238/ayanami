@@ -126,6 +126,7 @@ export interface ImportMessagePayload {
 
 export interface RedoOrUndoMessagePayload {
 	tabId: string;
+	frameId: string;
 }
 
 export interface SwitchFrameMessagePayload {
@@ -147,6 +148,7 @@ export type MessagePayload =
 	| RecordMessagePayload
 	| RedoOrUndoMessagePayload
 	| ExportMessagePayload
+	| ImportMessagePayload
 	| SwitchFrameMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {

@@ -1,8 +1,11 @@
 import type { SwitchFrameMessagePayload } from "@/types";
 import * as renderUtils from "./render";
 
-const generateSnapshot = (tabId: string, frameId: string) => {
-	const canvas = renderUtils.getCanvas("snapshot");
+export const generateSnapshot = (config: {
+	tabId: string;
+	frameId: string;
+}) => {
+	const canvas = renderUtils.getCanvas("main");
 	canvas
 		?.convertToBlob({
 			type: "image/png",
@@ -12,28 +15,11 @@ const generateSnapshot = (tabId: string, frameId: string) => {
 			self.postMessage({
 				type: "snapshot",
 				payload: {
-					tabId,
-					frameId,
+					...config,
 					blob,
 				},
 			});
 		});
-};
-
-export const generateFrameSnapshot = (config: {
-	tabId: string;
-	frameId: string;
-}) => {
-	const { tabId, frameId } = config;
-	const records = renderUtils.getRecordsWithFrameId(tabId, frameId);
-
-	renderUtils.replayRecords(records, {
-		tabId,
-		frameId,
-		canvasType: "snapshot",
-	});
-
-	generateSnapshot(tabId, frameId);
 };
 
 export const switchFrame = (payload: SwitchFrameMessagePayload) => {

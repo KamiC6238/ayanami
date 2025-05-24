@@ -22,7 +22,8 @@ export type MessageType =
 	| "redo"
 	| "undo"
 	| "export"
-	| "import";
+	| "import"
+	| "switchFrame";
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
@@ -127,6 +128,11 @@ export interface RedoOrUndoMessagePayload {
 	tabId: string;
 }
 
+export interface SwitchFrameMessagePayload {
+	tabId: string;
+	frameId: string;
+}
+
 export type MessagePayload =
 	| InitMessagePayload
 	| FillRectMessagePayload
@@ -140,7 +146,8 @@ export type MessagePayload =
 	| ClearAllPixelsMessagePayload
 	| RecordMessagePayload
 	| RedoOrUndoMessagePayload
-	| ExportMessagePayload;
+	| ExportMessagePayload
+	| SwitchFrameMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;

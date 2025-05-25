@@ -5,10 +5,11 @@ import type {
 	OpRecord,
 	SourceFile,
 } from "@/types";
-import { useRecords } from "../signals";
+import { useRecords, useRender } from "../signals";
 import * as renderUtils from "./render";
 
 const { getRecords, setRecordsFromImportFile } = useRecords();
+const { getCanvas } = useRender();
 
 export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 	const blob = await canvas.convertToBlob({
@@ -53,7 +54,7 @@ export const exportToSource = (
 
 export const exportFile = (payload: ExportMessagePayload) => {
 	const { exportType, tabId } = payload;
-	const canvas = renderUtils.getCanvas("main");
+	const canvas = getCanvas("main");
 	if (!canvas) return;
 
 	switch (exportType) {

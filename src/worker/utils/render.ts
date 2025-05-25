@@ -28,7 +28,18 @@ import {
 	getOffsetPosition,
 	makeColorPositionKey,
 } from "@/utils";
-import * as recordUtils from "./record";
+import { useRecords } from "../signals";
+
+const {
+	getColor,
+	getFrameIndex,
+	getUndoStack,
+	popUndoStack,
+	popRedoStack,
+	updatePointsRecord,
+	addRecordToUndoStack,
+	addRecordToRedoStack,
+} = useRecords();
 
 let mainCanvas: OffscreenCanvas | null = null;
 let previewCanvas: OffscreenCanvas | null = null;
@@ -114,7 +125,7 @@ export const fillRect = (payload: FillRectMessagePayload) => {
 	 * do not update point record during redo or undo
 	 * */
 	if (!isReplay && toolType === ToolTypeEnum.Pencil) {
-		recordUtils.updatePointsRecord({
+		updatePointsRecord({
 			toolType,
 			position: offsetPosition,
 		});
@@ -267,7 +278,7 @@ export const clearRect = (payload: ClearRectMessagePayload) => {
 	 * do not update point record during redo or undo
 	 * */
 	if (!isReplay && toolType === ToolTypeEnum.Eraser) {
-		recordUtils.updatePointsRecord({
+		updatePointsRecord({
 			toolType: ToolTypeEnum.Eraser,
 			position: offsetPosition,
 		});
@@ -518,26 +529,25 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 };
 
 export const getRecordsWithFrameId = (tabId: string, frameId: string) => {
-	const records = recordUtils.getUndoAndRedoStack(tabId);
-	return records.undoStack.filter((record) => {
+	const undoStack = getUndoStack(tabId);
+	return undoStack.filter((record) => {
 		const [toolType] = record;
 		const frameIndex = toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
-		const _frameIndex = recordUtils.getFrameIndex(tabId, frameId);
+		const _frameIndex = getFrameIndex(tabId, frameId);
 		return _frameIndex === frameIndex;
 	});
 };
 
 export const redo = (payload: RedoOrUndoMessagePayload) => {
 	const { tabId, frameId } = payload;
-	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
-	const record = recordStack.redoStack.pop();
-
+	const record = popRedoStack(tabId);
 	if (!record) return;
 
-	recordStack.undoStack.push(record);
+	addRecordToUndoStack(tabId, record);
+
 	colorPositionMap = new Map(colorPositionMapBackup);
 	visited.clear();
-	replayRecords(recordStack.undoStack, {
+	replayRecords(getUndoStack(tabId), {
 		tabId,
 		frameId,
 	});
@@ -545,15 +555,15 @@ export const redo = (payload: RedoOrUndoMessagePayload) => {
 
 export const undo = (payload: RedoOrUndoMessagePayload) => {
 	const { tabId, frameId } = payload;
-	const recordStack = recordUtils.getUndoAndRedoStack(tabId);
-	const record = recordStack.undoStack.pop();
+	const record = popUndoStack(tabId);
 
 	if (!record) return;
 
-	recordStack.redoStack.push(record);
+	addRecordToRedoStack(tabId, record);
+
 	colorPositionMap = new Map(colorPositionMapBackup);
 	visited.clear();
-	replayRecords(recordStack.undoStack, {
+	replayRecords(getUndoStack(tabId), {
 		tabId,
 		frameId,
 	});
@@ -617,7 +627,7 @@ const replayPencilRecord = (
 				position: { x, y },
 				canvasType,
 				pixelSize,
-				pixelColor: recordUtils.getColor(tabId, colorIndex),
+				pixelColor: getColor(tabId, colorIndex),
 				isReplay: true,
 			});
 		}
@@ -653,7 +663,7 @@ const replayLineRecord = (record: LineRecord, config: ReplayRecordsConfig) => {
 		canvasType,
 		lineStartPosition: { x: startX, y: startY },
 		lineEndPosition: { x: endX, y: endY },
-		pixelColor: recordUtils.getColor(tabId, colorIndex),
+		pixelColor: getColor(tabId, colorIndex),
 		pixelSize,
 	});
 };
@@ -673,7 +683,7 @@ const replaySquareRecord = (
 		squareStartPosition: { x: startX, y: startY },
 		squareEndPosition: { x: endX, y: endY },
 		pixelSize,
-		pixelColor: recordUtils.getColor(tabId, colorIndex),
+		pixelColor: getColor(tabId, colorIndex),
 	});
 };
 
@@ -693,7 +703,7 @@ const replayCircleRecord = (
 		circleStartPosition: { x: startX, y: startY },
 		circleEndPosition: { x: endX, y: endY },
 		pixelSize,
-		pixelColor: recordUtils.getColor(tabId, colorIndex),
+		pixelColor: getColor(tabId, colorIndex),
 	});
 };
 
@@ -707,7 +717,7 @@ const replayBucketRecord = (
 
 	fillBucket({
 		canvasType,
-		replacementColor: recordUtils.getColor(tabId, colorIndex),
+		replacementColor: getColor(tabId, colorIndex),
 		pixelSize,
 		position: { x, y },
 	});

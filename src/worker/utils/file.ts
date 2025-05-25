@@ -6,7 +6,7 @@ import type {
 	SourceFile,
 } from "@/types";
 import { useRecords, useRender } from "../signals";
-import * as renderUtils from "./render";
+import * as recordUtils from "./record";
 
 const { getRecords, setRecordsFromImportFile } = useRecords();
 const { getCanvas } = useRender();
@@ -89,7 +89,7 @@ export const importFile = (payload: ImportMessagePayload) => {
 				framesIndex,
 			});
 			// TODO: FIXME
-			renderUtils.replayRecords(records, { tabId, frameId: "" });
+			recordUtils.replayRecords(records, { tabId, frameId: "" });
 		} catch {}
 	};
 

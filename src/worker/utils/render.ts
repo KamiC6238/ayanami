@@ -1,24 +1,16 @@
 import { DEFAULT_PIXEL_SIZE, GRID_SIZE } from "@/constants";
 import type {
 	BucketMessagePayload,
-	BucketRecord,
 	CanvasType,
 	CircleMessagePayload,
-	CircleRecord,
 	ClearAllPixelsMessagePayload,
 	ClearHoverRectMessagePayload,
 	ClearRectMessagePayload,
-	EraserRecord,
 	FillHoverRectMessagePayload,
 	FillRectMessagePayload,
 	LineMessagePayload,
-	LineRecord,
-	OpRecord,
-	PencilRecord,
 	Position,
-	RedoOrUndoMessagePayload,
 	SquareMessagePayload,
-	SquareRecord,
 } from "@/types";
 import { ToolTypeEnum } from "@/types";
 import {
@@ -28,16 +20,7 @@ import {
 } from "@/utils";
 import { useRecords, useRender } from "../signals";
 
-const {
-	getColor,
-	getFrameIndex,
-	getUndoStack,
-	popUndoStack,
-	popRedoStack,
-	updatePointsRecord,
-	addRecordToUndoStack,
-	addRecordToRedoStack,
-} = useRecords();
+const { updatePointsRecord } = useRecords();
 
 const {
 	getCanvas,
@@ -50,7 +33,6 @@ const {
 	addVisited,
 	addTempVisited,
 	setColorPosition,
-	clearVisited,
 	clearTempVisited,
 } = useRender();
 
@@ -476,201 +458,4 @@ export const drawCircle = (payload: CircleMessagePayload) => {
 	} else {
 		drawEllipseCircle(centerX, centerY, radiusX, radiusY, canvasType);
 	}
-};
-
-export const getRecordsWithFrameId = (tabId: string, frameId: string) => {
-	const undoStack = getUndoStack(tabId);
-	return undoStack.filter((record) => {
-		const [toolType] = record;
-		const frameIndex = toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
-		const _frameIndex = getFrameIndex(tabId, frameId);
-		return _frameIndex === frameIndex;
-	});
-};
-
-export const redo = (payload: RedoOrUndoMessagePayload) => {
-	const { tabId, frameId } = payload;
-	const record = popRedoStack(tabId);
-	if (!record) return;
-
-	addRecordToUndoStack(tabId, record);
-	resetColorPositionMap();
-	clearVisited();
-	replayRecords(getUndoStack(tabId), {
-		tabId,
-		frameId,
-	});
-};
-
-export const undo = (payload: RedoOrUndoMessagePayload) => {
-	const { tabId, frameId } = payload;
-	const record = popUndoStack(tabId);
-
-	if (!record) return;
-
-	addRecordToRedoStack(tabId, record);
-	resetColorPositionMap();
-	clearVisited();
-	replayRecords(getUndoStack(tabId), {
-		tabId,
-		frameId,
-	});
-};
-
-interface ReplayRecordsConfig {
-	tabId: string;
-	frameId: string;
-	canvasType?: CanvasType;
-}
-export const replayRecords = (
-	records: OpRecord[],
-	config: ReplayRecordsConfig,
-) => {
-	clearAllPixels({ canvasType: "main" });
-
-	for (const record of records) {
-		const [toolType] = record;
-
-		switch (toolType) {
-			case ToolTypeEnum.Pencil:
-				replayPencilRecord(record as PencilRecord, config);
-				break;
-			case ToolTypeEnum.Eraser:
-				replayEraserRecord(record as EraserRecord, config);
-				break;
-			case ToolTypeEnum.Line:
-				replayLineRecord(record as LineRecord, config);
-				break;
-			case ToolTypeEnum.Square:
-				replaySquareRecord(record as SquareRecord, config);
-				break;
-			case ToolTypeEnum.Circle:
-				replayCircleRecord(record as CircleRecord, config);
-				break;
-			case ToolTypeEnum.Ellipse:
-				replayCircleRecord(record as CircleRecord, config);
-				break;
-			case ToolTypeEnum.Bucket:
-				replayBucketRecord(record as BucketRecord, config);
-				break;
-			case ToolTypeEnum.Broom:
-				replayClearAllPixelsRecord();
-				break;
-		}
-
-		clearVisited();
-	}
-};
-
-const replayPencilRecord = (
-	record: PencilRecord,
-	config: ReplayRecordsConfig,
-) => {
-	const [_, colorIndex, __, pixelSize, points] = record;
-	const { tabId, canvasType = "main" } = config;
-	for (const [x, y, drawCounts] of points) {
-		for (let i = 0; i < drawCounts; i++) {
-			fillRect({
-				toolType: ToolTypeEnum.Pencil,
-				position: { x, y },
-				canvasType,
-				pixelSize,
-				pixelColor: getColor(tabId, colorIndex),
-				isReplay: true,
-			});
-		}
-	}
-};
-
-const replayEraserRecord = (
-	record: EraserRecord,
-	config: ReplayRecordsConfig,
-) => {
-	const [_, __, pixelSize, points] = record;
-	const { canvasType = "main" } = config;
-	for (const [x, y] of points) {
-		clearRect({
-			toolType: ToolTypeEnum.Eraser,
-			position: { x, y },
-			canvasType,
-			pixelSize,
-			isReplay: true,
-		});
-	}
-};
-
-const replayLineRecord = (record: LineRecord, config: ReplayRecordsConfig) => {
-	const [_, colorIndex, __, pixelSize, points] = record;
-	const { tabId, canvasType = "main" } = config;
-	const [startPoint, endPoint] = points;
-	const [startX, startY] = startPoint;
-	const [endX, endY] = endPoint;
-
-	drawBresenhamLine({
-		toolType: ToolTypeEnum.Line,
-		canvasType,
-		lineStartPosition: { x: startX, y: startY },
-		lineEndPosition: { x: endX, y: endY },
-		pixelColor: getColor(tabId, colorIndex),
-		pixelSize,
-	});
-};
-
-const replaySquareRecord = (
-	record: SquareRecord,
-	config: ReplayRecordsConfig,
-) => {
-	const [_, colorIndex, __, pixelSize, points] = record;
-	const { tabId, canvasType = "main" } = config;
-	const [startPoint, endPoint] = points;
-	const [startX, startY] = startPoint;
-	const [endX, endY] = endPoint;
-
-	drawSquare({
-		canvasType,
-		squareStartPosition: { x: startX, y: startY },
-		squareEndPosition: { x: endX, y: endY },
-		pixelSize,
-		pixelColor: getColor(tabId, colorIndex),
-	});
-};
-
-const replayCircleRecord = (
-	record: CircleRecord,
-	config: ReplayRecordsConfig,
-) => {
-	const [toolType, colorIndex, __, pixelSize, points] = record;
-	const { tabId, canvasType = "main" } = config;
-	const [startPoint, endPoint] = points;
-	const [startX, startY] = startPoint;
-	const [endX, endY] = endPoint;
-
-	drawCircle({
-		toolType,
-		canvasType,
-		circleStartPosition: { x: startX, y: startY },
-		circleEndPosition: { x: endX, y: endY },
-		pixelSize,
-		pixelColor: getColor(tabId, colorIndex),
-	});
-};
-
-const replayBucketRecord = (
-	record: BucketRecord,
-	config: ReplayRecordsConfig,
-) => {
-	const [_, colorIndex, __, pixelSize, point] = record;
-	const { tabId, canvasType = "main" } = config;
-	const [x, y] = point;
-
-	fillBucket({
-		canvasType,
-		replacementColor: getColor(tabId, colorIndex),
-		pixelSize,
-		position: { x, y },
-	});
-};
-
-const replayClearAllPixelsRecord = () => {
-	clearAllPixels({ canvasType: "main" });
 };

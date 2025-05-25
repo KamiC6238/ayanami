@@ -71,13 +71,13 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		}
 		case "redo": {
 			const _payload = payload as RedoOrUndoMessagePayload;
-			renderUtils.redo(_payload);
+			recordUtils.redo(_payload);
 			frameUtils.generateSnapshot(_payload);
 			break;
 		}
 		case "undo": {
 			const _payload = payload as RedoOrUndoMessagePayload;
-			renderUtils.undo(_payload);
+			recordUtils.undo(_payload);
 			frameUtils.generateSnapshot(_payload);
 			break;
 		}

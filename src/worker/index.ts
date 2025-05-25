@@ -14,17 +14,23 @@ import type {
 	RecordMessagePayload,
 	RedoOrUndoMessagePayload,
 	SquareMessagePayload,
+	SwitchFrameMessagePayload,
 } from "@/types";
+import { useRender } from "./signals";
 import * as fileUtils from "./utils/file";
+import * as frameUtils from "./utils/frame";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
+
+const { clearVisitedPosition } = useRender();
+const { initOffScreenCanvas } = useRender();
 
 self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 	const { type, payload } = e.data;
 
 	switch (type) {
 		case "init":
-			renderUtils.initOffScreenCanvas(payload as InitMessagePayload);
+			initOffScreenCanvas(payload as InitMessagePayload);
 			break;
 		case "fillRect": {
 			renderUtils.fillRect(payload as FillRectMessagePayload);
@@ -56,18 +62,23 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "clearAllPixels":
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
 			break;
-		case "record":
-			renderUtils.clearVisitedPosition();
-			recordUtils.record(payload as RecordMessagePayload);
+		case "record": {
+			clearVisitedPosition();
+			const _payload = payload as RecordMessagePayload;
+			const recorded = recordUtils.record(_payload);
+			recorded && frameUtils.generateSnapshot(_payload);
 			break;
+		}
 		case "redo": {
-			const { tabId } = payload as RedoOrUndoMessagePayload;
-			renderUtils.redo(tabId);
+			const _payload = payload as RedoOrUndoMessagePayload;
+			recordUtils.redo(_payload);
+			frameUtils.generateSnapshot(_payload);
 			break;
 		}
 		case "undo": {
-			const { tabId } = payload as RedoOrUndoMessagePayload;
-			renderUtils.undo(tabId);
+			const _payload = payload as RedoOrUndoMessagePayload;
+			recordUtils.undo(_payload);
+			frameUtils.generateSnapshot(_payload);
 			break;
 		}
 		case "export":
@@ -75,6 +86,9 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "import":
 			fileUtils.importFile(payload as ImportMessagePayload);
+			break;
+		case "switchFrame":
+			frameUtils.switchFrame(payload as SwitchFrameMessagePayload);
 			break;
 	}
 };

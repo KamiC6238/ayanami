@@ -17,6 +17,7 @@ import { type Observable, fromEvent } from "rxjs";
 import { v4 as uuidV4 } from "uuid";
 import { computed, ref, watch } from "vue";
 import { useConfigStore } from "./config";
+import { useFramesStore } from "./frames";
 
 export const useCanvasStore = defineStore("canvas", () => {
 	const tabs = ref<Record<string, CanvasMap>>({});
@@ -26,6 +27,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		fromEvent<MouseEvent>(document, "mouseup"),
 	);
 
+	const framesStore = useFramesStore();
 	const configStore = useConfigStore();
 	const { toolType, pixelColor, pixelSize } = storeToRefs(configStore);
 
@@ -73,6 +75,8 @@ export const useCanvasStore = defineStore("canvas", () => {
 	const setTabId = (tabId: string) => {
 		currentTabId.value = tabId;
 	};
+
+	const getCurrentTabId = () => currentTabId.value;
 
 	const getCanvasWorker = () => {
 		return canvasWorker.value;
@@ -124,6 +128,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		}
 
 		setTabId(tabId);
+		framesStore.createFrame(tabId);
 	};
 
 	const drawSquare = (config: SquareRectConfig) => {
@@ -259,6 +264,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		worker.postMessage({
 			type: "fillBucket",
 			payload: {
+				canvasType: "main",
 				tabId: currentTabId.value,
 				position: config.position,
 				pixelSize: DEFAULT_PIXEL_SIZE,
@@ -275,6 +281,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "record",
 			payload: {
 				tabId: currentTabId.value,
+				frameId: framesStore.getCurrentFrameId(),
 				toolType: toolType.value,
 				pixelSize:
 					configStore.toolType === ToolTypeEnum.Bucket
@@ -294,6 +301,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "redo",
 			payload: {
 				tabId: currentTabId.value,
+				frameId: framesStore.getCurrentFrameId(),
 			},
 		});
 	};
@@ -306,6 +314,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			type: "undo",
 			payload: {
 				tabId: currentTabId.value,
+				frameId: framesStore.getCurrentFrameId(),
 			},
 		});
 	};
@@ -356,6 +365,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		mouse$,
 		tabs,
 		currentTabId,
+		getCurrentTabId,
 		setTabId,
 		exportFile,
 		importFile,

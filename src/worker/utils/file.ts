@@ -2,11 +2,14 @@ import { ExportTypeEnum } from "@/types";
 import type {
 	ExportMessagePayload,
 	ImportMessagePayload,
-	Record,
+	OpRecord,
 	SourceFile,
 } from "@/types";
+import { useRecords, useRender } from "../signals";
 import * as recordUtils from "./record";
-import * as renderUtils from "./render";
+
+const { getRecords, setRecordsFromImportFile } = useRecords();
+const { getCanvas } = useRender();
 
 export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 	const blob = await canvas.convertToBlob({
@@ -26,13 +29,15 @@ export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 export const exportToSource = (
 	canvas: OffscreenCanvas,
 	colorsIndex: string[],
-	records: Record[],
+	framesIndex: string[],
+	records: OpRecord[],
 	self: Window,
 ) => {
 	const data: SourceFile = {
 		width: canvas.width,
 		height: canvas.height,
 		colorsIndex,
+		framesIndex,
 		records,
 	};
 
@@ -49,7 +54,7 @@ export const exportToSource = (
 
 export const exportFile = (payload: ExportMessagePayload) => {
 	const { exportType, tabId } = payload;
-	const canvas = renderUtils.getCanvas("main");
+	const canvas = getCanvas("main");
 	if (!canvas) return;
 
 	switch (exportType) {
@@ -57,8 +62,8 @@ export const exportFile = (payload: ExportMessagePayload) => {
 			exportToPNG(canvas, self);
 			break;
 		case ExportTypeEnum.Source: {
-			const { undoStack, colorsIndex } = recordUtils.getUndoAndRedoStack(tabId);
-			exportToSource(canvas, colorsIndex, undoStack, self);
+			const { undoStack, colorsIndex, framesIndex } = getRecords(tabId);
+			exportToSource(canvas, colorsIndex, framesIndex, undoStack, self);
 			break;
 		}
 	}
@@ -72,13 +77,19 @@ export const importFile = (payload: ImportMessagePayload) => {
 		try {
 			const content = e.target?.result as string;
 			const data = JSON.parse(content) as SourceFile;
-			const { colorsIndex, records } = data;
+			const { colorsIndex, framesIndex, records } = data;
 
-			recordUtils.setRecordsFromImportFile(tabId, {
+			/**
+			 * TODO: FIXME 导入文件需要新开一个 tab 而不是在当前 tab 上导入
+			 * 否则会和动画帧冲突，导致动画帧的记录被覆盖
+			 */
+			setRecordsFromImportFile(tabId, {
 				undoStack: records,
 				colorsIndex,
+				framesIndex,
 			});
-			renderUtils.replayRecords(tabId, records);
+			// TODO: FIXME
+			recordUtils.replayRecords(records, { tabId, frameId: "" });
 		} catch {}
 	};
 

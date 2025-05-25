@@ -93,6 +93,7 @@ export interface ClearAllPixelsMessagePayload {
 }
 
 export interface InitMessagePayload {
+	tabId: string;
 	dpr: number;
 	clientWidth: number;
 	clientHeight: number;

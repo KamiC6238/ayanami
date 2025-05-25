@@ -17,22 +17,19 @@ import * as renderUtils from "./render";
 
 interface ReplayRecordsConfig {
 	tabId: string;
-	frameId: string;
 	canvasType?: CanvasType;
 }
 
 const {
 	getColor,
-	getRecords,
 	getColorIndex,
 	getFrameIndex,
 	getPencilRecordPoints,
 	getEraserRecordPoints,
-	initRecords,
 	addRecordToUndoStack,
 	clearRedoStack,
 	clearRecordPoints,
-	getUndoStack,
+	getRecordsWithFrameId,
 	popRedoStack,
 	popUndoStack,
 	addRecordToRedoStack,
@@ -219,24 +216,10 @@ export const record = (payload: RecordMessagePayload) => {
 
 	if (!record) return false;
 
-	if (!getRecords(tabId)) {
-		initRecords(tabId);
-	}
-
 	// Redo stack represents a possible future. If a new record occurs, that future is no longer valid — like a time paradox.
 	clearRedoStack(tabId);
 	addRecordToUndoStack(tabId, record);
 	return true;
-};
-
-export const getRecordsWithFrameId = (tabId: string, frameId: string) => {
-	const undoStack = getUndoStack(tabId);
-	return undoStack.filter((record) => {
-		const [toolType] = record;
-		const frameIndex = toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
-		const _frameIndex = getFrameIndex(tabId, frameId);
-		return _frameIndex === frameIndex;
-	});
 };
 
 export const redo = (payload: RedoOrUndoMessagePayload) => {
@@ -247,10 +230,7 @@ export const redo = (payload: RedoOrUndoMessagePayload) => {
 	addRecordToUndoStack(tabId, record);
 	resetColorPositionMap();
 	clearVisited();
-	replayRecords(getUndoStack(tabId), {
-		tabId,
-		frameId,
-	});
+	replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
 };
 
 export const undo = (payload: RedoOrUndoMessagePayload) => {
@@ -262,10 +242,7 @@ export const undo = (payload: RedoOrUndoMessagePayload) => {
 	addRecordToRedoStack(tabId, record);
 	resetColorPositionMap();
 	clearVisited();
-	replayRecords(getUndoStack(tabId), {
-		tabId,
-		frameId,
-	});
+	replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
 };
 
 export const replayRecords = (

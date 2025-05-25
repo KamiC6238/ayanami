@@ -16,22 +16,25 @@ import type {
 	SquareMessagePayload,
 	SwitchFrameMessagePayload,
 } from "@/types";
-import { useRender } from "./signals";
+import { useRecords, useRender } from "./signals";
 import * as fileUtils from "./utils/file";
 import * as frameUtils from "./utils/frame";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
 
-const { clearVisitedPosition } = useRender();
-const { initOffScreenCanvas } = useRender();
+const { initRecords } = useRecords();
+const { initOffScreenCanvas, clearVisitedPosition } = useRender();
 
 self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 	const { type, payload } = e.data;
 
 	switch (type) {
-		case "init":
-			initOffScreenCanvas(payload as InitMessagePayload);
+		case "init": {
+			const _payload = payload as InitMessagePayload;
+			initRecords(_payload.tabId);
+			initOffScreenCanvas(_payload);
 			break;
+		}
 		case "fillRect": {
 			renderUtils.fillRect(payload as FillRectMessagePayload);
 			break;

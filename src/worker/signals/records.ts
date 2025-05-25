@@ -39,6 +39,17 @@ export const useRecords = () => {
 
 	const getRedoStack = (tabId: string) => records()[tabId].redoStack;
 
+	const getRecordsWithFrameId = (tabId: string, frameId: string) => {
+		const undoStack = getUndoStack(tabId);
+		return undoStack.filter((record) => {
+			const [toolType] = record;
+			const frameIndex =
+				toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
+			const _frameIndex = getFrameIndex(tabId, frameId);
+			return _frameIndex === frameIndex;
+		});
+	};
+
 	const getColor = (tabId: string, colorIndex: number) => {
 		const records = getRecords(tabId);
 
@@ -58,12 +69,6 @@ export const useRecords = () => {
 	};
 
 	const getColorIndex = (tabId: string, pixelColor: string) => {
-		const records = getRecords(tabId);
-
-		if (!records) {
-			initRecords(tabId);
-		}
-
 		const colorsIndex = [...getRecords(tabId).colorsIndex];
 
 		let colorIndex = colorsIndex.findIndex((color) => color === pixelColor);
@@ -78,12 +83,6 @@ export const useRecords = () => {
 	};
 
 	const getFrameIndex = (tabId: string, frameId: string) => {
-		const records = getRecords(tabId);
-
-		if (!records) {
-			initRecords(tabId);
-		}
-
 		const framesIndex = [...getRecords(tabId).framesIndex];
 
 		let frameIndex = framesIndex.findIndex((color) => color === frameId);
@@ -269,6 +268,7 @@ export const useRecords = () => {
 		getFrameIndex,
 		getUndoStack,
 		getRedoStack,
+		getRecordsWithFrameId,
 		popUndoStack,
 		popRedoStack,
 		addRecordToUndoStack,

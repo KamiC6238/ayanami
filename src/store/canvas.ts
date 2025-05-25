@@ -96,6 +96,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 			{
 				type: "init",
 				payload: {
+					tabId: currentTabId.value,
 					canvasList: offscreens,
 					clientWidth: canvasList[0].clientWidth,
 					clientHeight: canvasList[0].clientHeight,

@@ -5,8 +5,10 @@ import type {
 	OpRecord,
 	SourceFile,
 } from "@/types";
-import * as recordUtils from "./record";
+import { useRecords } from "../signals";
 import * as renderUtils from "./render";
+
+const { getRecords, setRecordsFromImportFile } = useRecords();
 
 export const exportToPNG = async (canvas: OffscreenCanvas, self: Window) => {
 	const blob = await canvas.convertToBlob({
@@ -59,8 +61,7 @@ export const exportFile = (payload: ExportMessagePayload) => {
 			exportToPNG(canvas, self);
 			break;
 		case ExportTypeEnum.Source: {
-			const { undoStack, colorsIndex, framesIndex } =
-				recordUtils.getUndoAndRedoStack(tabId);
+			const { undoStack, colorsIndex, framesIndex } = getRecords(tabId);
 			exportToSource(canvas, colorsIndex, framesIndex, undoStack, self);
 			break;
 		}
@@ -77,7 +78,11 @@ export const importFile = (payload: ImportMessagePayload) => {
 			const data = JSON.parse(content) as SourceFile;
 			const { colorsIndex, framesIndex, records } = data;
 
-			recordUtils.setRecordsFromImportFile(tabId, {
+			/**
+			 * TODO: FIXME 导入文件需要新开一个 tab 而不是在当前 tab 上导入
+			 * 否则会和动画帧冲突，导致动画帧的记录被覆盖
+			 */
+			setRecordsFromImportFile(tabId, {
 				undoStack: records,
 				colorsIndex,
 				framesIndex,

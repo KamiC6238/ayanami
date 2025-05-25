@@ -1,11 +1,14 @@
 import type { SwitchFrameMessagePayload } from "@/types";
+import { useRender } from "../signals";
 import * as renderUtils from "./render";
+
+const { getCanvas } = useRender();
 
 export const generateSnapshot = (config: {
 	tabId: string;
 	frameId: string;
 }) => {
-	const canvas = renderUtils.getCanvas("main");
+	const canvas = getCanvas("main");
 	canvas
 		?.convertToBlob({
 			type: "image/png",

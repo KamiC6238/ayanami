@@ -16,17 +16,21 @@ import type {
 	SquareMessagePayload,
 	SwitchFrameMessagePayload,
 } from "@/types";
+import { useRender } from "./signals";
 import * as fileUtils from "./utils/file";
 import * as frameUtils from "./utils/frame";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
+
+const { clearVisitedPosition } = useRender();
+const { initOffScreenCanvas } = useRender();
 
 self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 	const { type, payload } = e.data;
 
 	switch (type) {
 		case "init":
-			renderUtils.initOffScreenCanvas(payload as InitMessagePayload);
+			initOffScreenCanvas(payload as InitMessagePayload);
 			break;
 		case "fillRect": {
 			renderUtils.fillRect(payload as FillRectMessagePayload);
@@ -59,7 +63,7 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
 			break;
 		case "record": {
-			renderUtils.clearVisitedPosition();
+			clearVisitedPosition();
 			const _payload = payload as RecordMessagePayload;
 			const recorded = recordUtils.record(_payload);
 			recorded && frameUtils.generateSnapshot(_payload);

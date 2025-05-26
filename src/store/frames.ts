@@ -17,14 +17,15 @@ export const useFramesStore = defineStore("frames", () => {
 
 			worker.addEventListener("message", (e) => {
 				const { type, payload } = e.data;
-				if (type !== "snapshot") return;
 
-				const { tabId, frameId, blob } = payload;
-				const reader = new FileReader();
-
-				reader.onloadend = () =>
-					updateSnapshot(tabId, frameId, reader.result as string);
-				reader.readAsDataURL(blob);
+				switch (type) {
+					case "snapshot":
+						updateSnapshot(payload);
+						break;
+					case "updateFrameId":
+						currentFrameId.value = payload.frameId;
+						break;
+				}
 			});
 		},
 	);
@@ -68,13 +69,22 @@ export const useFramesStore = defineStore("frames", () => {
 		});
 	};
 
-	const updateSnapshot = (tabId: string, frameId: string, snapshot: string) => {
-		const tab = tabs.value[tabId];
-		const frame = tab.frames[frameId];
+	const updateSnapshot = (payload: {
+		tabId: string;
+		frameId: string;
+		blob: Blob;
+	}) => {
+		const { tabId, frameId, blob } = payload;
+		const reader = new FileReader();
 
-		if (!frame) return;
+		reader.onloadend = () => {
+			const tab = tabs.value[tabId];
+			const frame = tab.frames[frameId];
+			if (!frame) return;
 
-		tabs.value[tabId].frames[frameId].snapshot = snapshot;
+			tabs.value[tabId].frames[frameId].snapshot = reader.result as string;
+		};
+		reader.readAsDataURL(blob);
 	};
 
 	return {

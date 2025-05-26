@@ -6,7 +6,7 @@ import Frame from "./frame.vue";
 const canvasStore = useCanvasStore();
 const framesStore = useFramesStore();
 const { currentTabId } = storeToRefs(canvasStore);
-const { frames } = storeToRefs(framesStore);
+const { frames, currentFrameId } = storeToRefs(framesStore);
 </script>
 <template>
   <div class='mr-2'>
@@ -15,6 +15,7 @@ const { frames } = storeToRefs(framesStore);
       v-for='frameId of Object.keys(frames)'
       :key='frameId'
       :snapshot='frames[frameId].snapshot'
+      :active='currentFrameId === frameId'
       @click='() => framesStore.switchFrame(frameId)'
     />
     <div

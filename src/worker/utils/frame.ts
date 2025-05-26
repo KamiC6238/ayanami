@@ -1,7 +1,6 @@
 import type { SwitchFrameMessagePayload } from "@/types";
 import { useRecords, useRender } from "../signals";
 import * as recordUtils from "./record";
-import * as renderUtils from "./render";
 
 const { getRecordsWithFrameId } = useRecords();
 const { getCanvas } = useRender();
@@ -29,11 +28,5 @@ export const generateSnapshot = (config: {
 
 export const switchFrame = (payload: SwitchFrameMessagePayload) => {
 	const { tabId, frameId } = payload;
-	const records = getRecordsWithFrameId(tabId, frameId);
-
-	renderUtils.clearAllPixels({ canvasType: "main" });
-	recordUtils.replayRecords(records, {
-		tabId,
-		canvasType: "main",
-	});
+	recordUtils.replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
 };

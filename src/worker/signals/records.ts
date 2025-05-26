@@ -82,6 +82,11 @@ export const useRecords = () => {
 		return colorIndex;
 	};
 
+	const getFrameIndexByRecord = (record: OpRecord) => {
+		const [toolType] = record;
+		return toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
+	};
+
 	const getFrameIndex = (tabId: string, frameId: string) => {
 		const framesIndex = [...getRecords(tabId).framesIndex];
 
@@ -94,6 +99,11 @@ export const useRecords = () => {
 		updateFramesIndex(tabId, framesIndex);
 
 		return frameIndex;
+	};
+
+	const getFrameId = (tabId: string, frameIndex: number) => {
+		const framesIndex = [...getRecords(tabId).framesIndex];
+		return framesIndex[frameIndex];
 	};
 
 	const popUndoStack = (tabId: string) => {
@@ -265,7 +275,9 @@ export const useRecords = () => {
 		getColor,
 		getColorIndex,
 		getColorsIndex,
+		getFrameIndexByRecord,
 		getFrameIndex,
+		getFrameId,
 		getUndoStack,
 		getRedoStack,
 		getRecordsWithFrameId,

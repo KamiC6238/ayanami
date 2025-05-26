@@ -13,6 +13,7 @@ import type {
 } from "@/types";
 import { ToolTypeEnum } from "@/types";
 import { useRecords, useRender } from "../signals";
+import * as frameUtils from "./frame";
 import * as renderUtils from "./render";
 
 interface ReplayRecordsConfig {
@@ -23,7 +24,9 @@ interface ReplayRecordsConfig {
 const {
 	getColor,
 	getColorIndex,
+	getFrameIndexByRecord,
 	getFrameIndex,
+	getFrameId,
 	getPencilRecordPoints,
 	getEraserRecordPoints,
 	addRecordToUndoStack,
@@ -222,27 +225,55 @@ export const record = (payload: RecordMessagePayload) => {
 	return true;
 };
 
-export const redo = (payload: RedoOrUndoMessagePayload) => {
+const _undoOrRedo = (
+	payload: RedoOrUndoMessagePayload,
+	config: {
+		isUndo: boolean;
+	},
+) => {
+	const { isUndo } = config;
 	const { tabId, frameId } = payload;
-	const record = popRedoStack(tabId);
+	const record = isUndo ? popUndoStack(tabId) : popRedoStack(tabId);
 	if (!record) return;
 
-	addRecordToUndoStack(tabId, record);
+	const recordframeIndex = getFrameIndexByRecord(record);
+	const curFrameIndex = getFrameIndex(tabId, frameId);
+
+	const _frameId =
+		typeof recordframeIndex === "number" && recordframeIndex !== curFrameIndex
+			? getFrameId(tabId, recordframeIndex)
+			: frameId;
+
+	if (isUndo) {
+		addRecordToRedoStack(tabId, record);
+	} else {
+		addRecordToUndoStack(tabId, record);
+	}
+
 	resetColorPositionMap();
 	clearVisited();
-	replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
+	replayRecords(getRecordsWithFrameId(tabId, _frameId), { tabId });
+	frameUtils.generateSnapshot({ tabId, frameId: _frameId });
+
+	/**
+	 * TODO: FIXME undo 时如果更新了 frameId, 那么 redo 时同样也要更新 frameId, 这样才符合 undo 和 redo 的逻辑,
+	 * 比如从第 3 帧 undo 到第 2 帧，那么在第 2 帧 redo 后，应该回到第 3 帧
+	 */
+	self.postMessage({
+		type: "updateFrameId",
+		payload: {
+			tabId,
+			frameId: _frameId,
+		},
+	});
+};
+
+export const redo = (payload: RedoOrUndoMessagePayload) => {
+	_undoOrRedo(payload, { isUndo: false });
 };
 
 export const undo = (payload: RedoOrUndoMessagePayload) => {
-	const { tabId, frameId } = payload;
-	const record = popUndoStack(tabId);
-
-	if (!record) return;
-
-	addRecordToRedoStack(tabId, record);
-	resetColorPositionMap();
-	clearVisited();
-	replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
+	_undoOrRedo(payload, { isUndo: true });
 };
 
 export const replayRecords = (

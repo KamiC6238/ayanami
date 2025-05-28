@@ -106,6 +106,28 @@ export const useRecords = () => {
 		return framesIndex[frameIndex];
 	};
 
+	const getFrameIdWhenUndoRedo = (
+		frameId: string,
+		{
+			tabId,
+			isUndo,
+			record,
+		}: { tabId: string; isUndo: boolean; record: OpRecord },
+	) => {
+		const recordFrameIndex = getFrameIndexByRecord(record);
+		const curFrameIndex = getFrameIndex(tabId, frameId);
+
+		if (
+			isUndo &&
+			typeof recordFrameIndex === "number" &&
+			recordFrameIndex !== curFrameIndex
+		) {
+			record.returnFrameId = frameId;
+			return getFrameId(tabId, recordFrameIndex);
+		}
+		return frameId;
+	};
+
 	const popUndoStack = (tabId: string) => {
 		const undoStack = getUndoStack(tabId);
 		const record = undoStack.pop();
@@ -278,6 +300,7 @@ export const useRecords = () => {
 		getFrameIndexByRecord,
 		getFrameIndex,
 		getFrameId,
+		getFrameIdWhenUndoRedo,
 		getUndoStack,
 		getRedoStack,
 		getRecordsWithFrameId,

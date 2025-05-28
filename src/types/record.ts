@@ -77,14 +77,17 @@ export type BucketRecord = [
 
 export type BroomRecord = [ToolTypeEnum, number];
 
-export type OpRecord =
+export type OpRecord = {
+	returnFrameId?: string;
+} & (
 	| PencilRecord
 	| EraserRecord
 	| LineRecord
 	| SquareRecord
 	| CircleRecord
 	| BucketRecord
-	| BroomRecord;
+	| BroomRecord
+);
 
 export interface Records {
 	[tabId: string]: {

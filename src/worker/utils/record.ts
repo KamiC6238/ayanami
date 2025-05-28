@@ -24,9 +24,8 @@ interface ReplayRecordsConfig {
 const {
 	getColor,
 	getColorIndex,
-	getFrameIndexByRecord,
 	getFrameIndex,
-	getFrameId,
+	getFrameIdWhenUndoRedo,
 	getPencilRecordPoints,
 	getEraserRecordPoints,
 	addRecordToUndoStack,
@@ -236,13 +235,7 @@ const _undoOrRedo = (
 	const record = isUndo ? popUndoStack(tabId) : popRedoStack(tabId);
 	if (!record) return;
 
-	const recordframeIndex = getFrameIndexByRecord(record);
-	const curFrameIndex = getFrameIndex(tabId, frameId);
-
-	const _frameId =
-		typeof recordframeIndex === "number" && recordframeIndex !== curFrameIndex
-			? getFrameId(tabId, recordframeIndex)
-			: frameId;
+	let _frameId = getFrameIdWhenUndoRedo(frameId, { tabId, isUndo, record });
 
 	if (isUndo) {
 		addRecordToRedoStack(tabId, record);
@@ -255,10 +248,12 @@ const _undoOrRedo = (
 	replayRecords(getRecordsWithFrameId(tabId, _frameId), { tabId });
 	frameUtils.generateSnapshot({ tabId, frameId: _frameId });
 
-	/**
-	 * TODO: FIXME undo 时如果更新了 frameId, 那么 redo 时同样也要更新 frameId, 这样才符合 undo 和 redo 的逻辑,
-	 * 比如从第 3 帧 undo 到第 2 帧，那么在第 2 帧 redo 后，应该回到第 3 帧
-	 */
+	if (!isUndo && record.returnFrameId) {
+		_frameId = record.returnFrameId;
+		replayRecords(getRecordsWithFrameId(tabId, _frameId), { tabId });
+		frameUtils.generateSnapshot({ tabId, frameId: _frameId });
+	}
+
 	self.postMessage({
 		type: "updateFrameId",
 		payload: {

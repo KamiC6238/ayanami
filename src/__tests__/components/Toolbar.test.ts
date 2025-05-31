@@ -4,9 +4,9 @@ import { Toolbar } from '@/components'
 import { useConfigStore } from '@/store'
 import { ToolTypeEnum } from '@/types'
 
-vi.mock('@/components/Export.vue', () => ({
+vi.mock('@/components/ImportExport.vue', () => ({
   default: {
-    name: 'Export',
+    name: 'ImportExport',
     template: '<div></div>'
   }
 }))

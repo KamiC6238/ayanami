@@ -44,7 +44,7 @@
 		"vue-tsc": "^2.0.29"
 	},
 	"lint-staged": {
-		"src/**/*.{js,ts,vue,json}": [
+		"src/!(__tests__)/**/*.{js,ts,vue,json}": [
 			"biome check --write --no-errors-on-unmatched"
 		]
 	}

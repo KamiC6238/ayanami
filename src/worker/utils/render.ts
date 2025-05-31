@@ -218,8 +218,6 @@ export const fillBucket = (payload: BucketMessagePayload) => {
 	const targetColor = colorPositionMap.get(makeColorPositionKey(position));
 	const visited = new Set<string>();
 
-	if (targetColor === replacementColor) return;
-
 	while (queue.length > 0) {
 		const pos = queue.pop() as Position;
 		const { x, y } = pos;

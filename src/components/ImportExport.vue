@@ -29,7 +29,7 @@ watch(
 	(worker) => {
 		if (!worker) return;
 
-		worker.onmessage = (e) => {
+		worker.addEventListener("message", (e) => {
 			const { type, payload } = e.data;
 			if (type !== "export") return;
 			const { blob, exportType } = payload;
@@ -38,7 +38,7 @@ watch(
 				filename: canvasStore.currentTabId,
 				exportType,
 			});
-		};
+		});
 	},
 );
 

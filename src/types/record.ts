@@ -19,26 +19,55 @@ import type { ToolTypeEnum } from "./config";
 export type PencilPointRecord = [number, number, number];
 export type PencilRecord = [
 	ToolTypeEnum,
+	// colorIndex
 	number,
+	// frameIndex
+	number,
+	// pixelSize
 	number,
 	Array<PencilPointRecord>,
 ];
 
 export type EraserPointRecord = [number, number];
-export type EraserRecord = [ToolTypeEnum, number, Array<EraserPointRecord>];
+export type EraserRecord = [
+	ToolTypeEnum,
+	number,
+	number,
+	Array<EraserPointRecord>,
+];
 
 export type LinePointRecord = [[number, number], [number, number]];
-export type LineRecord = [ToolTypeEnum, number, number, LinePointRecord];
+export type LineRecord = [
+	ToolTypeEnum,
+	number,
+	number,
+	number,
+	LinePointRecord,
+];
 
 export type SquarePointRecord = [[number, number], [number, number]];
-export type SquareRecord = [ToolTypeEnum, number, number, SquarePointRecord];
+export type SquareRecord = [
+	ToolTypeEnum,
+	number,
+	number,
+	number,
+	SquarePointRecord,
+];
 
 export type CirclePointRecord = [[number, number], [number, number]];
-export type CircleRecord = [ToolTypeEnum, number, number, CirclePointRecord];
+export type CircleRecord = [
+	ToolTypeEnum,
+	number,
+	number,
+	number,
+	CirclePointRecord,
+];
 
 export type BucketRecord = [
 	ToolTypeEnum,
 	// replacementColor
+	number,
+	// frameIndex
 	number,
 	// pixelSize
 	number,
@@ -46,25 +75,26 @@ export type BucketRecord = [
 	[number, number],
 ];
 
-export type BroomRecord = [ToolTypeEnum];
+export type BroomRecord = [ToolTypeEnum, number];
 
-export type Record =
+export type OpRecord = {
+	returnFrameId?: string;
+} & (
 	| PencilRecord
 	| EraserRecord
 	| LineRecord
 	| SquareRecord
 	| CircleRecord
 	| BucketRecord
-	| BroomRecord;
-
-export type RecordStack = {
-	undoStack: Record[];
-	redoStack: Record[];
-};
+	| BroomRecord
+);
 
 export interface Records {
-	[tabId: string]: RecordStack & {
-		colorsIndex: string[];
+	[tabId: string]: {
 		tabId: string;
+		colorsIndex: string[];
+		framesIndex: string[];
+		undoStack: OpRecord[];
+		redoStack: OpRecord[];
 	};
 }

@@ -43,10 +43,12 @@ export const useFramesStore = defineStore("frames", () => {
 
 	const framesSnapshot = computed(() => {
 		const currentTabId = canvasStore.getCurrentTabId();
-		if (!currentTabId) return [];
-		return Object.values(tabs.value[currentTabId].frames).map(
-			(frame) => frame.snapshot,
-		);
+
+		return currentTabId
+			? Object.values(tabs.value[currentTabId].frames).map(
+					(frame) => frame.snapshot,
+				)
+			: [];
 	});
 
 	const getCurrentFrameId = () => currentFrameId.value;

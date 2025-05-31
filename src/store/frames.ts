@@ -7,6 +7,8 @@ import { useCanvasStore } from "./canvas";
 export const useFramesStore = defineStore("frames", () => {
 	const tabs = ref<Record<string, Frames>>({});
 	const currentFrameId = ref("");
+	const isFramesPlaying = ref(false);
+	const fps = ref(2);
 
 	const canvasStore = useCanvasStore();
 
@@ -37,7 +39,25 @@ export const useFramesStore = defineStore("frames", () => {
 		return tabs.value[currentTabId].frames;
 	});
 
+	const frameDuration = computed(() => Math.floor(1000 / fps.value));
+
+	const framesSnapshot = computed(() => {
+		const currentTabId = canvasStore.getCurrentTabId();
+		if (!currentTabId) return [];
+		return Object.values(tabs.value[currentTabId].frames).map(
+			(frame) => frame.snapshot,
+		);
+	});
+
 	const getCurrentFrameId = () => currentFrameId.value;
+
+	const setIsFramesPlaying = (isPlaying: boolean) => {
+		isFramesPlaying.value = isPlaying;
+	};
+
+	const setFps = (_fps: number) => {
+		fps.value = _fps;
+	};
 
 	const createFrame = (tabId: string) => {
 		const frameId = uuidV4();
@@ -90,7 +110,13 @@ export const useFramesStore = defineStore("frames", () => {
 	return {
 		frames,
 		currentFrameId,
+		isFramesPlaying,
+		fps,
+		frameDuration,
+		framesSnapshot,
 		getCurrentFrameId,
+		setIsFramesPlaying,
+		setFps,
 		createFrame,
 		switchFrame,
 	};

@@ -11,9 +11,17 @@ import Frame from "./frame.vue";
 const canvasStore = useCanvasStore();
 const framesStore = useFramesStore();
 const { currentTabId } = storeToRefs(canvasStore);
-const { frames, currentFrameId } = storeToRefs(framesStore);
+const { frames, currentFrameId, isFramesPlaying } = storeToRefs(framesStore);
 
 const frameIcons = [PlayPrevIcon, PlayIcon, PlayNextIcon];
+
+const onFramesActionsHandler = (icon: string) => {
+	if (icon === PlayIcon) {
+		framesStore.setIsFramesPlaying(!isFramesPlaying.value);
+	} else {
+		console.log(icon);
+	}
+};
 </script>
 <template>
   <div class='h-[600px] mr-2'>
@@ -26,6 +34,7 @@ const frameIcons = [PlayPrevIcon, PlayIcon, PlayNextIcon];
         <PixelBorderUltimate
           v-for='(icon, index) in frameIcons'
           :key='index'
+          @click='() => onFramesActionsHandler(icon)'
         >
           <component :is="icon" class='w-6 h-6' />
         </PixelBorderUltimate>

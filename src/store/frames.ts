@@ -8,7 +8,7 @@ export const useFramesStore = defineStore("frames", () => {
 	const tabs = ref<Record<string, Frames>>({});
 	const currentFrameId = ref("");
 	const isFramesPlaying = ref(false);
-	const fps = ref(2);
+	const fps = ref(24);
 
 	const canvasStore = useCanvasStore();
 
@@ -25,7 +25,7 @@ export const useFramesStore = defineStore("frames", () => {
 						updateSnapshot(payload);
 						break;
 					case "updateFrameId":
-						currentFrameId.value = payload.frameId;
+						updateFrameId(payload.frameId);
 						break;
 				}
 			});
@@ -107,6 +107,10 @@ export const useFramesStore = defineStore("frames", () => {
 		reader.readAsDataURL(blob);
 	};
 
+	const updateFrameId = (frameId: string) => {
+		currentFrameId.value = frameId;
+	};
+
 	return {
 		frames,
 		currentFrameId,
@@ -119,5 +123,6 @@ export const useFramesStore = defineStore("frames", () => {
 		setFps,
 		createFrame,
 		switchFrame,
+		updateFrameId,
 	};
 });

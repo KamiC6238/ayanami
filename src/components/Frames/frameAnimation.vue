@@ -4,36 +4,43 @@ import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 
 const snapshot = ref("");
+const currentFrameIndex = ref(-1);
 const interval = ref<number | null>(null);
-const currentFrameIndex = ref(0);
 const framesStore = useFramesStore();
-const { isFramesPlaying, frameDuration, framesSnapshot } =
+const { isFramesPlaying, frameDuration, framesSnapshot, frames } =
 	storeToRefs(framesStore);
 
 watch(
 	() => isFramesPlaying.value,
 	(newVal) => {
+		clearInterval();
+
 		if (newVal) {
-			clearInterval();
 			updateSnapshot();
 			interval.value = window.setInterval(updateSnapshot, frameDuration.value);
 		} else {
-			clearInterval();
+			const frameId = Object.keys(frames.value)[currentFrameIndex.value];
+			framesStore.switchFrame(frameId);
 		}
 	},
 );
 
 const updateSnapshot = () => {
-	snapshot.value = framesSnapshot.value[currentFrameIndex.value];
+	if (!isFramesPlaying.value) {
+		return;
+	}
+
 	currentFrameIndex.value++;
 
 	if (currentFrameIndex.value >= framesSnapshot.value.length) {
 		currentFrameIndex.value = 0;
 	}
+
+	snapshot.value = framesSnapshot.value[currentFrameIndex.value];
 };
 
 const clearInterval = () => {
-	if (interval.value) {
+	if (typeof interval.value === "number") {
 		window.clearInterval(interval.value);
 		interval.value = null;
 	}

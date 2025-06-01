@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import ActiveFrameIcon from "@/assets/icons/active-frame.svg";
+import PlayFirstIcon from "@/assets/icons/play-first.svg";
+import PlayLastIcon from "@/assets/icons/play-last.svg";
 import PlayNextIcon from "@/assets/icons/play-next.svg";
 import PlayPrevIcon from "@/assets/icons/play-prev.svg";
 import PlayIcon from "@/assets/icons/play.svg";
@@ -13,13 +15,73 @@ const framesStore = useFramesStore();
 const { currentTabId } = storeToRefs(canvasStore);
 const { frames, currentFrameId, isFramesPlaying } = storeToRefs(framesStore);
 
-const frameIcons = [PlayPrevIcon, PlayIcon, PlayNextIcon];
+const frameIcons = [
+	PlayFirstIcon,
+	PlayPrevIcon,
+	PlayIcon,
+	PlayNextIcon,
+	PlayLastIcon,
+];
+
+const getFirstFrameId = () => {
+	return Object.keys(frames.value)[0];
+};
+
+const getLastFrameId = () => {
+	const frameIds = Object.keys(frames.value);
+	return frameIds[frameIds.length - 1];
+};
+
+const getCurrentFrameIndex = () => {
+	const frameIds = Object.keys(frames.value);
+	return frameIds.indexOf(currentFrameId.value);
+};
+
+const getPrevFrameId = (currentIndex: number) => {
+	const frameIds = Object.keys(frames.value);
+	return currentIndex === 0
+		? frameIds[frameIds.length - 1]
+		: frameIds[currentIndex - 1];
+};
+
+const getNextFrameId = (currentIndex: number) => {
+	const frameIds = Object.keys(frames.value);
+	return currentIndex === frameIds.length - 1
+		? frameIds[0]
+		: frameIds[currentIndex + 1];
+};
 
 const onFramesActionsHandler = (icon: string) => {
-	if (icon === PlayIcon) {
-		framesStore.setIsFramesPlaying(!isFramesPlaying.value);
-	} else {
-		console.log(icon);
+	switch (icon) {
+		case PlayFirstIcon: {
+			const frameId = getFirstFrameId();
+			framesStore.switchFrame(frameId);
+			break;
+		}
+		case PlayPrevIcon: {
+			const currentIndex = getCurrentFrameIndex();
+			const prevFrameId = getPrevFrameId(currentIndex);
+			framesStore.switchFrame(prevFrameId);
+			break;
+		}
+		case PlayIcon:
+			framesStore.setIsFramesPlaying(!isFramesPlaying.value);
+			break;
+		case PlayNextIcon: {
+			const currentIndex = getCurrentFrameIndex();
+			const nextFrameId = getNextFrameId(currentIndex);
+			framesStore.switchFrame(nextFrameId);
+			break;
+		}
+		case PlayLastIcon: {
+			const frameId = getLastFrameId();
+			framesStore.switchFrame(frameId);
+			break;
+		}
+	}
+
+	if (icon !== PlayIcon) {
+		framesStore.setIsFramesPlaying(false);
 	}
 };
 </script>
@@ -41,7 +103,7 @@ const onFramesActionsHandler = (icon: string) => {
       </div>
     </PixelBorderSecondary>
     <PixelBorderSecondary
-      wrapper-width='w-[140px]'
+      wrapper-width='w-[200px]'
       wrapper-height='h-[536px]'
       content-cls='flex flex-col items-center pt-2.5 pb-2.5'
       background='bg-[#6e8f8b]'
@@ -56,7 +118,7 @@ const onFramesActionsHandler = (icon: string) => {
         </Frame>
         <ActiveFrameIcon
           v-show='currentFrameId === frameId'
-          class='w-8 h-8 absolute top-[50%] left-[-50px] translate-y-[-50%]'
+          class='w-8 h-8 absolute top-[50%] left-[-35px] translate-y-[-50%]'
         />
       </div>
       <div

@@ -42,9 +42,7 @@ export const useRecords = () => {
 	const getRecordsWithFrameId = (tabId: string, frameId: string) => {
 		const undoStack = getUndoStack(tabId);
 		return undoStack.filter((record) => {
-			const [toolType] = record;
-			const frameIndex =
-				toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
+			const [_, frameIndex] = record;
 			const _frameIndex = getFrameIndex(tabId, frameId);
 			return _frameIndex === frameIndex;
 		});
@@ -82,10 +80,7 @@ export const useRecords = () => {
 		return colorIndex;
 	};
 
-	const getFrameIndexByRecord = (record: OpRecord) => {
-		const [toolType] = record;
-		return toolType === ToolTypeEnum.Eraser ? record[1] : record[2];
-	};
+	const getFrameIndexByRecord = (record: OpRecord) => record[1];
 
 	const getFrameIndex = (tabId: string, frameId: string) => {
 		const framesIndex = [...getRecords(tabId).framesIndex];

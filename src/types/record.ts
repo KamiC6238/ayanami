@@ -1,27 +1,11 @@
 import type { ToolTypeEnum } from "./config";
 
-/**
- * @description PointRecord means a point record of a tool,
- * which is a tuple of [x, y, drawCounts].
- * x and y are the coordinates of the point,
- * and drawCounts is the number of times the point is drawn.
- * For example, if a point is drawn 3 times,
- * the PointRecord will be [x, y, 3].
- * If a point is drawn 1 time, the PointRecord will be [x, y, 1].
- *
- * @description [Tool]Record means a record of a tool,
- * which is a tuple of [toolType, pixelColor, pixelSize, points].
- * toolType is the type of the tool,
- * pixelColor is the color of the tool,
- * pixelSize is the size of the tool,
- */
-
 export type PencilPointRecord = [number, number, number];
 export type PencilRecord = [
 	ToolTypeEnum,
-	// colorIndex
-	number,
 	// frameIndex
+	number,
+	// colorIndex
 	number,
 	// pixelSize
 	number,
@@ -31,7 +15,9 @@ export type PencilRecord = [
 export type EraserPointRecord = [number, number];
 export type EraserRecord = [
 	ToolTypeEnum,
+	// frameIndex
 	number,
+	// colorIndex
 	number,
 	Array<EraserPointRecord>,
 ];
@@ -39,8 +25,11 @@ export type EraserRecord = [
 export type LinePointRecord = [[number, number], [number, number]];
 export type LineRecord = [
 	ToolTypeEnum,
+	// frameIndex
 	number,
+	// colorIndex
 	number,
+	// pixelSize
 	number,
 	LinePointRecord,
 ];
@@ -48,8 +37,11 @@ export type LineRecord = [
 export type SquarePointRecord = [[number, number], [number, number]];
 export type SquareRecord = [
 	ToolTypeEnum,
+	// frameIndex
 	number,
+	// colorIndex
 	number,
+	// pixelSize
 	number,
 	SquarePointRecord,
 ];
@@ -57,17 +49,20 @@ export type SquareRecord = [
 export type CirclePointRecord = [[number, number], [number, number]];
 export type CircleRecord = [
 	ToolTypeEnum,
+	// frameIndex
 	number,
+	// colorIndex
 	number,
+	// pixelSize
 	number,
 	CirclePointRecord,
 ];
 
 export type BucketRecord = [
 	ToolTypeEnum,
-	// replacementColor
-	number,
 	// frameIndex
+	number,
+	// colorIndex
 	number,
 	// pixelSize
 	number,
@@ -75,7 +70,11 @@ export type BucketRecord = [
 	[number, number],
 ];
 
-export type BroomRecord = [ToolTypeEnum, number];
+export type BroomRecord = [
+	ToolTypeEnum,
+	// frameIndex
+	number,
+];
 
 export type OpRecord = {
 	returnFrameId?: string;

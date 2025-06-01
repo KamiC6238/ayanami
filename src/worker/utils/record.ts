@@ -51,7 +51,7 @@ const makePencilRecord = (
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
 	const frameIndex = getFrameIndex(tabId, frameId);
-	return [toolType, colorIndex, frameIndex, pixelSize, [...pencilRecordPoints]];
+	return [toolType, frameIndex, colorIndex, pixelSize, [...pencilRecordPoints]];
 };
 
 const makeEraserRecord = (
@@ -87,8 +87,8 @@ const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
-		colorIndex,
 		frameIndex,
+		colorIndex,
 		pixelSize,
 		[
 			[lineStartPosition.x, lineStartPosition.y],
@@ -118,8 +118,8 @@ const makeSquareRecord = (
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
-		colorIndex,
 		frameIndex,
+		colorIndex,
 		pixelSize,
 		[
 			[squareStartPosition.x, squareStartPosition.y],
@@ -149,8 +149,8 @@ const makeCircleRecord = (
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
-		colorIndex,
 		frameIndex,
+		colorIndex,
 		pixelSize,
 		[
 			[circleStartPosition.x, circleStartPosition.y],
@@ -170,8 +170,8 @@ const makeBucketRecord = (
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
 		toolType,
-		colorIndex,
 		frameIndex,
+		colorIndex,
 		pixelSize,
 		[position.x, position.y],
 	];
@@ -315,7 +315,7 @@ const replayPencilRecord = (
 	record: PencilRecord,
 	config: ReplayRecordsConfig,
 ) => {
-	const [_, colorIndex, __, pixelSize, points] = record;
+	const [_, __, colorIndex, pixelSize, points] = record;
 	const { tabId, canvasType = "main" } = config;
 	for (const [x, y, drawCounts] of points) {
 		for (let i = 0; i < drawCounts; i++) {
@@ -349,7 +349,7 @@ const replayEraserRecord = (
 };
 
 const replayLineRecord = (record: LineRecord, config: ReplayRecordsConfig) => {
-	const [_, colorIndex, __, pixelSize, points] = record;
+	const [_, __, colorIndex, pixelSize, points] = record;
 	const { tabId, canvasType = "main" } = config;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
@@ -369,7 +369,7 @@ const replaySquareRecord = (
 	record: SquareRecord,
 	config: ReplayRecordsConfig,
 ) => {
-	const [_, colorIndex, __, pixelSize, points] = record;
+	const [_, __, colorIndex, pixelSize, points] = record;
 	const { tabId, canvasType = "main" } = config;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
@@ -388,7 +388,7 @@ const replayCircleRecord = (
 	record: CircleRecord,
 	config: ReplayRecordsConfig,
 ) => {
-	const [toolType, colorIndex, __, pixelSize, points] = record;
+	const [toolType, __, colorIndex, pixelSize, points] = record;
 	const { tabId, canvasType = "main" } = config;
 	const [startPoint, endPoint] = points;
 	const [startX, startY] = startPoint;
@@ -408,7 +408,7 @@ const replayBucketRecord = (
 	record: BucketRecord,
 	config: ReplayRecordsConfig,
 ) => {
-	const [_, colorIndex, __, pixelSize, point] = record;
+	const [_, __, colorIndex, pixelSize, point] = record;
 	const { tabId, canvasType = "main" } = config;
 	const [x, y] = point;
 

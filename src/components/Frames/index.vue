@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ActiveFrameIcon from "@/assets/icons/active-frame.svg";
+import PauseIcon from "@/assets/icons/pause.svg";
 import PlayFirstIcon from "@/assets/icons/play-first.svg";
 import PlayLastIcon from "@/assets/icons/play-last.svg";
 import PlayNextIcon from "@/assets/icons/play-next.svg";
@@ -22,6 +23,13 @@ const frameIcons = [
 	PlayNextIcon,
 	PlayLastIcon,
 ];
+
+const getIcon = (icon: string) => {
+	if (icon === PlayIcon) {
+		return isFramesPlaying.value ? PauseIcon : PlayIcon;
+	}
+	return icon;
+};
 
 const getFirstFrameId = () => {
 	return Object.keys(frames.value)[0];
@@ -98,7 +106,7 @@ const onFramesActionsHandler = (icon: string) => {
           :key='index'
           @click='() => onFramesActionsHandler(icon)'
         >
-          <component :is="icon" class='w-6 h-6' />
+          <component :is="getIcon(icon)" class='w-6 h-6' />
         </PixelBorderUltimate>
       </div>
     </PixelBorderSecondary>

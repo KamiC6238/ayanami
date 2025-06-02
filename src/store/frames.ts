@@ -1,4 +1,5 @@
 import type { Frames } from "@/types";
+import { produce } from "immer";
 import { defineStore } from "pinia";
 import { v4 as uuidV4 } from "uuid";
 import { computed, ref, watch } from "vue";
@@ -61,22 +62,21 @@ export const useFramesStore = defineStore("frames", () => {
 		fps.value = _fps;
 	};
 
+	const updateFrame = (frameId: string, snapshot: string) => {
+		tabs.value = produce(tabs.value, (draft) => {
+			const tabId = canvasStore.getCurrentTabId();
+			if (!tabId) return;
+
+			draft[tabId] ??= { frames: {} };
+			draft[tabId].frames[frameId] = {
+				snapshot,
+			};
+		});
+	};
+
 	const createFrame = () => {
 		const frameId = uuidV4();
-		const tabId = canvasStore.getCurrentTabId();
-
-		tabs.value = {
-			...tabs.value,
-			[tabId]: {
-				frames: {
-					...(tabs.value[tabId]?.frames ?? {}),
-					[frameId]: {
-						snapshot: "",
-					},
-				},
-			},
-		};
-
+		updateFrame(frameId, "");
 		switchFrame(frameId);
 	};
 
@@ -92,20 +92,13 @@ export const useFramesStore = defineStore("frames", () => {
 		});
 	};
 
-	const updateSnapshot = (payload: {
-		tabId: string;
-		frameId: string;
-		blob: Blob;
-	}) => {
-		const { tabId, frameId, blob } = payload;
+	const updateSnapshot = (payload: { frameId: string; blob: Blob }) => {
+		const { frameId, blob } = payload;
 		const reader = new FileReader();
 
 		reader.onloadend = () => {
-			const tab = tabs.value[tabId];
-			const frame = tab.frames[frameId];
-			if (!frame) return;
-
-			tabs.value[tabId].frames[frameId].snapshot = reader.result as string;
+			const snapshot = reader.result as string;
+			updateFrame(frameId, snapshot);
 		};
 		reader.readAsDataURL(blob);
 	};

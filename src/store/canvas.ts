@@ -129,7 +129,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		}
 
 		setTabId(tabId);
-		framesStore.createFrame(tabId);
+		framesStore.createFrame();
 	};
 
 	const drawSquare = (config: SquareRectConfig) => {

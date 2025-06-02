@@ -235,7 +235,15 @@ const _undoOrRedo = (
 	const record = isUndo ? popUndoStack(tabId) : popRedoStack(tabId);
 	if (!record) return;
 
-	let _frameId = getFrameIdWhenUndoRedo(frameId, { tabId, isUndo, record });
+	let { frameId: _frameId, returnFrameId } = getFrameIdWhenUndoRedo(frameId, {
+		tabId,
+		isUndo,
+		record,
+	});
+
+	if (isUndo && returnFrameId) {
+		record.returnFrameId = returnFrameId;
+	}
 
 	if (isUndo) {
 		addRecordToRedoStack(tabId, record);

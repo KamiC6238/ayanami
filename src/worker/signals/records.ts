@@ -10,6 +10,7 @@ import {
 	ToolTypeEnum,
 } from "@/types";
 import { signal } from "alien-signals";
+import { produce } from "immer";
 
 const records = signal<Records>({});
 const pencilRecordPoints = signal<PencilPointRecord[]>([]);
@@ -17,16 +18,17 @@ const eraserRecordPoints = signal<EraserPointRecord[]>([]);
 
 export const useRecords = () => {
 	const initRecords = (tabId: string) => {
-		records({
-			...records(),
-			[tabId]: {
-				undoStack: [],
-				redoStack: [],
-				colorsIndex: [],
-				framesIndex: [],
-				tabId,
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId] = {
+					undoStack: [],
+					redoStack: [],
+					colorsIndex: [],
+					framesIndex: [],
+					tabId,
+				};
+			}),
+		);
 	};
 
 	const getRecords = (tabId: string) => records()[tabId];
@@ -111,108 +113,127 @@ export const useRecords = () => {
 	) => {
 		const recordFrameIndex = getFrameIndexByRecord(record);
 		const curFrameIndex = getFrameIndex(tabId, frameId);
+		let hasReturnFrameId = false;
 
 		if (
 			isUndo &&
 			typeof recordFrameIndex === "number" &&
 			recordFrameIndex !== curFrameIndex
 		) {
-			record.returnFrameId = frameId;
-			return getFrameId(tabId, recordFrameIndex);
+			hasReturnFrameId = true;
 		}
-		return frameId;
+
+		return {
+			frameId: getFrameId(tabId, recordFrameIndex),
+			returnFrameId: hasReturnFrameId ? frameId : "",
+		};
 	};
 
 	const popUndoStack = (tabId: string) => {
-		const undoStack = getUndoStack(tabId);
-		const record = undoStack.pop();
+		let record: OpRecord | undefined;
 
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				undoStack: [...undoStack],
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				const _record = draft[tabId].undoStack.pop();
+				if (!_record) return;
+
+				/**
+				 * Read returnFrameId before JSON.stringify,
+				 * because JSON.stringify will clear the returnFrameId
+				 */
+				const returnFrameId = _record.returnFrameId;
+				record = JSON.parse(JSON.stringify(_record)) as OpRecord;
+
+				if (returnFrameId) {
+					record.returnFrameId = returnFrameId;
+				}
+			}),
+		);
 
 		return record;
 	};
 
 	const popRedoStack = (tabId: string) => {
-		const redoStack = getRedoStack(tabId);
-		const record = redoStack.pop();
+		let record: OpRecord | undefined;
 
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				redoStack: [...redoStack],
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				const _record = draft[tabId].redoStack.pop();
+				if (!_record) return;
+
+				/**
+				 * Read returnFrameId before JSON.stringify,
+				 * because JSON.stringify will clear the returnFrameId
+				 */
+				const returnFrameId = _record.returnFrameId;
+				record = JSON.parse(JSON.stringify(_record)) as OpRecord;
+
+				if (returnFrameId) {
+					record.returnFrameId = returnFrameId;
+				}
+			}),
+		);
 
 		return record;
 	};
+
 	const addRecordToUndoStack = (tabId: string, record: OpRecord) => {
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				undoStack: [...records()[tabId].undoStack, record],
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId].undoStack.push(record);
+			}),
+		);
 	};
 
 	const addRecordToRedoStack = (tabId: string, record: OpRecord) => {
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				redoStack: [...records()[tabId].redoStack, record],
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId].redoStack.push(record);
+			}),
+		);
+
+		console.log("redoStack", records()[tabId].redoStack);
 	};
 
 	const updatePencilPointsRecord = (position: Position) => {
 		let saveAsNewPoint = true;
 
 		pencilRecordPoints(
-			[...pencilRecordPoints()].map((point) => {
-				const [x, y, drawCounts] = point;
-
-				if (position.x === x && position.y === y) {
-					saveAsNewPoint = false;
-					return [x, y, drawCounts + 1];
+			produce(pencilRecordPoints(), (draft) => {
+				for (let i = 0; i < draft.length; i++) {
+					const [x, y, drawCounts] = draft[i];
+					if (position.x === x && position.y === y) {
+						draft[i] = [x, y, drawCounts + 1];
+						saveAsNewPoint = false;
+						break;
+					}
 				}
-				return point;
+
+				if (saveAsNewPoint) {
+					draft.push([position.x, position.y, 1]);
+				}
 			}),
 		);
-
-		if (saveAsNewPoint) {
-			pencilRecordPoints([
-				...pencilRecordPoints(),
-				[position.x, position.y, 1],
-			]);
-		}
 	};
 
 	const updateEraserPointsRecord = (position: Position) => {
 		let saveAsNewPoint = true;
 
 		eraserRecordPoints(
-			[...eraserRecordPoints()].map((point) => {
-				const [x, y] = point;
-
-				if (position.x === x && position.y === y) {
-					saveAsNewPoint = false;
-					return [x, y];
+			produce(eraserRecordPoints(), (draft) => {
+				for (let i = 0; i < draft.length; i++) {
+					const [x, y] = draft[i];
+					if (position.x === x && position.y === y) {
+						saveAsNewPoint = false;
+						break;
+					}
 				}
-				return point;
+
+				if (saveAsNewPoint) {
+					draft.push([position.x, position.y]);
+				}
 			}),
 		);
-
-		if (saveAsNewPoint) {
-			eraserRecordPoints([...eraserRecordPoints(), [position.x, position.y]]);
-		}
 	};
 
 	const updatePointsRecord = (
@@ -233,23 +254,19 @@ export const useRecords = () => {
 	};
 
 	const updateColorsIndex = (tabId: string, colorsIndex: string[]) => {
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				colorsIndex,
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId].colorsIndex = colorsIndex;
+			}),
+		);
 	};
 
 	const updateFramesIndex = (tabId: string, framesIndex: string[]) => {
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				framesIndex,
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId].framesIndex = framesIndex;
+			}),
+		);
 	};
 
 	const clearRecordPoints = () => {
@@ -259,29 +276,28 @@ export const useRecords = () => {
 
 	// TODO: FIXME 这里需要加上 frameId 来清除 redoStack
 	const clearRedoStack = (tabId: string) => {
-		records({
-			...records(),
-			[tabId]: {
-				...records()[tabId],
-				redoStack: [],
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId].redoStack = [];
+			}),
+		);
 	};
 
 	const setRecordsFromImportFile = (
 		tabId: string,
 		config: ImportFileConfig,
 	) => {
-		records({
-			...records(),
-			[tabId]: {
-				redoStack: [],
-				undoStack: [...config.undoStack],
-				colorsIndex: [...config.colorsIndex],
-				framesIndex: [...config.framesIndex],
-				tabId,
-			},
-		});
+		records(
+			produce(records(), (draft) => {
+				draft[tabId] = {
+					redoStack: [],
+					undoStack: [...config.undoStack],
+					colorsIndex: [...config.colorsIndex],
+					framesIndex: [...config.framesIndex],
+					tabId,
+				};
+			}),
+		);
 	};
 
 	return {

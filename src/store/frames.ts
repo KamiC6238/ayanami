@@ -61,8 +61,9 @@ export const useFramesStore = defineStore("frames", () => {
 		fps.value = _fps;
 	};
 
-	const createFrame = (tabId: string) => {
+	const createFrame = () => {
 		const frameId = uuidV4();
+		const tabId = canvasStore.getCurrentTabId();
 
 		tabs.value = {
 			...tabs.value,

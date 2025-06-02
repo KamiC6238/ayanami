@@ -1,4 +1,4 @@
-import type { ToolTypeEnum } from "./config";
+import type { FrameTypeEnum, ToolTypeEnum } from "./config";
 
 export type PencilPointRecord = [number, number, number];
 export type PencilRecord = [
@@ -76,6 +76,20 @@ export type BroomRecord = [
 	number,
 ];
 
+export type AddFrameRecord = [FrameTypeEnum];
+
+export type CopyFrameRecord = [
+	FrameTypeEnum,
+	// frameIndex
+	number,
+];
+
+export type DeleteFrameRecord = [
+	FrameTypeEnum,
+	// frameIndex
+	number,
+];
+
 export type OpRecord = {
 	returnFrameId?: string;
 } & (
@@ -86,6 +100,9 @@ export type OpRecord = {
 	| CircleRecord
 	| BucketRecord
 	| BroomRecord
+	| AddFrameRecord
+	| CopyFrameRecord
+	| DeleteFrameRecord
 );
 
 export interface Records {

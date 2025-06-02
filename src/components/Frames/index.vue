@@ -7,14 +7,12 @@ import PlayLastIcon from "@/assets/icons/play-last.svg";
 import PlayNextIcon from "@/assets/icons/play-next.svg";
 import PlayPrevIcon from "@/assets/icons/play-prev.svg";
 import PlayIcon from "@/assets/icons/play.svg";
-import { useCanvasStore, useFramesStore } from "@/store";
+import { useFramesStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { PixelBorderSecondary, PixelBorderUltimate } from "../PixelBorder";
 import Frame from "./frame.vue";
 
-const canvasStore = useCanvasStore();
 const framesStore = useFramesStore();
-const { currentTabId } = storeToRefs(canvasStore);
 const { frames, currentFrameId, isFramesPlaying } = storeToRefs(framesStore);
 
 const frameIcons = [
@@ -111,7 +109,7 @@ const onFramesActionsHandler = (icon: string) => {
         </PixelBorderUltimate>
         <PixelBorderUltimate
           class='w-8.5 h-8.5 ml-2.5'
-          @click='() => framesStore.createFrame(currentTabId)'
+          @click='() => framesStore.createFrame()'
         >
           <AddFrameIcon class='w-6 h-6' />
         </PixelBorderUltimate>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ActiveFrameIcon from "@/assets/icons/active-frame.svg";
+import AddFrameIcon from "@/assets/icons/add-frame.svg";
 import PauseIcon from "@/assets/icons/pause.svg";
 import PlayFirstIcon from "@/assets/icons/play-first.svg";
 import PlayLastIcon from "@/assets/icons/play-last.svg";
@@ -108,10 +109,16 @@ const onFramesActionsHandler = (icon: string) => {
         >
           <component :is="getIcon(icon)" class='w-6 h-6' />
         </PixelBorderUltimate>
+        <PixelBorderUltimate
+          class='w-8.5 h-8.5 ml-2.5'
+          @click='() => framesStore.createFrame(currentTabId)'
+        >
+          <AddFrameIcon class='w-6 h-6' />
+        </PixelBorderUltimate>
       </div>
     </PixelBorderSecondary>
     <PixelBorderSecondary
-      wrapper-width='w-[200px]'
+      wrapper-width='w-[240px]'
       wrapper-height='h-[536px]'
       content-cls='flex flex-col items-center pt-2.5 pb-2.5'
       background='bg-[#6e8f8b]'
@@ -129,10 +136,6 @@ const onFramesActionsHandler = (icon: string) => {
           class='w-8 h-8 absolute top-[50%] left-[-35px] translate-y-[-50%]'
         />
       </div>
-      <div
-        class='text-[10px] cursor-pointer'
-        @click='() => framesStore.createFrame(currentTabId)'
-      >add frame</div>
     </PixelBorderSecondary>
   </div>
 </template>

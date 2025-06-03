@@ -191,8 +191,6 @@ export const useRecords = () => {
 				draft[tabId].redoStack.push(record);
 			}),
 		);
-
-		console.log("redoStack", records()[tabId].redoStack);
 	};
 
 	const updatePencilPointsRecord = (position: Position) => {

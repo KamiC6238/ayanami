@@ -12,7 +12,7 @@ import type {
 	SquareRecord,
 } from "@/types";
 import { ToolTypeEnum } from "@/types";
-import { useRecords, useRender } from "../signals";
+import { useFrames, useRecords, useRender } from "../signals";
 import * as frameUtils from "./frame";
 import * as renderUtils from "./render";
 
@@ -38,6 +38,7 @@ const {
 } = useRecords();
 
 const { resetColorPositionMap, clearVisited } = useRender();
+const { switchFrame } = useFrames();
 
 const makePencilRecord = (
 	payload: RecordMessagePayload,
@@ -262,13 +263,7 @@ const _undoOrRedo = (
 		frameUtils.generateSnapshot({ tabId, frameId: _frameId });
 	}
 
-	self.postMessage({
-		type: "updateFrameId",
-		payload: {
-			tabId,
-			frameId: _frameId,
-		},
-	});
+	switchFrame(_frameId);
 };
 
 export const redo = (payload: RedoOrUndoMessagePayload) => {

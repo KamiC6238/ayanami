@@ -15,7 +15,7 @@ import CanvasWorker from "@/worker?worker";
 import { defineStore, storeToRefs } from "pinia";
 import { type Observable, fromEvent } from "rxjs";
 import { v4 as uuidV4 } from "uuid";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useConfigStore } from "./config";
 import { useFramesStore } from "./frames";
 
@@ -129,7 +129,7 @@ export const useCanvasStore = defineStore("canvas", () => {
 		}
 
 		setTabId(tabId);
-		framesStore.createFrame();
+		nextTick(() => framesStore.onFrameAction("createFrame"));
 	};
 
 	const drawSquare = (config: SquareRectConfig) => {

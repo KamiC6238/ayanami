@@ -20,7 +20,7 @@ watch(
 			interval.value = window.setInterval(updateSnapshot, frameDuration.value);
 		} else {
 			const frameId = Object.keys(frames.value)[currentFrameIndex.value];
-			framesStore.switchFrame(frameId);
+			framesStore.onFrameAction("switchFrame", { frameId });
 		}
 	},
 );

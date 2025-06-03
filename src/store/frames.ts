@@ -1,7 +1,5 @@
 import type { Frames } from "@/types";
-import { produce } from "immer";
 import { defineStore } from "pinia";
-import { v4 as uuidV4 } from "uuid";
 import { computed, ref, watch } from "vue";
 import { useCanvasStore } from "./canvas";
 
@@ -22,11 +20,9 @@ export const useFramesStore = defineStore("frames", () => {
 				const { type, payload } = e.data;
 
 				switch (type) {
-					case "snapshot":
-						updateSnapshot(payload);
-						break;
-					case "updateFrameId":
-						updateFrameId(payload.frameId);
+					case "framesUpdated":
+						tabs.value = payload.tabs;
+						currentFrameId.value = payload.currentFrameId;
 						break;
 				}
 			});
@@ -37,7 +33,7 @@ export const useFramesStore = defineStore("frames", () => {
 		const currentTabId = canvasStore.getCurrentTabId();
 		if (!currentTabId) return {};
 
-		return tabs.value[currentTabId].frames;
+		return tabs.value[currentTabId]?.frames || {};
 	});
 
 	const frameDuration = computed(() => Math.floor(1000 / fps.value));
@@ -46,7 +42,7 @@ export const useFramesStore = defineStore("frames", () => {
 		const currentTabId = canvasStore.getCurrentTabId();
 
 		return currentTabId
-			? Object.values(tabs.value[currentTabId].frames).map(
+			? Object.values(tabs.value[currentTabId]?.frames || {}).map(
 					(frame) => frame.snapshot,
 				)
 			: [];
@@ -62,49 +58,17 @@ export const useFramesStore = defineStore("frames", () => {
 		fps.value = _fps;
 	};
 
-	const updateFrame = (frameId: string, snapshot: string) => {
-		tabs.value = produce(tabs.value, (draft) => {
-			const tabId = canvasStore.getCurrentTabId();
-			if (!tabId) return;
-
-			draft[tabId] ??= { frames: {} };
-			draft[tabId].frames[frameId] = {
-				snapshot,
-			};
-		});
-	};
-
-	const createFrame = () => {
-		const frameId = uuidV4();
-		updateFrame(frameId, "");
-		switchFrame(frameId);
-	};
-
-	const switchFrame = (frameId: string) => {
-		currentFrameId.value = frameId;
-
+	const onFrameAction = (
+		action: "createFrame" | "switchFrame",
+		payload?: { frameId: string },
+	) => {
 		canvasStore.canvasWorker?.postMessage({
-			type: "switchFrame",
+			type: action,
 			payload: {
 				tabId: canvasStore.getCurrentTabId(),
-				frameId,
+				...payload,
 			},
 		});
-	};
-
-	const updateSnapshot = (payload: { frameId: string; blob: Blob }) => {
-		const { frameId, blob } = payload;
-		const reader = new FileReader();
-
-		reader.onloadend = () => {
-			const snapshot = reader.result as string;
-			updateFrame(frameId, snapshot);
-		};
-		reader.readAsDataURL(blob);
-	};
-
-	const updateFrameId = (frameId: string) => {
-		currentFrameId.value = frameId;
 	};
 
 	return {
@@ -117,8 +81,6 @@ export const useFramesStore = defineStore("frames", () => {
 		getCurrentFrameId,
 		setIsFramesPlaying,
 		setFps,
-		createFrame,
-		switchFrame,
-		updateFrameId,
+		onFrameAction,
 	};
 });

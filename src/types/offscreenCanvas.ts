@@ -23,6 +23,7 @@ export type MessageType =
 	| "undo"
 	| "export"
 	| "import"
+	| "createFrame"
 	| "switchFrame";
 
 export interface FillRectMessagePayload {
@@ -134,6 +135,8 @@ export interface SwitchFrameMessagePayload {
 	tabId: string;
 	frameId: string;
 }
+
+export type CreateFrameMessagePayload = SwitchFrameMessagePayload;
 
 export type MessagePayload =
 	| InitMessagePayload

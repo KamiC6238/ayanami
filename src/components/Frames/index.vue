@@ -62,13 +62,13 @@ const onFramesActionsHandler = (icon: string) => {
 	switch (icon) {
 		case PlayFirstIcon: {
 			const frameId = getFirstFrameId();
-			framesStore.switchFrame(frameId);
+			framesStore.onFrameAction("switchFrame", { frameId });
 			break;
 		}
 		case PlayPrevIcon: {
 			const currentIndex = getCurrentFrameIndex();
 			const prevFrameId = getPrevFrameId(currentIndex);
-			framesStore.switchFrame(prevFrameId);
+			framesStore.onFrameAction("switchFrame", { frameId: prevFrameId });
 			break;
 		}
 		case PlayIcon:
@@ -77,12 +77,12 @@ const onFramesActionsHandler = (icon: string) => {
 		case PlayNextIcon: {
 			const currentIndex = getCurrentFrameIndex();
 			const nextFrameId = getNextFrameId(currentIndex);
-			framesStore.switchFrame(nextFrameId);
+			framesStore.onFrameAction("switchFrame", { frameId: nextFrameId });
 			break;
 		}
 		case PlayLastIcon: {
 			const frameId = getLastFrameId();
-			framesStore.switchFrame(frameId);
+			framesStore.onFrameAction("switchFrame", { frameId });
 			break;
 		}
 	}
@@ -109,7 +109,7 @@ const onFramesActionsHandler = (icon: string) => {
         </PixelBorderUltimate>
         <PixelBorderUltimate
           class='w-8.5 h-8.5 ml-2.5'
-          @click='() => framesStore.createFrame()'
+          @click='() => framesStore.onFrameAction("createFrame")'
         >
           <AddFrameIcon class='w-6 h-6' />
         </PixelBorderUltimate>
@@ -126,7 +126,7 @@ const onFramesActionsHandler = (icon: string) => {
           class='mb-2'
           :snapshot='frames[frameId].snapshot'
           :active='currentFrameId === frameId'
-          @click='() => framesStore.switchFrame(frameId)'
+          @click='() => framesStore.onFrameAction("switchFrame", { frameId })'
         >
         </Frame>
         <ActiveFrameIcon

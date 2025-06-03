@@ -37,15 +37,5 @@ export interface BucketConfig {
 	position: Position;
 }
 
-export type Frame = {
-	snapshot: string;
-};
-
-export type FramesMap = Record<string, Frame>;
-
-export type Frames = {
-	frames: FramesMap;
-};
-
 export type CanvasMap = Record<CanvasType, HTMLCanvasElement | null> &
 	Record<CanvasMouseEventType, Observable<MouseEvent> | null>;

@@ -3,6 +3,7 @@ import { cn } from "@/utils";
 import PixelBorderPrimary from "./PixelBorderPrimary.vue";
 
 interface Props {
+	wrapperCls?: string;
 	wrapperWidth?: string;
 	wrapperHeight?: string;
 	contentCls?: string;
@@ -15,7 +16,8 @@ defineProps<Props>();
   <div :class="cn(
     'relative',
     wrapperWidth ?? '!w-full',
-    wrapperHeight ?? '!h-full'
+    wrapperHeight ?? '!h-full',
+    wrapperCls,
   )">
     <PixelBorderPrimary class='!absolute inset-0 z-0 !w-full !h-full bg-black' />
     <PixelBorderPrimary :class="cn(

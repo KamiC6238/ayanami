@@ -6,3 +6,4 @@ export * from "./common";
 export * from "./record";
 export * from "./offscreenCanvas";
 export * from "./export";
+export * from "./frames";

@@ -22,7 +22,9 @@ export type MessageType =
 	| "redo"
 	| "undo"
 	| "export"
-	| "import";
+	| "import"
+	| "createFrame"
+	| "switchFrame";
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
@@ -67,6 +69,7 @@ export interface CircleMessagePayload {
 }
 
 export interface BucketMessagePayload {
+	canvasType: CanvasType;
 	replacementColor: string;
 	position: Position;
 	pixelSize: number;
@@ -91,6 +94,7 @@ export interface ClearAllPixelsMessagePayload {
 }
 
 export interface InitMessagePayload {
+	tabId: string;
 	dpr: number;
 	clientWidth: number;
 	clientHeight: number;
@@ -99,6 +103,7 @@ export interface InitMessagePayload {
 
 export interface RecordMessagePayload {
 	tabId: string;
+	frameId: string;
 	toolType: ToolTypeEnum;
 	pixelSize: number;
 	pixelColor: string;
@@ -123,7 +128,15 @@ export interface ImportMessagePayload {
 
 export interface RedoOrUndoMessagePayload {
 	tabId: string;
+	frameId: string;
 }
+
+export interface SwitchFrameMessagePayload {
+	tabId: string;
+	frameId: string;
+}
+
+export type CreateFrameMessagePayload = SwitchFrameMessagePayload;
 
 export type MessagePayload =
 	| InitMessagePayload
@@ -138,7 +151,9 @@ export type MessagePayload =
 	| ClearAllPixelsMessagePayload
 	| RecordMessagePayload
 	| RedoOrUndoMessagePayload
-	| ExportMessagePayload;
+	| ExportMessagePayload
+	| ImportMessagePayload
+	| SwitchFrameMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;

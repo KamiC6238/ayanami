@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 9 9" class="pixelicon-caret-left">
+	<g transform="translate(7, 1) scale(-1, 1)">
+		<rect fill="#000000" x="0" y="1" width="1" height="5"/>
+		<polygon fill="#000000" points="3,6 3,5 4,5 4,4 5,4 5,3 4,3 4,2 3,2 3,1 2,1 2,6"/>
+	</g>
+</svg>

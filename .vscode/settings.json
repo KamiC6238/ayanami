@@ -8,5 +8,9 @@
   "tailwindCSS.includeLanguages": {
     "plaintext": "html"
   },
-  "tailwindCSS.classFunctions": ["tw", "clsx"]
+  "tailwindCSS.classFunctions": [
+    "tw",
+    "clsx"
+  ],
+  "svg.preview.background": "transparent"
 }

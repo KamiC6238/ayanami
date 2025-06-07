@@ -357,9 +357,9 @@ export const replayRecords = (
 	renderUtils.clearAllPixels({ canvasType: "main" });
 
 	for (const record of records) {
-		const [type] = record;
+		const [toolType] = record;
 
-		switch (type) {
+		switch (toolType) {
 			case ToolTypeEnum.Pencil:
 				replayPencilRecord(record as PencilRecord, config);
 				break;

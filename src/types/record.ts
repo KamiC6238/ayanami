@@ -76,7 +76,13 @@ export type BroomRecord = [
 	number,
 ];
 
-export type AddFrameRecord = [FrameTypeEnum];
+export type CreateFrameRecord = [
+	FrameTypeEnum,
+	// frameIndex
+	number,
+	// previous frameIndex
+	number,
+];
 
 export type CopyFrameRecord = [
 	FrameTypeEnum,
@@ -100,7 +106,7 @@ export type OpRecord = {
 	| CircleRecord
 	| BucketRecord
 	| BroomRecord
-	| AddFrameRecord
+	| CreateFrameRecord
 	| CopyFrameRecord
 	| DeleteFrameRecord
 );

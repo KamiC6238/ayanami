@@ -1,6 +1,6 @@
 import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
-import type { ToolTypeEnum } from "./config";
+import type { FrameTypeEnum, ToolTypeEnum } from "./config";
 
 export enum ExportTypeEnum {
 	PNG = "png",
@@ -104,9 +104,11 @@ export interface InitMessagePayload {
 export interface RecordMessagePayload {
 	tabId: string;
 	frameId: string;
-	toolType: ToolTypeEnum;
-	pixelSize: number;
-	pixelColor: string;
+	prevFrameId?: string;
+	toolType?: ToolTypeEnum;
+	frameType?: FrameTypeEnum;
+	pixelSize?: number;
+	pixelColor?: string;
 	position?: Position;
 	lineStartPosition?: Position;
 	lineEndPosition?: Position;

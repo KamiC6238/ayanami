@@ -12,7 +12,7 @@ export enum ToolTypeEnum {
 
 export enum FrameTypeEnum {
 	Unknown = -1,
-	Add = 9,
+	Create = 9,
 	Copy = 10,
 	Delete = 11,
 }

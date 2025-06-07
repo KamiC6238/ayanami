@@ -2,6 +2,7 @@ import {
 	type ClearRectMessagePayload,
 	type EraserPointRecord,
 	type FillRectMessagePayload,
+	FrameTypeEnum,
 	type ImportFileConfig,
 	type OpRecord,
 	type PencilPointRecord,
@@ -298,6 +299,15 @@ export const useRecords = () => {
 		);
 	};
 
+	const checkIfFrameRecord = (record: OpRecord) => {
+		const [type] = record;
+		return (
+			type === FrameTypeEnum.Create ||
+			type === FrameTypeEnum.Delete ||
+			type === FrameTypeEnum.Copy
+		);
+	};
+
 	return {
 		initRecords,
 		getRecords,
@@ -323,5 +333,6 @@ export const useRecords = () => {
 		clearRedoStack,
 		clearRecordPoints,
 		setRecordsFromImportFile,
+		checkIfFrameRecord,
 	};
 };

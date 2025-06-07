@@ -3,6 +3,7 @@ import type {
 	BucketRecord,
 	CanvasType,
 	CircleRecord,
+	CreateFrameRecord,
 	EraserRecord,
 	LineRecord,
 	OpRecord,
@@ -11,7 +12,7 @@ import type {
 	RedoOrUndoMessagePayload,
 	SquareRecord,
 } from "@/types";
-import { ToolTypeEnum } from "@/types";
+import { FrameTypeEnum, ToolTypeEnum } from "@/types";
 import { useFrames, useRecords, useRender } from "../signals";
 import * as frameUtils from "./frame";
 import * as renderUtils from "./render";
@@ -31,63 +32,69 @@ const {
 	addRecordToUndoStack,
 	clearRedoStack,
 	clearRecordPoints,
-	getRecordsWithFrameId,
 	popRedoStack,
 	popUndoStack,
 	addRecordToRedoStack,
+	getFrameId,
+	checkIfFrameRecord,
 } = useRecords();
 
 const { resetColorPositionMap, clearVisited } = useRender();
-const { switchFrame } = useFrames();
+const { createFrame, deleteFrame } = useFrames();
 
 const makePencilRecord = (
 	payload: RecordMessagePayload,
 ): PencilRecord | null => {
-	const { tabId, frameId, toolType, pixelColor, pixelSize } = payload;
+	const { tabId, frameId, pixelColor, pixelSize } = payload;
 	const pencilRecordPoints = getPencilRecordPoints();
 
-	if (!pencilRecordPoints.length) {
-		return null;
-	}
-
-	const colorIndex = getColorIndex(tabId, pixelColor);
-	const frameIndex = getFrameIndex(tabId, frameId);
-	return [toolType, frameIndex, colorIndex, pixelSize, [...pencilRecordPoints]];
-};
-
-const makeEraserRecord = (
-	payload: RecordMessagePayload,
-): EraserRecord | null => {
-	const { tabId, frameId, toolType, pixelSize } = payload;
-	const eraserRecordPoints = getEraserRecordPoints();
-
-	if (!eraserRecordPoints.length) {
-		return null;
-	}
-
-	const frameIndex = getFrameIndex(tabId, frameId);
-	return [toolType, frameIndex, pixelSize, [...eraserRecordPoints]];
-};
-
-const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
-	const {
-		tabId,
-		frameId,
-		toolType,
-		lineStartPosition,
-		lineEndPosition,
-		pixelColor,
-		pixelSize,
-	} = payload;
-
-	if (!lineStartPosition || !lineEndPosition) {
+	if (!pencilRecordPoints.length || !pixelColor || !pixelSize) {
 		return null;
 	}
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
-		toolType,
+		ToolTypeEnum.Pencil,
+		frameIndex,
+		colorIndex,
+		pixelSize,
+		[...pencilRecordPoints],
+	];
+};
+
+const makeEraserRecord = (
+	payload: RecordMessagePayload,
+): EraserRecord | null => {
+	const { tabId, frameId, pixelSize } = payload;
+	const eraserRecordPoints = getEraserRecordPoints();
+
+	if (!eraserRecordPoints.length || !pixelSize) {
+		return null;
+	}
+
+	const frameIndex = getFrameIndex(tabId, frameId);
+	return [ToolTypeEnum.Eraser, frameIndex, pixelSize, [...eraserRecordPoints]];
+};
+
+const makeLineRecord = (payload: RecordMessagePayload): LineRecord | null => {
+	const {
+		tabId,
+		frameId,
+		lineStartPosition,
+		lineEndPosition,
+		pixelColor,
+		pixelSize,
+	} = payload;
+
+	if (!lineStartPosition || !lineEndPosition || !pixelColor || !pixelSize) {
+		return null;
+	}
+
+	const colorIndex = getColorIndex(tabId, pixelColor);
+	const frameIndex = getFrameIndex(tabId, frameId);
+	return [
+		ToolTypeEnum.Line,
 		frameIndex,
 		colorIndex,
 		pixelSize,
@@ -104,21 +111,20 @@ const makeSquareRecord = (
 	const {
 		tabId,
 		frameId,
-		toolType,
 		squareStartPosition,
 		squareEndPosition,
 		pixelColor,
 		pixelSize,
 	} = payload;
 
-	if (!squareStartPosition || !squareEndPosition) {
+	if (!squareStartPosition || !squareEndPosition || !pixelColor || !pixelSize) {
 		return null;
 	}
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
-		toolType,
+		ToolTypeEnum.Square,
 		frameIndex,
 		colorIndex,
 		pixelSize,
@@ -142,7 +148,13 @@ const makeCircleRecord = (
 		pixelSize,
 	} = payload;
 
-	if (!circleStartPosition || !circleEndPosition) {
+	if (
+		!toolType ||
+		!circleStartPosition ||
+		!circleEndPosition ||
+		!pixelColor ||
+		!pixelSize
+	) {
 		return null;
 	}
 
@@ -163,14 +175,14 @@ const makeCircleRecord = (
 const makeBucketRecord = (
 	payload: RecordMessagePayload,
 ): BucketRecord | null => {
-	const { tabId, frameId, toolType, pixelColor, pixelSize, position } = payload;
+	const { tabId, frameId, pixelColor, pixelSize, position } = payload;
 
-	if (!position) return null;
+	if (!position || !pixelColor || !pixelSize) return null;
 
 	const colorIndex = getColorIndex(tabId, pixelColor);
 	const frameIndex = getFrameIndex(tabId, frameId);
 	return [
-		toolType,
+		ToolTypeEnum.Bucket,
 		frameIndex,
 		colorIndex,
 		pixelSize,
@@ -184,11 +196,23 @@ const makeBroomRecord = (payload: RecordMessagePayload): BroomRecord => {
 	return [ToolTypeEnum.Broom, frameIndex];
 };
 
-export const record = (payload: RecordMessagePayload) => {
-	const { tabId, toolType } = payload;
-	let record: OpRecord | null = null;
+const makeCreateFrameRecord = (
+	payload: RecordMessagePayload,
+): CreateFrameRecord | null => {
+	const { tabId, frameId, prevFrameId } = payload;
+	if (!prevFrameId) return null;
 
-	switch (toolType) {
+	const frameIndex = getFrameIndex(tabId, frameId);
+	const previousFrameIndex = getFrameIndex(tabId, prevFrameId);
+	return [FrameTypeEnum.Create, frameIndex, previousFrameIndex];
+};
+
+export const record = (payload: RecordMessagePayload) => {
+	const { tabId, toolType, frameType } = payload;
+	let record: OpRecord | null = null;
+	const type = frameType || toolType;
+
+	switch (type) {
 		case ToolTypeEnum.Pencil:
 			record = makePencilRecord(payload);
 			break;
@@ -213,6 +237,9 @@ export const record = (payload: RecordMessagePayload) => {
 		case ToolTypeEnum.Broom:
 			record = makeBroomRecord(payload);
 			break;
+		case FrameTypeEnum.Create:
+			record = makeCreateFrameRecord(payload);
+			break;
 	}
 
 	clearRecordPoints();
@@ -225,16 +252,15 @@ export const record = (payload: RecordMessagePayload) => {
 	return true;
 };
 
-const _undoOrRedo = (
-	payload: RedoOrUndoMessagePayload,
+const _undoRedoDrawRecord = (
+	record: OpRecord,
 	config: {
+		tabId: string;
+		frameId: string;
 		isUndo: boolean;
 	},
 ) => {
-	const { isUndo } = config;
-	const { tabId, frameId } = payload;
-	const record = isUndo ? popUndoStack(tabId) : popRedoStack(tabId);
-	if (!record) return;
+	const { tabId, frameId, isUndo } = config;
 
 	let { frameId: _frameId, returnFrameId } = getFrameIdWhenUndoRedo(frameId, {
 		tabId,
@@ -254,24 +280,74 @@ const _undoOrRedo = (
 
 	resetColorPositionMap();
 	clearVisited();
-	replayRecords(getRecordsWithFrameId(tabId, _frameId), { tabId });
-	frameUtils.generateSnapshot({ tabId, frameId: _frameId });
+
+	frameUtils.switchFrame({ tabId, frameId: _frameId });
 
 	if (!isUndo && record.returnFrameId) {
 		_frameId = record.returnFrameId;
-		replayRecords(getRecordsWithFrameId(tabId, _frameId), { tabId });
-		frameUtils.generateSnapshot({ tabId, frameId: _frameId });
+		frameUtils.switchFrame({
+			tabId,
+			frameId: record.returnFrameId,
+		});
 	}
+};
 
-	switchFrame(_frameId);
+const _undoRedoFrameRecord = (
+	record: OpRecord,
+	config: {
+		tabId: string;
+		isUndo: boolean;
+	},
+) => {
+	const { tabId, isUndo } = config;
+	const [frameType, frameIndex, prevFrameIndex] = record;
+
+	if (isUndo) {
+		addRecordToRedoStack(tabId, record);
+
+		if (frameType === FrameTypeEnum.Create) {
+			const prevFrameId = getFrameId(tabId, prevFrameIndex);
+			const frameId = getFrameId(tabId, frameIndex);
+			deleteFrame(tabId, frameId);
+			frameUtils.switchFrame({ tabId, frameId: prevFrameId });
+		}
+	} else {
+		addRecordToUndoStack(tabId, record);
+
+		if (frameType === FrameTypeEnum.Create) {
+			const frameId = getFrameId(tabId, frameIndex);
+			createFrame(tabId, frameId);
+			frameUtils.switchFrame({ tabId, frameId });
+		}
+	}
+};
+
+const _undoRedo = (
+	payload: RedoOrUndoMessagePayload,
+	config: {
+		isUndo: boolean;
+	},
+) => {
+	const { isUndo } = config;
+	const { tabId, frameId } = payload;
+	const record = isUndo ? popUndoStack(tabId) : popRedoStack(tabId);
+	if (!record) return;
+
+	const common = { tabId, frameId, isUndo };
+
+	if (checkIfFrameRecord(record)) {
+		_undoRedoFrameRecord(record, common);
+	} else {
+		_undoRedoDrawRecord(record, common);
+	}
 };
 
 export const redo = (payload: RedoOrUndoMessagePayload) => {
-	_undoOrRedo(payload, { isUndo: false });
+	_undoRedo(payload, { isUndo: false });
 };
 
 export const undo = (payload: RedoOrUndoMessagePayload) => {
-	_undoOrRedo(payload, { isUndo: true });
+	_undoRedo(payload, { isUndo: true });
 };
 
 export const replayRecords = (
@@ -281,9 +357,9 @@ export const replayRecords = (
 	renderUtils.clearAllPixels({ canvasType: "main" });
 
 	for (const record of records) {
-		const [toolType] = record;
+		const [type] = record;
 
-		switch (toolType) {
+		switch (type) {
 			case ToolTypeEnum.Pencil:
 				replayPencilRecord(record as PencilRecord, config);
 				break;

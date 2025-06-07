@@ -2,6 +2,7 @@ import type {
 	CreateFrameMessagePayload,
 	SwitchFrameMessagePayload,
 } from "@/types";
+import { FrameTypeEnum } from "@/types";
 import { useFrames, useRecords, useRender } from "../signals";
 import * as recordUtils from "./record";
 
@@ -33,11 +34,23 @@ export const generateSnapshot = (config: {
 };
 
 export const createFrame = (payload: CreateFrameMessagePayload) => {
-	_createFrame(payload.tabId);
+	const { tabId } = payload;
+	const { frameId, prevFrameId } = _createFrame(tabId) ?? {};
+	if (!frameId || !prevFrameId) return;
+
+	recordUtils.record({
+		tabId,
+		frameId,
+		prevFrameId,
+		frameType: FrameTypeEnum.Create,
+	});
+
+	switchFrame({ tabId, frameId });
 };
 
 export const switchFrame = (payload: SwitchFrameMessagePayload) => {
 	const { tabId, frameId } = payload;
 	_switchFrame(frameId);
 	recordUtils.replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
+	generateSnapshot({ tabId, frameId });
 };

@@ -2,6 +2,8 @@
 import type { Frame } from "@/types";
 import { PixelBorderSecondary } from "../PixelBorder";
 
+const emit = defineEmits<(e: "delete") => void>();
+
 defineProps<
 	Frame & {
 		active: boolean;
@@ -13,6 +15,12 @@ defineProps<
     wrapper-width="w-25"
     wrapper-height="h-25"
   >
-    <img :src="snapshot" />
+    <div class='relative'>
+      <img :src="snapshot" />
+      <div
+        class='absolute top-0 right-0'
+        @click.stop='emit("delete")'
+      >d</div>
+    </div>
   </PixelBorderSecondary>
 </template>

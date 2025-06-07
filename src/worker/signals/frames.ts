@@ -28,6 +28,14 @@ export const useFrames = () => {
 		});
 	});
 
+	const getPrevFrameId = (tabId: string, frameId: string) => {
+		const frames = tabs()[tabId]?.frames;
+		if (!frames) return "";
+
+		const frameIndex = Object.keys(frames).findIndex((id) => id === frameId);
+		return Object.keys(frames)[frameIndex - 1];
+	};
+
 	const createFrame = (tabId: string, _frameId?: string) => {
 		if (!tabId) return;
 
@@ -72,6 +80,7 @@ export const useFrames = () => {
 	return {
 		tabs,
 		currentFrameId,
+		getPrevFrameId,
 		createFrame,
 		switchFrame,
 		deleteFrame,

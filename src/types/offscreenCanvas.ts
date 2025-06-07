@@ -7,6 +7,8 @@ export enum ExportTypeEnum {
 	Source = "source",
 }
 
+export type FrameAction = "createFrame" | "switchFrame" | "deleteFrame";
+
 export type MessageType =
 	| "init"
 	| "fillRect"
@@ -23,8 +25,7 @@ export type MessageType =
 	| "undo"
 	| "export"
 	| "import"
-	| "createFrame"
-	| "switchFrame";
+	| FrameAction;
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
@@ -140,6 +141,8 @@ export interface SwitchFrameMessagePayload {
 
 export type CreateFrameMessagePayload = SwitchFrameMessagePayload;
 
+export type DeleteFrameMessagePayload = SwitchFrameMessagePayload;
+
 export type MessagePayload =
 	| InitMessagePayload
 	| FillRectMessagePayload
@@ -155,7 +158,8 @@ export type MessagePayload =
 	| RedoOrUndoMessagePayload
 	| ExportMessagePayload
 	| ImportMessagePayload
-	| SwitchFrameMessagePayload;
+	| SwitchFrameMessagePayload
+	| DeleteFrameMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;

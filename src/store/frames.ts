@@ -1,4 +1,4 @@
-import type { Frames } from "@/types";
+import type { FrameAction, Frames } from "@/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useCanvasStore } from "./canvas";
@@ -59,7 +59,7 @@ export const useFramesStore = defineStore("frames", () => {
 	};
 
 	const onFrameAction = (
-		action: "createFrame" | "switchFrame",
+		action: FrameAction,
 		payload?: { frameId: string },
 	) => {
 		canvasStore.canvasWorker?.postMessage({

@@ -1,5 +1,6 @@
 import type {
 	CreateFrameMessagePayload,
+	DeleteFrameMessagePayload,
 	SwitchFrameMessagePayload,
 } from "@/types";
 import { FrameTypeEnum } from "@/types";
@@ -9,8 +10,11 @@ import * as recordUtils from "./record";
 const { getRecordsWithFrameId } = useRecords();
 const { getCanvas } = useRender();
 const {
+	currentFrameId,
 	createFrame: _createFrame,
 	switchFrame: _switchFrame,
+	deleteFrame: _deleteFrame,
+	getPrevFrameId,
 	updateFrameSnapshot,
 } = useFrames();
 
@@ -53,4 +57,25 @@ export const switchFrame = (payload: SwitchFrameMessagePayload) => {
 	_switchFrame(frameId);
 	recordUtils.replayRecords(getRecordsWithFrameId(tabId, frameId), { tabId });
 	generateSnapshot({ tabId, frameId });
+};
+
+export const deleteFrame = (payload: DeleteFrameMessagePayload) => {
+	const { tabId, frameId } = payload;
+	let prevFrameId = "";
+
+	if (frameId === currentFrameId()) {
+		prevFrameId = getPrevFrameId(tabId, frameId);
+	}
+
+	_deleteFrame(tabId, frameId);
+
+	// recordUtils.record({
+	//   tabId,
+	//   frameId,
+	//   prevFrameId,
+	//   frameType: FrameTypeEnum.Delete,
+	// });
+
+	if (!prevFrameId) return;
+	switchFrame({ tabId, frameId: prevFrameId });
 };

@@ -94,6 +94,12 @@ export type DeleteFrameRecord = [
 	FrameTypeEnum,
 	// frameIndex
 	number,
+	// previous frameIndex
+	number,
+	// original index position
+	number,
+	// shouldSwitchFrame
+	boolean,
 ];
 
 export type OpRecord = {

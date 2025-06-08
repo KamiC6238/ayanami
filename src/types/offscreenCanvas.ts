@@ -117,6 +117,8 @@ export interface RecordMessagePayload {
 	squareEndPosition?: Position;
 	circleStartPosition?: Position;
 	circleEndPosition?: Position;
+	originalIndex?: number;
+	shouldSwitchFrame?: boolean;
 }
 
 export interface ExportMessagePayload {

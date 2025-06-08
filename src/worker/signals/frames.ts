@@ -32,8 +32,11 @@ export const useFrames = () => {
 		const frames = tabs()[tabId]?.frames;
 		if (!frames) return "";
 
-		const frameIndex = Object.keys(frames).findIndex((id) => id === frameId);
-		return Object.keys(frames)[frameIndex - 1];
+		const frameIds = Object.keys(frames);
+		const frameIndex = frameIds.findIndex((id) => id === frameId);
+
+		if (frameIndex <= 0) return "";
+		return frameIds[frameIndex - 1];
 	};
 
 	const createFrame = (tabId: string, _frameId?: string) => {
@@ -56,10 +59,95 @@ export const useFrames = () => {
 	};
 
 	const deleteFrame = (tabId: string, frameId: string) => {
+		const frames = tabs()[tabId]?.frames;
+		if (!frames) {
+			return {
+				frameId,
+				prevFrameId: "",
+				originalIndex: -1,
+				shouldSwitchFrame: false,
+			};
+		}
+
+		const frameIds = Object.keys(frames);
+		const originalIndex = frameIds.findIndex((id) => id === frameId);
+		const isLastFrame = originalIndex === frameIds.length - 1;
+		const isCurrentFrame = frameId === currentFrameId();
+
+		let prevFrameId = "";
+		if (isCurrentFrame) {
+			/**
+			 * frames: [f1, f2, f3]
+			 * currentFrame: f1
+			 * delete f1, prevFrameId should be f2
+			 * currentFrame: f2
+			 * delete f2, prevFrameId should be f1
+			 * currentFrame: f3
+			 * delete f3, prevFrameId should be f2
+			 * currentFrame: f2
+			 * delete f2, prevFrameId should be f1
+			 */
+			prevFrameId = getPrevFrameId(tabId, frameId);
+			if (!prevFrameId && frameIds.length > 1) {
+				const nextIndex = originalIndex + 1;
+				if (nextIndex < frameIds.length) {
+					prevFrameId = frameIds[nextIndex];
+				}
+			}
+		} else {
+			prevFrameId = currentFrameId();
+		}
+
 		tabs(
 			produce(tabs(), (draft) => {
 				draft[tabId] ??= { frames: {} };
 				delete draft[tabId].frames[frameId];
+			}),
+		);
+
+		return {
+			frameId,
+			prevFrameId,
+			originalIndex: isLastFrame ? -1 : originalIndex,
+			shouldSwitchFrame: isCurrentFrame,
+		};
+	};
+
+	const reorderFrame = (
+		tabId: string,
+		frameId: string,
+		targetIndex: number,
+	) => {
+		const frames = tabs()[tabId]?.frames;
+		if (!frames) return;
+
+		const frameIds = Object.keys(frames);
+		const currentIndex = frameIds.findIndex((id) => id === frameId);
+
+		if (
+			currentIndex === -1 ||
+			targetIndex < 0 ||
+			targetIndex >= frameIds.length ||
+			currentIndex === targetIndex
+		) {
+			return;
+		}
+
+		/**
+		 * remove the frame from the current index
+		 * insert the frame to the target index
+		 */
+		frameIds.splice(currentIndex, 1);
+		frameIds.splice(targetIndex, 0, frameId);
+
+		const reorderedFrames: Record<string, { snapshot: string }> = {};
+		for (const id of frameIds) {
+			reorderedFrames[id] = frames[id];
+		}
+
+		tabs(
+			produce(tabs(), (draft) => {
+				draft[tabId].frames = reorderedFrames;
 			}),
 		);
 	};
@@ -84,6 +172,7 @@ export const useFrames = () => {
 		createFrame,
 		switchFrame,
 		deleteFrame,
+		reorderFrame,
 		updateFrameSnapshot,
 	};
 };

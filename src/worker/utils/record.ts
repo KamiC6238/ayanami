@@ -4,6 +4,7 @@ import type {
 	CanvasType,
 	CircleRecord,
 	CreateFrameRecord,
+	DeleteFrameRecord,
 	EraserRecord,
 	LineRecord,
 	OpRecord,
@@ -40,7 +41,7 @@ const {
 } = useRecords();
 
 const { resetColorPositionMap, clearVisited } = useRender();
-const { createFrame, deleteFrame } = useFrames();
+const { createFrame, deleteFrame, currentFrameId } = useFrames();
 
 const makePencilRecord = (
 	payload: RecordMessagePayload,
@@ -207,6 +208,32 @@ const makeCreateFrameRecord = (
 	return [FrameTypeEnum.Create, frameIndex, previousFrameIndex];
 };
 
+const makeDeleteFrameRecord = (
+	payload: RecordMessagePayload,
+): DeleteFrameRecord | null => {
+	const { tabId, frameId, prevFrameId, originalIndex, shouldSwitchFrame } =
+		payload;
+
+	if (
+		!prevFrameId ||
+		typeof originalIndex !== "number" ||
+		typeof shouldSwitchFrame !== "boolean"
+	) {
+		return null;
+	}
+
+	const frameIndex = getFrameIndex(tabId, frameId);
+	const prevFrameIndex = getFrameIndex(tabId, prevFrameId);
+
+	return [
+		FrameTypeEnum.Delete,
+		frameIndex,
+		prevFrameIndex,
+		originalIndex,
+		shouldSwitchFrame,
+	];
+};
+
 export const record = (payload: RecordMessagePayload) => {
 	const { tabId, toolType, frameType } = payload;
 	let record: OpRecord | null = null;
@@ -239,6 +266,9 @@ export const record = (payload: RecordMessagePayload) => {
 			break;
 		case FrameTypeEnum.Create:
 			record = makeCreateFrameRecord(payload);
+			break;
+		case FrameTypeEnum.Delete:
+			record = makeDeleteFrameRecord(payload);
 			break;
 	}
 
@@ -300,24 +330,74 @@ const _undoRedoFrameRecord = (
 	},
 ) => {
 	const { tabId, isUndo } = config;
-	const [frameType, frameIndex, prevFrameIndex] = record;
+	const [
+		frameType,
+		frameIndex,
+		prevFrameIndex,
+		originalIndex,
+		shouldSwitchFrame,
+	] = record;
+
+	const _undoCreateFrame = () => {
+		const prevFrameId = getFrameId(tabId, prevFrameIndex);
+		const frameId = getFrameId(tabId, frameIndex);
+		deleteFrame(tabId, frameId);
+		frameUtils.switchFrame({ tabId, frameId: prevFrameId });
+	};
+
+	const _redoCreateFrame = () => {
+		const frameId = getFrameId(tabId, frameIndex);
+		createFrame(tabId, frameId);
+		frameUtils.switchFrame({ tabId, frameId });
+	};
+
+	const _undoDeleteFrame = () => {
+		const frameId = getFrameId(tabId, frameIndex);
+		const _currentFrameId = currentFrameId();
+
+		createFrame(tabId, frameId);
+
+		/**
+		 * if the originalIndex is valid, it means the frame which is deleted is in the middle of the frames,
+		 * so we need to reorder the frames to keep the order of the frames
+		 */
+		if (typeof originalIndex === "number" && originalIndex >= 0) {
+			frameUtils.reorderFrame({ tabId, frameId, targetIndex: originalIndex });
+		}
+
+		frameUtils.switchFrame({ tabId, frameId });
+
+		/**
+		 * if shouldSwitchFrame is false,
+		 * it means the frame which is deleted is not the current frame before the delete operation,
+		 * so after the delete operation, we need to switch back to the current frame before the delete operation
+		 */
+		if (!shouldSwitchFrame) {
+			frameUtils.switchFrame({ tabId, frameId: _currentFrameId });
+		}
+	};
+
+	const _redoDeleteFrame = () => {
+		const frameId = getFrameId(tabId, frameIndex);
+		const prevFrameId = getFrameId(tabId, prevFrameIndex);
+		deleteFrame(tabId, frameId);
+		frameUtils.switchFrame({ tabId, frameId: prevFrameId });
+	};
 
 	if (isUndo) {
 		addRecordToRedoStack(tabId, record);
-
-		if (frameType === FrameTypeEnum.Create) {
-			const prevFrameId = getFrameId(tabId, prevFrameIndex);
-			const frameId = getFrameId(tabId, frameIndex);
-			deleteFrame(tabId, frameId);
-			frameUtils.switchFrame({ tabId, frameId: prevFrameId });
-		}
 	} else {
 		addRecordToUndoStack(tabId, record);
+	}
 
-		if (frameType === FrameTypeEnum.Create) {
-			const frameId = getFrameId(tabId, frameIndex);
-			createFrame(tabId, frameId);
-			frameUtils.switchFrame({ tabId, frameId });
+	switch (frameType) {
+		case FrameTypeEnum.Create: {
+			isUndo ? _undoCreateFrame() : _redoCreateFrame();
+			break;
+		}
+		case FrameTypeEnum.Delete: {
+			isUndo ? _undoDeleteFrame() : _redoDeleteFrame();
+			break;
 		}
 	}
 };

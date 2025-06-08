@@ -7,6 +7,7 @@ const emit = defineEmits<(e: "delete") => void>();
 defineProps<
 	Frame & {
 		active: boolean;
+		enableDelete: boolean;
 	}
 >();
 </script>
@@ -18,6 +19,7 @@ defineProps<
     <div class='relative'>
       <img :src="snapshot" />
       <div
+        v-if='enableDelete'
         class='absolute top-0 right-0'
         @click.stop='emit("delete")'
       >d</div>

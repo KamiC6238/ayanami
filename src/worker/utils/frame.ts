@@ -10,12 +10,11 @@ import * as recordUtils from "./record";
 const { getRecordsWithFrameId } = useRecords();
 const { getCanvas } = useRender();
 const {
-	currentFrameId,
 	createFrame: _createFrame,
 	switchFrame: _switchFrame,
 	deleteFrame: _deleteFrame,
-	getPrevFrameId,
 	updateFrameSnapshot,
+	reorderFrame: _reorderFrame,
 } = useFrames();
 
 export const generateSnapshot = (config: {
@@ -61,21 +60,29 @@ export const switchFrame = (payload: SwitchFrameMessagePayload) => {
 
 export const deleteFrame = (payload: DeleteFrameMessagePayload) => {
 	const { tabId, frameId } = payload;
-	let prevFrameId = "";
-
-	if (frameId === currentFrameId()) {
-		prevFrameId = getPrevFrameId(tabId, frameId);
-	}
-
-	_deleteFrame(tabId, frameId);
-
-	// recordUtils.record({
-	//   tabId,
-	//   frameId,
-	//   prevFrameId,
-	//   frameType: FrameTypeEnum.Delete,
-	// });
-
+	const { prevFrameId, originalIndex, shouldSwitchFrame } = _deleteFrame(
+		tabId,
+		frameId,
+	);
 	if (!prevFrameId) return;
+
+	recordUtils.record({
+		tabId,
+		frameId,
+		prevFrameId,
+		originalIndex,
+		shouldSwitchFrame,
+		frameType: FrameTypeEnum.Delete,
+	});
+
 	switchFrame({ tabId, frameId: prevFrameId });
+};
+
+export const reorderFrame = (config: {
+	tabId: string;
+	frameId: string;
+	targetIndex: number;
+}) => {
+	const { tabId, frameId, targetIndex } = config;
+	_reorderFrame(tabId, frameId, targetIndex);
 };

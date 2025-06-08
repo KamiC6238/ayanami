@@ -126,6 +126,7 @@ const onFramesActionsHandler = (icon: string) => {
           class='mb-2'
           :snapshot='frames[frameId].snapshot'
           :active='currentFrameId === frameId'
+          :enable-delete='Object.keys(frames).length > 1'
           @click='() => framesStore.onFrameAction("switchFrame", { frameId })'
           @delete='() => framesStore.onFrameAction("deleteFrame", { frameId })'
         >

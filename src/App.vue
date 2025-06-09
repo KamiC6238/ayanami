@@ -2,6 +2,7 @@
 import {
 	Canvas,
 	ColorPicker,
+	FrameActions,
 	Frames,
 	Palette,
 	PixelBorderSecondary,
@@ -47,7 +48,10 @@ generatePixelBorder(4, 3);
             <div class='flex w-full h-[calc(100%-40px)]'>
               <PixelBorderSecondary>
                 <Canvas />
-                <UndoRedo />
+                <div class='absolute w-full flex justify-between items-center bottom-2 pl-2 pr-2'>
+                  <FrameActions />
+                  <UndoRedo />
+                </div>
               </PixelBorderSecondary>
               <Toolbar />
             </div>

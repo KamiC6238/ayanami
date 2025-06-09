@@ -36,7 +36,7 @@ const updateSnapshot = () => {
 		currentFrameIndex.value = 0;
 	}
 
-	snapshot.value = framesSnapshot.value[currentFrameIndex.value];
+	snapshot.value = framesSnapshot.value[currentFrameIndex.value] ?? "";
 };
 
 const clearInterval = () => {

@@ -12,12 +12,22 @@ const { frames, currentFrameId } = storeToRefs(framesStore);
     <PixelBorderSecondary
       wrapper-width='w-[135px]'
       wrapper-height='h-[600px]'
-      content-cls='flex flex-col items-center pt-2.5 pb-2.5'
+      content-cls='flex flex-col items-center pt-2.5 pb-2.5 overflow-auto'
       background='bg-[#6e8f8b]'
     >
-      <div v-for='frameId of Object.keys(frames)' class='relative' :key='frameId'>
+      <div
+        v-for='frameId of Object.keys(frames)'
+        :class='[
+          "relative",
+          "mb-2",
+          currentFrameId === frameId
+            ? "w-[105%] flex items-center justify-center bg-[#4c5d5b]"
+            : ""
+          ]
+        '
+        :key='frameId'
+      >
         <Frame
-          class='mb-2'
           :snapshot='frames[frameId].snapshot ?? ""'
           :active='currentFrameId === frameId'
           :enable-delete='Object.keys(frames).length > 1'

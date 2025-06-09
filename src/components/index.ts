@@ -7,4 +7,4 @@ export { default as SocialMedia } from "./SocialMedia.vue";
 export { default as UndoRedo } from "./UndoRedo.vue";
 export { default as Dialog } from "./Dialog.vue";
 export { default as Frames } from "./Frames/index.vue";
-export { default as FrameActions } from "./Frames/frameActions.vue";
+export { default as FrameActions } from "./Frames/FrameActions.vue";

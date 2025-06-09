@@ -2,7 +2,7 @@
 import { useFramesStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { PixelBorderSecondary } from "../PixelBorder";
-import Frame from "./frame.vue";
+import Frame from "./Frame.vue";
 
 const framesStore = useFramesStore();
 const { frames, currentFrameId } = storeToRefs(framesStore);

@@ -7,7 +7,11 @@ export enum ExportTypeEnum {
 	Source = "source",
 }
 
-export type FrameAction = "createFrame" | "switchFrame" | "deleteFrame";
+export type FrameAction =
+	| "createFrame"
+	| "switchFrame"
+	| "deleteFrame"
+	| "copyFrame";
 
 export type MessageType =
 	| "init"
@@ -119,6 +123,7 @@ export interface RecordMessagePayload {
 	circleEndPosition?: Position;
 	originalIndex?: number;
 	shouldSwitchFrame?: boolean;
+	sourceFrameId?: string;
 }
 
 export interface ExportMessagePayload {
@@ -139,11 +144,15 @@ export interface RedoOrUndoMessagePayload {
 export interface SwitchFrameMessagePayload {
 	tabId: string;
 	frameId: string;
+	sourceFrameId?: string;
+	shouldClear?: boolean;
 }
 
 export type CreateFrameMessagePayload = SwitchFrameMessagePayload;
 
 export type DeleteFrameMessagePayload = SwitchFrameMessagePayload;
+
+export type CopyFrameMessagePayload = SwitchFrameMessagePayload;
 
 export type MessagePayload =
 	| InitMessagePayload
@@ -161,7 +170,8 @@ export type MessagePayload =
 	| ExportMessagePayload
 	| ImportMessagePayload
 	| SwitchFrameMessagePayload
-	| DeleteFrameMessagePayload;
+	| DeleteFrameMessagePayload
+	| CopyFrameMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;

@@ -4,6 +4,7 @@ import type {
 	ClearAllPixelsMessagePayload,
 	ClearHoverRectMessagePayload,
 	ClearRectMessagePayload,
+	CopyFrameMessagePayload,
 	CreateFrameMessagePayload,
 	DeleteFrameMessagePayload,
 	ExportMessagePayload,
@@ -92,6 +93,9 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "createFrame":
 			frameUtils.createFrame(payload as CreateFrameMessagePayload);
+			break;
+		case "copyFrame":
+			frameUtils.copyFrame(payload as CopyFrameMessagePayload);
 			break;
 		case "switchFrame":
 			frameUtils.switchFrame(payload as SwitchFrameMessagePayload);

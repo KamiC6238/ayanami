@@ -79,10 +79,6 @@ export const importFile = (payload: ImportMessagePayload) => {
 			const data = JSON.parse(content) as SourceFile;
 			const { colorsIndex, framesIndex, records } = data;
 
-			/**
-			 * TODO: FIXME 导入文件需要新开一个 tab 而不是在当前 tab 上导入
-			 * 否则会和动画帧冲突，导致动画帧的记录被覆盖
-			 */
 			setRecordsFromImportFile(tabId, {
 				undoStack: records,
 				colorsIndex,

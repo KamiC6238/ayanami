@@ -88,6 +88,8 @@ export type CopyFrameRecord = [
 	FrameTypeEnum,
 	// frameIndex
 	number,
+	// previousFrameIndex & sourceFrameIndex
+	number,
 ];
 
 export type DeleteFrameRecord = [
@@ -104,6 +106,8 @@ export type DeleteFrameRecord = [
 
 export type OpRecord = {
 	returnFrameId?: string;
+	timestamp?: number; // Timestamp when record was created
+	copyTimestamp?: number; // Copy timestamp for copied frame records
 } & (
 	| PencilRecord
 	| EraserRecord

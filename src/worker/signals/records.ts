@@ -51,6 +51,20 @@ export const useRecords = () => {
 		});
 	};
 
+	const getDrawRecordsWithFrameId = (tabId: string, frameId: string) => {
+		const undoStack = getUndoStack(tabId);
+		return undoStack.filter((record) => {
+			const [type, frameIndex] = record;
+			const _frameIndex = getFrameIndex(tabId, frameId);
+			return (
+				_frameIndex === frameIndex &&
+				type !== FrameTypeEnum.Create &&
+				type !== FrameTypeEnum.Delete &&
+				type !== FrameTypeEnum.Copy
+			);
+		});
+	};
+
 	const getColor = (tabId: string, colorIndex: number) => {
 		const records = getRecords(tabId);
 
@@ -139,14 +153,20 @@ export const useRecords = () => {
 				if (!_record) return;
 
 				/**
-				 * Read returnFrameId before JSON.stringify,
-				 * because JSON.stringify will clear the returnFrameId
+				 * Read returnFrameId, timestamp, copyTimestamp before JSON.stringify,
+				 * because JSON.stringify will clear these fields
 				 */
-				const returnFrameId = _record.returnFrameId;
+				const { returnFrameId, timestamp, copyTimestamp } = _record;
 				record = JSON.parse(JSON.stringify(_record)) as OpRecord;
 
 				if (returnFrameId) {
 					record.returnFrameId = returnFrameId;
+				}
+				if (timestamp) {
+					record.timestamp = timestamp;
+				}
+				if (copyTimestamp) {
+					record.copyTimestamp = copyTimestamp;
 				}
 			}),
 		);
@@ -163,14 +183,20 @@ export const useRecords = () => {
 				if (!_record) return;
 
 				/**
-				 * Read returnFrameId before JSON.stringify,
-				 * because JSON.stringify will clear the returnFrameId
+				 * Read returnFrameId, timestamp, copyTimestamp before JSON.stringify,
+				 * because JSON.stringify will clear these fields
 				 */
-				const returnFrameId = _record.returnFrameId;
+				const { returnFrameId, timestamp, copyTimestamp } = _record;
 				record = JSON.parse(JSON.stringify(_record)) as OpRecord;
 
 				if (returnFrameId) {
 					record.returnFrameId = returnFrameId;
+				}
+				if (timestamp) {
+					record.timestamp = timestamp;
+				}
+				if (copyTimestamp) {
+					record.copyTimestamp = copyTimestamp;
 				}
 			}),
 		);
@@ -273,7 +299,6 @@ export const useRecords = () => {
 		eraserRecordPoints([]);
 	};
 
-	// TODO: FIXME 这里需要加上 frameId 来清除 redoStack
 	const clearRedoStack = (tabId: string) => {
 		records(
 			produce(records(), (draft) => {
@@ -323,6 +348,7 @@ export const useRecords = () => {
 		getUndoStack,
 		getRedoStack,
 		getRecordsWithFrameId,
+		getDrawRecordsWithFrameId,
 		popUndoStack,
 		popRedoStack,
 		addRecordToUndoStack,

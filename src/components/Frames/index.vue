@@ -124,11 +124,12 @@ const onFramesActionsHandler = (icon: string) => {
       <div v-for='frameId of Object.keys(frames)' class='relative' :key='frameId'>
         <Frame
           class='mb-2'
-          :snapshot='frames[frameId].snapshot'
+          :snapshot='frames[frameId].snapshot ?? ""'
           :active='currentFrameId === frameId'
           :enable-delete='Object.keys(frames).length > 1'
           @click='() => framesStore.onFrameAction("switchFrame", { frameId })'
           @delete='() => framesStore.onFrameAction("deleteFrame", { frameId })'
+          @copy='() => framesStore.onFrameAction("copyFrame", { frameId })'
         >
         </Frame>
         <ActiveFrameIcon

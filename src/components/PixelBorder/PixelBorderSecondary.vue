@@ -30,20 +30,8 @@ defineProps<Props>();
         'w-[calc(100%-19px)]',
         'h-[calc(100%-19px)]',
         contentCls,
-        'scroll-hidden'
       )">
       <slot />
     </div>
   </div>
 </template>
-<style scoped>
-.scroll-hidden {
-  overflow: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scroll-hidden::-webkit-scrollbar {
-  display: none;
-}
-</style>

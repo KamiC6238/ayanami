@@ -38,7 +38,9 @@ export const useRender = () => {
 	};
 
 	const getCanvas = (canvasType: CanvasType) => {
-		return canvasType === "main" ? mainCanvas() : previewCanvas();
+		if (canvasType === "main") return mainCanvas();
+		if (canvasType === "grid") return gridCanvas();
+		return previewCanvas();
 	};
 
 	const getContext = (canvasType: CanvasType) => {

@@ -12,7 +12,7 @@ const { frames, currentFrameId } = storeToRefs(framesStore);
     <PixelBorderSecondary
       wrapper-width='w-[135px]'
       wrapper-height='h-[600px]'
-      content-cls='flex flex-col items-center pt-2.5 pb-2.5 overflow-auto'
+      content-cls='flex flex-col items-center pt-2.5 pb-2.5 overflow-auto w-[calc(100%-13px)] left-[3px]'
       background='bg-[#6e8f8b]'
     >
       <div

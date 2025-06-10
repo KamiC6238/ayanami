@@ -48,6 +48,11 @@ const onFileChange = (e: Event) => {
 	if (!file) return;
 
 	canvasStore.importFile(file);
+	/**
+	 * why do this?
+	 * because if we don't do this, the same file will not be selected again
+	 */
+	target.value = "";
 };
 
 const onExport = (exportType: ExportTypeEnum) => {

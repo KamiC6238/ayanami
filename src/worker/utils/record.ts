@@ -42,6 +42,7 @@ const {
 	checkIfFrameRecord,
 	getRecords,
 	getDrawRecordsWithFrameId,
+	getRedoStack,
 } = useRecords();
 
 const { resetColorPositionMap, clearVisited } = useRender();
@@ -50,7 +51,7 @@ const { getFrame, createFrame, deleteFrame, currentFrameId } = useFrames();
 // Helper function to replay individual frame records
 const replayCurrentFrameRecords = (tabId: string, frameId: string) => {
 	const currentFrameDrawRecords = getDrawRecordsWithFrameId(tabId, frameId);
-	replayRecords(currentFrameDrawRecords, { tabId, shouldClear: false });
+	replayDrawRecords(currentFrameDrawRecords, { tabId, shouldClear: false });
 };
 
 // Replay drawing records from frame chain (exported for use by other modules)
@@ -77,7 +78,7 @@ export const replayFrameChain = (
 			}
 		}
 
-		replayRecords(filteredRecords, { tabId, shouldClear: isFirstReplay });
+		replayDrawRecords(filteredRecords, { tabId, shouldClear: isFirstReplay });
 		isFirstReplay = false;
 	}
 	return !isFirstReplay; // Return whether canvas has been cleared
@@ -90,7 +91,7 @@ export const replayFrameRecords = (
 	shouldClear: boolean,
 ) => {
 	const frameDrawRecords = getDrawRecordsWithFrameId(tabId, frameId);
-	replayRecords(frameDrawRecords, { tabId, shouldClear });
+	replayDrawRecords(frameDrawRecords, { tabId, shouldClear });
 };
 
 const makePencilRecord = (
@@ -633,7 +634,20 @@ export const undo = (payload: RedoOrUndoMessagePayload) => {
 	_undoRedo(payload, { isUndo: true });
 };
 
-export const replayRecords = (
+export const replayAllRecordsFromImportFile = (tabId: string) => {
+	const redoStack = getRedoStack(tabId);
+	for (let i = redoStack.length - 1; i >= 0; i--) {
+		const record = redoStack[i];
+		const [, frameIndex] = record;
+
+		redo({
+			tabId,
+			frameId: getFrameId(tabId, frameIndex),
+		});
+	}
+};
+
+export const replayDrawRecords = (
 	records: OpRecord[],
 	config: ReplayRecordsConfig,
 ) => {

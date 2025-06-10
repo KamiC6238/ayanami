@@ -17,7 +17,7 @@ export type EraserRecord = [
 	ToolTypeEnum,
 	// frameIndex
 	number,
-	// colorIndex
+	// pixelSize
 	number,
 	Array<EraserPointRecord>,
 ];
@@ -130,3 +130,5 @@ export interface Records {
 		redoStack: OpRecord[];
 	};
 }
+
+export type ExportOpRecord = unknown[];

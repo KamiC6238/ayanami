@@ -314,8 +314,8 @@ export const useRecords = () => {
 		records(
 			produce(records(), (draft) => {
 				draft[tabId] = {
-					redoStack: [],
-					undoStack: [...config.undoStack],
+					undoStack: [],
+					redoStack: [...config.redoStack],
 					colorsIndex: [...config.colorsIndex],
 					framesIndex: [...config.framesIndex],
 					tabId,

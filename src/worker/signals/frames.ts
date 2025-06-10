@@ -264,9 +264,21 @@ export const useFrames = () => {
 		});
 	};
 
+	const setFramesFromImportFile = (
+		tabId: string,
+		frames: Record<string, Frame>,
+	) => {
+		tabs(
+			produce(tabs(), (draft) => {
+				draft[tabId] = { frames: { ...frames } };
+			}),
+		);
+	};
+
 	return {
 		tabs,
 		currentFrameId,
+		setFramesFromImportFile,
 		getFrame,
 		getPrevFrameId,
 		createFrame,

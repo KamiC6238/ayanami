@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import CopyIcon from "@/assets/icons/copy.svg";
-import TrashIcon from "@/assets/icons/trash.svg";
 import type { Frame } from "@/types";
 import { ref } from "vue";
 import { PixelBorderSecondary } from "../PixelBorder";

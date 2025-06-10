@@ -30,16 +30,18 @@ const displayFrameAction = ref(false);
       @mouseleave='displayFrameAction = false'
     >
       <img :src="snapshot" />
-      <TrashIcon
+      <div
         v-show='displayFrameAction && enableDelete'
-        class='absolute top-0 right-0 w-4 h-4 cursor-pointer'
+        class='absolute top-0 right-0 cursor-pointer text-[10px]'
         @click.stop='emit("delete")'
-      />
-      <CopyIcon
+      >del
+      </div>
+      <div
         v-show='displayFrameAction'
-        class='absolute bottom-0 right-0 w-4 h-4 cursor-pointer'
+        class='absolute bottom-0 right-0 cursor-pointer text-[10px]'
         @click.stop='emit("copy")'
-      />
+      >copy
+      </div>
     </div>
   </PixelBorderSecondary>
 </template>

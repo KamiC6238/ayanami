@@ -1,3 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9" class="pixelicon-arrow-up">
-	<polygon fill="#000000" points="5,8 5,4 7,4 7,3 6,3 6,2 5,2 5,1 4,1 4,2 3,2 3,3 2,3 2,4 4,4 4,8"/>
-</svg>
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M11 5V3h2v2h2v2h2v2h-2V7h-2v10h-2V7H9v2H7V7h2V5h2zM3 15v6h18v-6h-2v4H5v-4H3z" fill="currentColor"/> </svg>

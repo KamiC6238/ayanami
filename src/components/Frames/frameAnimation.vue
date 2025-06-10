@@ -25,6 +25,16 @@ watch(
 	},
 );
 
+watch(
+	() => frameDuration.value,
+	(newVal) => {
+		if (!isFramesPlaying.value) return;
+
+		clearInterval();
+		interval.value = window.setInterval(updateSnapshot, newVal);
+	},
+);
+
 const updateSnapshot = () => {
 	if (!isFramesPlaying.value) {
 		return;

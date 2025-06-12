@@ -40,59 +40,13 @@ const {
 	addRecordToRedoStack,
 	getFrameId,
 	checkIfFrameRecord,
-	getRecords,
 	getDrawRecordsWithFrameId,
 	getRedoStack,
 } = useRecords();
 
 const { resetColorPositionMap, clearVisited } = useRender();
-const { getFrame, createFrame, deleteFrame, currentFrameId } = useFrames();
-
-// Helper function to replay individual frame records
-const replayCurrentFrameRecords = (tabId: string, frameId: string) => {
-	const currentFrameDrawRecords = getDrawRecordsWithFrameId(tabId, frameId);
-	replayDrawRecords(currentFrameDrawRecords, { tabId, shouldClear: false });
-};
-
-// Replay drawing records from frame chain (exported for use by other modules)
-export const replayFrameChain = (
-	tabId: string,
-	frameChain: string[],
-	timestampLimits?: Record<string, number>,
-	fallbackTimestamp?: number,
-) => {
-	let isFirstReplay = true;
-	for (const chainFrameId of frameChain) {
-		const chainDrawRecords = getDrawRecordsWithFrameId(tabId, chainFrameId);
-
-		// Filter records if timestamp limits exist
-		let filteredRecords = chainDrawRecords;
-		if (timestampLimits || fallbackTimestamp) {
-			const timestampLimit =
-				timestampLimits?.[chainFrameId] || fallbackTimestamp;
-			if (timestampLimit) {
-				filteredRecords =
-					chainDrawRecords?.filter(
-						(record) => !record.timestamp || record.timestamp <= timestampLimit,
-					) || [];
-			}
-		}
-
-		replayDrawRecords(filteredRecords, { tabId, shouldClear: isFirstReplay });
-		isFirstReplay = false;
-	}
-	return !isFirstReplay; // Return whether canvas has been cleared
-};
-
-// Replay drawing records of individual frame (exported for use by other modules)
-export const replayFrameRecords = (
-	tabId: string,
-	frameId: string,
-	shouldClear: boolean,
-) => {
-	const frameDrawRecords = getDrawRecordsWithFrameId(tabId, frameId);
-	replayDrawRecords(frameDrawRecords, { tabId, shouldClear });
-};
+const { getFrame, createFrame, deleteFrame, currentFrameId, tabs } =
+	useFrames();
 
 const makePencilRecord = (
 	payload: RecordMessagePayload,
@@ -262,8 +216,14 @@ const makeCreateFrameRecord = (
 const makeDeleteFrameRecord = (
 	payload: RecordMessagePayload,
 ): DeleteFrameRecord | null => {
-	const { tabId, frameId, prevFrameId, originalIndex, shouldSwitchFrame } =
-		payload;
+	const {
+		tabId,
+		frameId,
+		prevFrameId,
+		originalIndex,
+		shouldSwitchFrame,
+		frameToDelete,
+	} = payload;
 
 	if (
 		!prevFrameId ||
@@ -276,12 +236,18 @@ const makeDeleteFrameRecord = (
 	const frameIndex = getFrameIndex(tabId, frameId);
 	const prevFrameIndex = getFrameIndex(tabId, prevFrameId);
 
+	// Use the pre-captured frame information
+	const sourceFrameIndex = frameToDelete?.sourceFrameId
+		? getFrameIndex(tabId, frameToDelete.sourceFrameId)
+		: -1;
+
 	return [
 		FrameTypeEnum.Delete,
 		frameIndex,
 		prevFrameIndex,
 		originalIndex,
 		shouldSwitchFrame,
+		sourceFrameIndex,
 	];
 };
 
@@ -344,6 +310,10 @@ export const record = (payload: RecordMessagePayload) => {
 			break;
 		case FrameTypeEnum.Delete:
 			record = makeDeleteFrameRecord(payload);
+			// Save copy timestamp for copied frames
+			if (record && payload.frameToDelete?.copyTimestamp) {
+				record.copyTimestamp = payload.frameToDelete.copyTimestamp;
+			}
 			break;
 	}
 
@@ -434,6 +404,62 @@ const _undoRedoDrawRecord = (
 	}
 };
 
+// Common function to create a copied frame with proper source frame chain and timestamp handling
+const createCopiedFrame = (
+	tabId: string,
+	frameId: string,
+	sourceFrameId: string,
+	copyTimestamp: number,
+) => {
+	// Get source frame information
+	const sourceFrame = getFrame(tabId, sourceFrameId);
+	const sourceFrameChain = sourceFrame?.sourceFrameChain ?? [];
+
+	// Check if source frame has its own drawing records
+	const sourceFrameDrawRecords = getDrawRecordsWithFrameId(
+		tabId,
+		sourceFrameId,
+	);
+	const hasSourceFrameDrawRecords =
+		sourceFrameDrawRecords && sourceFrameDrawRecords.length > 0;
+
+	let newSourceFrameChain: string[] = [];
+	let sourceFrameTimestamps: Record<string, number> = {};
+
+	if (hasSourceFrameDrawRecords) {
+		// Source frame has drawing records, add source frame to dependency chain
+		newSourceFrameChain = [...sourceFrameChain, sourceFrameId];
+
+		// Inherit timestamp limits from source frame
+		sourceFrameTimestamps = { ...sourceFrame?.sourceFrameTimestamps };
+
+		// Set timestamp limits for each frame in dependency chain
+		for (const chainFrameId of sourceFrameChain) {
+			if (!sourceFrameTimestamps[chainFrameId]) {
+				sourceFrameTimestamps[chainFrameId] = copyTimestamp;
+			}
+		}
+
+		// Set timestamp limit for source frame
+		sourceFrameTimestamps[sourceFrameId] = copyTimestamp;
+	} else {
+		// Source frame has no drawing records (pure copied frame), inherit its dependency chain and timestamp constraints
+		newSourceFrameChain = sourceFrameChain;
+		// Directly inherit timestamp limits from source frame
+		sourceFrameTimestamps = { ...sourceFrame?.sourceFrameTimestamps };
+	}
+
+	// Create frame with complete copied frame configuration
+	createFrame(tabId, {
+		frameId,
+		isCopiedFrame: true,
+		sourceFrameId,
+		sourceFrameChain: newSourceFrameChain,
+		copyTimestamp: copyTimestamp,
+		sourceFrameTimestamps: sourceFrameTimestamps,
+	});
+};
+
 const _undoRedoFrameRecord = (
 	record: OpRecord,
 	config: {
@@ -466,8 +492,18 @@ const _undoRedoFrameRecord = (
 	const _undoDeleteFrame = () => {
 		const frameId = getFrameId(tabId, frameIndex);
 		const _currentFrameId = currentFrameId();
+		const [, , , , , sourceFrameIndex] = record as DeleteFrameRecord;
 
-		createFrame(tabId, { frameId });
+		if (sourceFrameIndex !== -1) {
+			// This was a copied frame, recreate it using the common function
+			const sourceFrameId = getFrameId(tabId, sourceFrameIndex);
+			const copyTimestamp = record.copyTimestamp || Date.now();
+
+			createCopiedFrame(tabId, frameId, sourceFrameId, copyTimestamp);
+		} else {
+			// This was a regular frame
+			createFrame(tabId, { frameId });
+		}
 
 		/**
 		 * if the originalIndex is valid, it means the frame which is deleted is in the middle of the frames,
@@ -510,76 +546,26 @@ const _undoRedoFrameRecord = (
 		const [, , sourceFrameIndex] = record as CopyFrameRecord;
 		const sourceFrameId = getFrameId(tabId, sourceFrameIndex);
 
-		// Get source frame information
-		const sourceFrame = getFrame(tabId, sourceFrameId);
-		const sourceFrameChain = sourceFrame?.sourceFrameChain ?? [];
-
-		// Check if source frame has its own drawing records
-		const sourceFrameDrawRecords = getDrawRecordsWithFrameId(
-			tabId,
-			sourceFrameId,
-		);
-		const hasSourceFrameDrawRecords =
-			sourceFrameDrawRecords && sourceFrameDrawRecords.length > 0;
-
 		// Use copy timestamp saved in record, fallback to current time if not available
 		const copyTimestamp = record.copyTimestamp || Date.now();
 
-		let newSourceFrameChain: string[] = [];
-		let sourceFrameTimestamps: Record<string, number> = {};
-
-		if (hasSourceFrameDrawRecords) {
-			// Source frame has drawing records, add source frame to dependency chain
-			newSourceFrameChain = [...sourceFrameChain, sourceFrameId];
-
-			// Inherit timestamp limits from source frame
-			sourceFrameTimestamps = { ...sourceFrame?.sourceFrameTimestamps };
-
-			// Set timestamp limits for each frame in dependency chain
-			for (const chainFrameId of sourceFrameChain) {
-				if (!sourceFrameTimestamps[chainFrameId]) {
-					sourceFrameTimestamps[chainFrameId] = copyTimestamp;
-				}
-			}
-
-			// Set timestamp limit for source frame
-			sourceFrameTimestamps[sourceFrameId] = copyTimestamp;
-		} else {
-			// Source frame has no drawing records (pure copied frame), inherit its dependency chain and timestamp constraints
-			newSourceFrameChain = sourceFrameChain;
-			// Directly inherit timestamp limits from source frame
-			sourceFrameTimestamps = { ...sourceFrame?.sourceFrameTimestamps };
-		}
-
-		createFrame(tabId, {
-			frameId,
-			isCopiedFrame: true,
-			sourceFrameId,
-			sourceFrameChain: newSourceFrameChain,
-			copyTimestamp: copyTimestamp,
-			sourceFrameTimestamps: sourceFrameTimestamps,
-		});
+		// Create copied frame using the common function
+		createCopiedFrame(tabId, frameId, sourceFrameId, copyTimestamp);
 
 		// Reorder: move new frame to position after source frame
-		// Use same logic as normal copyFrame
-		// First switch to newly created frame, then calculate correct target position
-		frameUtils.switchFrame({ tabId, frameId });
+		// Use same logic as normal copyFrame - get current frame order from frames object
+		const frames = tabs()[tabId]?.frames;
+		if (frames) {
+			const frameIds = Object.keys(frames);
+			const sourcePosition = frameIds.findIndex(
+				(id: string) => id === sourceFrameId,
+			);
 
-		// Since we cannot directly access frames object to get accurate index,
-		// we use a practical approach: place new frame directly after source frame
-		// Achieve correct position through multiple adjustments
-
-		// Get source frame position in framesIndex as reference
-		const framesIndex = getRecords(tabId).framesIndex;
-		const sourcePosition = framesIndex.findIndex(
-			(id: string) => id === sourceFrameId,
-		);
-
-		if (sourcePosition !== -1) {
-			// Move new frame to position after source frame
-			// Since new frame is created at the end by default, we need to move it to correct position
-			const targetIndex = sourcePosition + 1;
-			frameUtils.reorderFrame({ tabId, frameId, targetIndex });
+			if (sourcePosition !== -1) {
+				// Move new frame to position after source frame
+				const targetIndex = sourcePosition + 1;
+				frameUtils.reorderFrame({ tabId, frameId, targetIndex });
+			}
 		}
 
 		frameUtils.switchFrame({
@@ -632,6 +618,52 @@ export const redo = (payload: RedoOrUndoMessagePayload) => {
 
 export const undo = (payload: RedoOrUndoMessagePayload) => {
 	_undoRedo(payload, { isUndo: true });
+};
+
+// Helper function to replay individual frame records
+const replayCurrentFrameRecords = (tabId: string, frameId: string) => {
+	const currentFrameDrawRecords = getDrawRecordsWithFrameId(tabId, frameId);
+	replayDrawRecords(currentFrameDrawRecords, { tabId, shouldClear: false });
+};
+
+// Replay drawing records from frame chain (exported for use by other modules)
+export const replayFrameChain = (
+	tabId: string,
+	frameChain: string[],
+	timestampLimits?: Record<string, number>,
+	fallbackTimestamp?: number,
+) => {
+	let isFirstReplay = true;
+	for (const chainFrameId of frameChain) {
+		const chainDrawRecords = getDrawRecordsWithFrameId(tabId, chainFrameId);
+
+		// Filter records if timestamp limits exist
+		let filteredRecords = chainDrawRecords;
+		if (timestampLimits || fallbackTimestamp) {
+			const timestampLimit =
+				timestampLimits?.[chainFrameId] || fallbackTimestamp;
+			if (timestampLimit) {
+				filteredRecords =
+					chainDrawRecords?.filter(
+						(record) => !record.timestamp || record.timestamp <= timestampLimit,
+					) || [];
+			}
+		}
+
+		replayDrawRecords(filteredRecords, { tabId, shouldClear: isFirstReplay });
+		isFirstReplay = false;
+	}
+	return !isFirstReplay; // Return whether canvas has been cleared
+};
+
+// Replay drawing records of individual frame (exported for use by other modules)
+export const replayFrameRecords = (
+	tabId: string,
+	frameId: string,
+	shouldClear: boolean,
+) => {
+	const frameDrawRecords = getDrawRecordsWithFrameId(tabId, frameId);
+	replayDrawRecords(frameDrawRecords, { tabId, shouldClear });
 };
 
 export const replayAllRecordsFromImportFile = (tabId: string) => {

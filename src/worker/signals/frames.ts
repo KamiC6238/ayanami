@@ -26,7 +26,7 @@ const _updateFrame = (
 		produce(tabs(), (draft) => {
 			draft[tabId] ??= { frames: {} };
 			draft[tabId].frames[frameId] = {
-				...draft[tabId].frames[frameId],
+				...(draft[tabId].frames[frameId] || {}),
 				...config,
 			};
 		}),
@@ -93,6 +93,7 @@ export const useFrames = () => {
 				prevFrameId: "",
 				originalIndex: -1,
 				shouldSwitchFrame: false,
+				frameToDelete: null,
 			};
 		}
 
@@ -138,6 +139,56 @@ export const useFrames = () => {
 			originalIndex: isLastFrame ? -1 : originalIndex,
 			shouldSwitchFrame: isCurrentFrame,
 		};
+	};
+
+	const prepareDeleteFrame = (tabId: string, frameId: string) => {
+		const frames = tabs()[tabId]?.frames;
+		if (!frames) {
+			return {
+				frameId,
+				prevFrameId: "",
+				originalIndex: -1,
+				shouldSwitchFrame: false,
+				frameToDelete: null,
+			};
+		}
+
+		// Capture frame information before deletion
+		const frameToDelete = frames[frameId];
+		const frameIds = Object.keys(frames);
+		const originalIndex = frameIds.findIndex((id) => id === frameId);
+		const isLastFrame = originalIndex === frameIds.length - 1;
+		const isCurrentFrame = frameId === currentFrameId();
+
+		let prevFrameId = "";
+		if (isCurrentFrame) {
+			prevFrameId = getPrevFrameId(tabId, frameId);
+			if (!prevFrameId && frameIds.length > 1) {
+				const nextIndex = originalIndex + 1;
+				if (nextIndex < frameIds.length) {
+					prevFrameId = frameIds[nextIndex];
+				}
+			}
+		} else {
+			prevFrameId = currentFrameId();
+		}
+
+		return {
+			frameId,
+			prevFrameId,
+			originalIndex: isLastFrame ? -1 : originalIndex,
+			shouldSwitchFrame: isCurrentFrame,
+			frameToDelete,
+		};
+	};
+
+	const executeDeleteFrame = (tabId: string, frameId: string) => {
+		tabs(
+			produce(tabs(), (draft) => {
+				draft[tabId] ??= { frames: {} };
+				delete draft[tabId].frames[frameId];
+			}),
+		);
 	};
 
 	const copyFrame = (tabId: string, sourceFrameId: string) => {
@@ -284,6 +335,8 @@ export const useFrames = () => {
 		createFrame,
 		switchFrame,
 		deleteFrame,
+		prepareDeleteFrame,
+		executeDeleteFrame,
 		copyFrame,
 		reorderFrame,
 		updateFrameSnapshot,

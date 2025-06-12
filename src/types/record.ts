@@ -102,6 +102,8 @@ export type DeleteFrameRecord = [
 	number,
 	// shouldSwitchFrame
 	boolean,
+	// sourceFrameIndex (for copied frames, -1 if not a copied frame)
+	number,
 ];
 
 export type OpRecord = {

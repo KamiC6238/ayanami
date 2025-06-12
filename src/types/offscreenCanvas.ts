@@ -1,6 +1,7 @@
 import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
 import type { FrameTypeEnum, ToolTypeEnum } from "./config";
+import type { Frame } from "./frames";
 
 export enum ExportTypeEnum {
 	PNG = "png",
@@ -124,6 +125,7 @@ export interface RecordMessagePayload {
 	originalIndex?: number;
 	shouldSwitchFrame?: boolean;
 	sourceFrameId?: string;
+	frameToDelete?: Frame | null;
 }
 
 export interface ExportMessagePayload {

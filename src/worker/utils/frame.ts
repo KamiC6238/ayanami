@@ -13,6 +13,8 @@ const {
 	createFrame: _createFrame,
 	switchFrame: _switchFrame,
 	deleteFrame: _deleteFrame,
+	prepareDeleteFrame: _prepareDeleteFrame,
+	executeDeleteFrame: _executeDeleteFrame,
 	copyFrame: _copyFrame,
 	updateFrameSnapshot,
 	reorderFrame: _reorderFrame,
@@ -102,12 +104,13 @@ export const switchFrame = (payload: SwitchFrameMessagePayload) => {
 
 export const deleteFrame = (payload: DeleteFrameMessagePayload) => {
 	const { tabId, frameId } = payload;
-	const { prevFrameId, originalIndex, shouldSwitchFrame } = _deleteFrame(
-		tabId,
-		frameId,
-	);
+
+	// 1. Prepare deletion and get frame info (but don't delete yet)
+	const { prevFrameId, originalIndex, shouldSwitchFrame, frameToDelete } =
+		_prepareDeleteFrame(tabId, frameId);
 	if (!prevFrameId) return;
 
+	// 2. Record the operation (frame still exists at this point)
 	recordUtils.record({
 		tabId,
 		frameId,
@@ -115,7 +118,11 @@ export const deleteFrame = (payload: DeleteFrameMessagePayload) => {
 		originalIndex,
 		shouldSwitchFrame,
 		frameType: FrameTypeEnum.Delete,
+		frameToDelete, // Pass the captured frame info
 	});
+
+	// 3. Actually execute the deletion
+	_executeDeleteFrame(tabId, frameId);
 
 	switchFrame({ tabId, frameId: prevFrameId });
 };

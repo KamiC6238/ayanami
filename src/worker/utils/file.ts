@@ -118,16 +118,9 @@ export const importFile = (payload: ImportMessagePayload) => {
 				framesIndex,
 			});
 
-			setFramesFromImportFile(
-				tabId,
-				framesIndex.reduce(
-					(res, frameId) => {
-						res[frameId] = {} as Frame;
-						return res;
-					},
-					{} as Record<string, Frame>,
-				),
-			);
+			setFramesFromImportFile(tabId, {
+				[framesIndex[0]]: {} as Frame,
+			});
 
 			recordUtils.replayAllRecordsFromImportFile(tabId);
 		} catch {}

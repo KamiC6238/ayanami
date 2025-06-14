@@ -668,15 +668,30 @@ export const replayFrameRecords = (
 
 export const replayAllRecordsFromImportFile = (tabId: string) => {
 	const redoStack = getRedoStack(tabId);
-	for (let i = redoStack.length - 1; i >= 0; i--) {
-		const record = redoStack[i];
+	let currentIndex = redoStack.length - 1;
+
+	const replayNext = () => {
+		if (currentIndex < 0) return;
+
+		const record = redoStack[currentIndex];
 		const [, frameIndex] = record;
 
 		redo({
 			tabId,
 			frameId: getFrameId(tabId, frameIndex),
 		});
-	}
+
+		currentIndex--;
+
+		/**
+		 * Use setTimeout to avoid race conditions from alien-signals updating state asynchronously
+		 * alien-signals uses batching and a push-pull system, so state updates aren’t always instant
+		 * This small delay makes sure the previous update finishes before the next action runs
+		 */
+		setTimeout(replayNext, 0);
+	};
+
+	replayNext();
 };
 
 export const replayDrawRecords = (

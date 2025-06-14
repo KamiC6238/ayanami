@@ -55,7 +55,7 @@ const onFileChange = (e: Event) => {
 	target.value = "";
 };
 
-const upload = () => {
+const onUpload = () => {
 	// @ts-ignore
 	uploadRef.value?.click();
 };
@@ -70,7 +70,7 @@ const onExport = (exportType: ExportTypeEnum) => {
     <PixelBorderUltimate>
       <Upload
         class='w-6 h-6 p-1'
-        @click='upload'
+        @click='onUpload'
       />
       <input
         ref='upload'

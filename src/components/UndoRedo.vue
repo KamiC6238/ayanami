@@ -7,7 +7,7 @@ import { PixelBorderUltimate } from "./PixelBorder";
 const canvasStore = useCanvasStore();
 </script>
 <template>
-  <div class="flex absolute bottom-2 right-2 gap-2">
+  <div class="flex gap-2">
     <PixelBorderUltimate @click='canvasStore.undo'>
       <UndoIcon class='w-6 h-6 p-1' />
     </PixelBorderUltimate>

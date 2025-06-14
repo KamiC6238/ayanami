@@ -9,3 +9,10 @@ export enum ToolTypeEnum {
 	Bucket = 7,
 	Broom = 8,
 }
+
+export enum FrameTypeEnum {
+	Unknown = -1,
+	Create = 9,
+	Copy = 10,
+	Delete = 11,
+}

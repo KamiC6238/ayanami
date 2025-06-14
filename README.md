@@ -33,15 +33,11 @@ Huge thanks to [Luke Morrigan](https://github.com/CodeFoodPixels) for [Pixel-Cor
 | 🌈    | Color picker                 |             |
 
 ## 🚧 Version 2.0.0
-- [ ] Supports for persistent storage with [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
-- [ ] Supports multiple frames for animation
-- [ ] Supports canvas zooming
-- [ ] Supports canvas preview
-- [ ] Supports different canvas sizes
-- [ ] Download and save
-  - [ ] as GIF
-- [ ] Select tool
-- [ ] Gradient tool
+- [x] Supports multiple frames for animation
+  - [x] Supports create/copy/delete frame
+  - [x] Supports undo/redo for all frame actions
+- [x] Download and save
+  - [x] as GIF
 
 ## Tech stack
 - [Vue 3](https://vuejs.org/guide/introduction.html)

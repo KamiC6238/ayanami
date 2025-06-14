@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { useCanvasStore } from "@/store";
+import { FrameAnimation } from "@/components";
+import { useCanvasStore, useFramesStore } from "@/store";
+import type { CanvasType } from "@/types";
 import { cn } from "@/utils";
 import { type CSSProperties, onMounted, ref, useTemplateRef } from "vue";
 
@@ -16,9 +18,15 @@ const canvasStyle = ref<CSSProperties>({
 });
 
 const { initCanvas } = useCanvasStore();
+const framesStore = useFramesStore();
 
-const getCanvasCls = (zIndex: number) =>
-	cn(`absolute top-0 bottom-0 left-0 z-${zIndex}`);
+const getCanvasCls = (type: CanvasType, zIndex: number) => {
+	return cn(`
+    absolute
+    top-0 bottom-0 left-0 z-${zIndex}
+    ${framesStore.isFramesPlaying && type !== "grid" ? "hidden" : "block"}
+  `);
+};
 
 onMounted(() => {
 	if (canvas.value && previewCanvas.value && gridCanvas.value) {
@@ -33,9 +41,10 @@ onMounted(() => {
 <template>
   <div class="w-full h-full bg-[#635561] flex items-center justify-center">
     <div class="relative w-[264px] h-[264px]">
-      <canvas ref="gridCanvas" :style="canvasStyle" :class="getCanvasCls(8)" />
-      <canvas ref="canvas" :style="canvasStyle" :class="getCanvasCls(9)" />
-      <canvas ref="previewCanvas" :style="canvasStyle" :class="getCanvasCls(10)" />
+      <canvas ref="gridCanvas" :style="canvasStyle" :class="getCanvasCls('grid', 8)" />
+      <canvas ref="canvas" :style="canvasStyle" :class="getCanvasCls('main', 9)" />
+      <canvas ref="previewCanvas" :style="canvasStyle" :class="getCanvasCls('preview', 10)" />
+      <FrameAnimation />
     </div>
   </div>
 </template>

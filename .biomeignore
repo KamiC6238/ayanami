@@ -1,0 +1,9 @@
+# third-party
+src/worker/gif.worker.js
+
+# build
+dist/
+node_modules/
+
+# testcases
+src/__tests__/

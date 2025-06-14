@@ -1,13 +1,15 @@
-import type { Record } from "./record";
+import type { ExportOpRecord, OpRecord } from "./record";
 
 export interface SourceFile {
 	width: number;
 	height: number;
 	colorsIndex: string[];
-	records: Record[];
+	framesIndex: string[];
+	records: ExportOpRecord[];
 }
 
 export interface ImportFileConfig {
-	undoStack: Record[];
+	redoStack: OpRecord[];
 	colorsIndex: string[];
+	framesIndex: string[];
 }

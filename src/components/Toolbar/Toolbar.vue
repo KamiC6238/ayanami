@@ -13,7 +13,7 @@ import { useCanvasStore, useConfigStore } from "@/store";
 import { ToolTypeEnum } from "@/types";
 import { useLocalStorage } from "@vueuse/core";
 import { onMounted } from "vue";
-import ImportExport from "../ImportExport.vue";
+import { ImportExport } from "../ImportExport";
 import { PixelBorderUltimate } from "../PixelBorder";
 import tools from "./tools";
 

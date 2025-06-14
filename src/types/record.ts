@@ -1,44 +1,68 @@
-import type { ToolTypeEnum } from "./config";
-
-/**
- * @description PointRecord means a point record of a tool,
- * which is a tuple of [x, y, drawCounts].
- * x and y are the coordinates of the point,
- * and drawCounts is the number of times the point is drawn.
- * For example, if a point is drawn 3 times,
- * the PointRecord will be [x, y, 3].
- * If a point is drawn 1 time, the PointRecord will be [x, y, 1].
- *
- * @description [Tool]Record means a record of a tool,
- * which is a tuple of [toolType, pixelColor, pixelSize, points].
- * toolType is the type of the tool,
- * pixelColor is the color of the tool,
- * pixelSize is the size of the tool,
- */
+import type { FrameTypeEnum, ToolTypeEnum } from "./config";
 
 export type PencilPointRecord = [number, number, number];
 export type PencilRecord = [
 	ToolTypeEnum,
+	// frameIndex
 	number,
+	// colorIndex
+	number,
+	// pixelSize
 	number,
 	Array<PencilPointRecord>,
 ];
 
 export type EraserPointRecord = [number, number];
-export type EraserRecord = [ToolTypeEnum, number, Array<EraserPointRecord>];
+export type EraserRecord = [
+	ToolTypeEnum,
+	// frameIndex
+	number,
+	// pixelSize
+	number,
+	Array<EraserPointRecord>,
+];
 
 export type LinePointRecord = [[number, number], [number, number]];
-export type LineRecord = [ToolTypeEnum, number, number, LinePointRecord];
+export type LineRecord = [
+	ToolTypeEnum,
+	// frameIndex
+	number,
+	// colorIndex
+	number,
+	// pixelSize
+	number,
+	LinePointRecord,
+];
 
 export type SquarePointRecord = [[number, number], [number, number]];
-export type SquareRecord = [ToolTypeEnum, number, number, SquarePointRecord];
+export type SquareRecord = [
+	ToolTypeEnum,
+	// frameIndex
+	number,
+	// colorIndex
+	number,
+	// pixelSize
+	number,
+	SquarePointRecord,
+];
 
 export type CirclePointRecord = [[number, number], [number, number]];
-export type CircleRecord = [ToolTypeEnum, number, number, CirclePointRecord];
+export type CircleRecord = [
+	ToolTypeEnum,
+	// frameIndex
+	number,
+	// colorIndex
+	number,
+	// pixelSize
+	number,
+	CirclePointRecord,
+];
 
 export type BucketRecord = [
 	ToolTypeEnum,
-	// replacementColor
+	// frameIndex
+	number,
+	// colorIndex
 	number,
 	// pixelSize
 	number,
@@ -46,25 +70,67 @@ export type BucketRecord = [
 	[number, number],
 ];
 
-export type BroomRecord = [ToolTypeEnum];
+export type BroomRecord = [
+	ToolTypeEnum,
+	// frameIndex
+	number,
+];
 
-export type Record =
+export type CreateFrameRecord = [
+	FrameTypeEnum,
+	// frameIndex
+	number,
+	// previous frameIndex
+	number,
+];
+
+export type CopyFrameRecord = [
+	FrameTypeEnum,
+	// frameIndex
+	number,
+	// previousFrameIndex & sourceFrameIndex
+	number,
+];
+
+export type DeleteFrameRecord = [
+	FrameTypeEnum,
+	// frameIndex
+	number,
+	// previous frameIndex
+	number,
+	// original index position
+	number,
+	// shouldSwitchFrame
+	boolean,
+	// sourceFrameIndex (for copied frames, -1 if not a copied frame)
+	number,
+];
+
+export type OpRecord = {
+	returnFrameId?: string;
+	timestamp?: number; // Timestamp when record was created
+	copyTimestamp?: number; // Copy timestamp for copied frame records
+} & (
 	| PencilRecord
 	| EraserRecord
 	| LineRecord
 	| SquareRecord
 	| CircleRecord
 	| BucketRecord
-	| BroomRecord;
-
-export type RecordStack = {
-	undoStack: Record[];
-	redoStack: Record[];
-};
+	| BroomRecord
+	| CreateFrameRecord
+	| CopyFrameRecord
+	| DeleteFrameRecord
+);
 
 export interface Records {
-	[tabId: string]: RecordStack & {
-		colorsIndex: string[];
+	[tabId: string]: {
 		tabId: string;
+		colorsIndex: string[];
+		framesIndex: string[];
+		undoStack: OpRecord[];
+		redoStack: OpRecord[];
 	};
 }
+
+export type ExportOpRecord = unknown[];

@@ -1,11 +1,19 @@
 import type { CanvasType } from "./canvas";
 import type { Position } from "./common";
-import type { ToolTypeEnum } from "./config";
+import type { FrameTypeEnum, ToolTypeEnum } from "./config";
+import type { Frame } from "./frames";
 
 export enum ExportTypeEnum {
 	PNG = "png",
+	GIF = "gif",
 	Source = "source",
 }
+
+export type FrameAction =
+	| "createFrame"
+	| "switchFrame"
+	| "deleteFrame"
+	| "copyFrame";
 
 export type MessageType =
 	| "init"
@@ -22,7 +30,8 @@ export type MessageType =
 	| "redo"
 	| "undo"
 	| "export"
-	| "import";
+	| "import"
+	| FrameAction;
 
 export interface FillRectMessagePayload {
 	canvasType: CanvasType;
@@ -67,6 +76,7 @@ export interface CircleMessagePayload {
 }
 
 export interface BucketMessagePayload {
+	canvasType: CanvasType;
 	replacementColor: string;
 	position: Position;
 	pixelSize: number;
@@ -91,6 +101,7 @@ export interface ClearAllPixelsMessagePayload {
 }
 
 export interface InitMessagePayload {
+	tabId: string;
 	dpr: number;
 	clientWidth: number;
 	clientHeight: number;
@@ -99,9 +110,12 @@ export interface InitMessagePayload {
 
 export interface RecordMessagePayload {
 	tabId: string;
-	toolType: ToolTypeEnum;
-	pixelSize: number;
-	pixelColor: string;
+	frameId: string;
+	prevFrameId?: string;
+	toolType?: ToolTypeEnum;
+	frameType?: FrameTypeEnum;
+	pixelSize?: number;
+	pixelColor?: string;
 	position?: Position;
 	lineStartPosition?: Position;
 	lineEndPosition?: Position;
@@ -109,6 +123,10 @@ export interface RecordMessagePayload {
 	squareEndPosition?: Position;
 	circleStartPosition?: Position;
 	circleEndPosition?: Position;
+	originalIndex?: number;
+	shouldSwitchFrame?: boolean;
+	sourceFrameId?: string;
+	frameToDelete?: Frame | null;
 }
 
 export interface ExportMessagePayload {
@@ -123,7 +141,21 @@ export interface ImportMessagePayload {
 
 export interface RedoOrUndoMessagePayload {
 	tabId: string;
+	frameId: string;
 }
+
+export interface SwitchFrameMessagePayload {
+	tabId: string;
+	frameId: string;
+	sourceFrameId?: string;
+	shouldClear?: boolean;
+}
+
+export type CreateFrameMessagePayload = SwitchFrameMessagePayload;
+
+export type DeleteFrameMessagePayload = SwitchFrameMessagePayload;
+
+export type CopyFrameMessagePayload = SwitchFrameMessagePayload;
 
 export type MessagePayload =
 	| InitMessagePayload
@@ -138,7 +170,11 @@ export type MessagePayload =
 	| ClearAllPixelsMessagePayload
 	| RecordMessagePayload
 	| RedoOrUndoMessagePayload
-	| ExportMessagePayload;
+	| ExportMessagePayload
+	| ImportMessagePayload
+	| SwitchFrameMessagePayload
+	| DeleteFrameMessagePayload
+	| CopyFrameMessagePayload;
 
 export interface OffscreenCanvasWorkerMessage {
 	type: MessageType;

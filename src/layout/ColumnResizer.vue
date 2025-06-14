@@ -8,6 +8,7 @@ const resizer = ref<ColumnResizer | null>(null);
 onMounted(() => {
 	if (resizerRef.value) {
 		const _resizer = new ColumnResizer({ vertical: false });
+		// @ts-ignore
 		_resizer.init(resizerRef.value);
 		resizer.value = _resizer;
 	}

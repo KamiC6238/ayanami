@@ -20,10 +20,10 @@ export function drawGrid(
 		clientHeight: number;
 	},
 ) {
-	const colorPositionMap = new Map();
+	const colorPositionMap = new Map<string, string>();
 	const context = canvas.getContext("2d");
 
-	if (!context) return null;
+	if (!context) return colorPositionMap;
 
 	const { clientWidth: width, clientHeight: height } = config;
 	const centerX = Math.floor(width / 2);

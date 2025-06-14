@@ -15,6 +15,14 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: 'pixel-font', sans-serif;
+  overflow: hidden;
+  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  /* IE & Edge */
+  user-select: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Opera */
 }
 
 #app {

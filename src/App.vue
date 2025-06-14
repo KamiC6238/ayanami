@@ -2,6 +2,8 @@
 import {
 	Canvas,
 	ColorPicker,
+	FrameActions,
+	Frames,
 	Palette,
 	PixelBorderSecondary,
 	SocialMedia,
@@ -17,7 +19,8 @@ generatePixelBorder(4, 3);
 </script>
 
 <template>
-  <div class='relative w-full h-full flex items-center justify-center'>
+  <div class='relative w-full h-full flex items-center justify-center min-w-[910px]'>
+    <Frames />
     <div class="absolute w-full h-full z-[-2] bg-[#d8c6a1]"></div>
     <div class='flex w-[800px] h-[600px]'>
       <PixelBorderSecondary
@@ -45,7 +48,10 @@ generatePixelBorder(4, 3);
             <div class='flex w-full h-[calc(100%-40px)]'>
               <PixelBorderSecondary>
                 <Canvas />
-                <UndoRedo />
+                <div class='absolute w-full flex justify-between items-center bottom-2 pl-2 pr-2'>
+                  <FrameActions />
+                  <UndoRedo />
+                </div>
               </PixelBorderSecondary>
               <Toolbar />
             </div>

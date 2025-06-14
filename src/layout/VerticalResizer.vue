@@ -7,6 +7,7 @@ const resizerRef = useTemplateRef("vertical-resizer-container");
 onMounted(() => {
 	if (resizerRef.value) {
 		const resizer = new ColumnResizer({ vertical: true });
+		// @ts-ignore
 		resizer.init(resizerRef.value);
 	}
 });

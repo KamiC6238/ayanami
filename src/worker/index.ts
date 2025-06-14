@@ -4,6 +4,9 @@ import type {
 	ClearAllPixelsMessagePayload,
 	ClearHoverRectMessagePayload,
 	ClearRectMessagePayload,
+	CopyFrameMessagePayload,
+	CreateFrameMessagePayload,
+	DeleteFrameMessagePayload,
 	ExportMessagePayload,
 	FillHoverRectMessagePayload,
 	FillRectMessagePayload,
@@ -14,18 +17,27 @@ import type {
 	RecordMessagePayload,
 	RedoOrUndoMessagePayload,
 	SquareMessagePayload,
+	SwitchFrameMessagePayload,
 } from "@/types";
+import { useRecords, useRender } from "./signals";
 import * as fileUtils from "./utils/file";
+import * as frameUtils from "./utils/frame";
 import * as recordUtils from "./utils/record";
 import * as renderUtils from "./utils/render";
+
+const { initRecords } = useRecords();
+const { initOffScreenCanvas, clearVisitedPosition } = useRender();
 
 self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 	const { type, payload } = e.data;
 
 	switch (type) {
-		case "init":
-			renderUtils.initOffScreenCanvas(payload as InitMessagePayload);
+		case "init": {
+			const _payload = payload as InitMessagePayload;
+			initRecords(_payload.tabId);
+			initOffScreenCanvas(_payload);
 			break;
+		}
 		case "fillRect": {
 			renderUtils.fillRect(payload as FillRectMessagePayload);
 			break;
@@ -56,18 +68,21 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 		case "clearAllPixels":
 			renderUtils.clearAllPixels(payload as ClearAllPixelsMessagePayload);
 			break;
-		case "record":
-			renderUtils.clearVisitedPosition();
-			recordUtils.record(payload as RecordMessagePayload);
+		case "record": {
+			clearVisitedPosition();
+			const _payload = payload as RecordMessagePayload;
+			const recorded = recordUtils.record(_payload);
+			recorded && frameUtils.generateSnapshot(_payload);
 			break;
+		}
 		case "redo": {
-			const { tabId } = payload as RedoOrUndoMessagePayload;
-			renderUtils.redo(tabId);
+			const _payload = payload as RedoOrUndoMessagePayload;
+			recordUtils.redo(_payload);
 			break;
 		}
 		case "undo": {
-			const { tabId } = payload as RedoOrUndoMessagePayload;
-			renderUtils.undo(tabId);
+			const _payload = payload as RedoOrUndoMessagePayload;
+			recordUtils.undo(_payload);
 			break;
 		}
 		case "export":
@@ -75,6 +90,18 @@ self.onmessage = (e: MessageEvent<OffscreenCanvasWorkerMessage>) => {
 			break;
 		case "import":
 			fileUtils.importFile(payload as ImportMessagePayload);
+			break;
+		case "createFrame":
+			frameUtils.createFrame(payload as CreateFrameMessagePayload);
+			break;
+		case "copyFrame":
+			frameUtils.copyFrame(payload as CopyFrameMessagePayload);
+			break;
+		case "switchFrame":
+			frameUtils.switchFrame(payload as SwitchFrameMessagePayload);
+			break;
+		case "deleteFrame":
+			frameUtils.deleteFrame(payload as DeleteFrameMessagePayload);
 			break;
 	}
 };

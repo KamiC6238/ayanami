@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FrameAnimation from "@/components/Frames/FrameAnimation.vue";
+import { FrameAnimation } from "@/components";
 import { useCanvasStore, useFramesStore } from "@/store";
 import type { CanvasType } from "@/types";
 import { cn } from "@/utils";

@@ -25,6 +25,13 @@ watch(
 		}
 	},
 );
+
+const focus = () => {
+	// @ts-ignore
+	dialogRef.value?.focus();
+};
+
+defineExpose({ focus });
 </script>
 <template>
   <teleport v-if='visible' to='body'>
@@ -40,7 +47,7 @@ watch(
         content-cls="bg-[#6e8f8b] flex flex-col justify-between p-2.5"
         background='bg-[#6e8f8b]'
       >
-        <div class='text-sm flex items-center justify-between'>
+        <div class='text-sm flex items-center justify-between mb-2'>
           <span>{{ title }}</span>
           <div class='cursor-pointer text-[12px]' @click="emit('close')">X</div>
         </div>

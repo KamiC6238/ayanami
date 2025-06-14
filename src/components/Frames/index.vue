@@ -88,6 +88,7 @@ watch(
           :key='frameId'
         >
           <Frame
+            :frame-id='frameId'
             :snapshot='frames[frameId].snapshot ?? ""'
             :active='currentFrameId === frameId'
             :enable-delete='Object.keys(frames).length > 1'

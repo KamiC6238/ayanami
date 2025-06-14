@@ -26,6 +26,7 @@
 		"src/**/*.ts",
 		"src/**/*.tsx",
 		"src/**/*.vue",
-		"src/utils/pixelBorder.js"
+		"src/utils/pixelBorder.js",
+		"src/worker/gif.worker.js"
 	]
 }

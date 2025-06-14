@@ -13,6 +13,7 @@ defineProps<
 	Frame & {
 		active: boolean;
 		enableDelete: boolean;
+		frameId: string;
 	}
 >();
 
@@ -28,7 +29,7 @@ const displayFrameAction = ref(false);
       @mouseenter='displayFrameAction = true'
       @mouseleave='displayFrameAction = false'
     >
-      <img :src="snapshot" />
+      <img :id="`frame-${frameId}`" :src="snapshot" />
       <img
         :src="frameBackground"
         class='absolute top-0 left-0 w-full h-full z-[-1]'

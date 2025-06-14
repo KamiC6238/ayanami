@@ -18,6 +18,7 @@ body {
   overflow: hidden;
   scrollbar-width: none;     /* Firefox */
   -ms-overflow-style: none;  /* IE & Edge */
+  user-select: none;
 }
 
 *::-webkit-scrollbar {

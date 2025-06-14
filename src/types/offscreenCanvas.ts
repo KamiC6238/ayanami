@@ -5,6 +5,7 @@ import type { Frame } from "./frames";
 
 export enum ExportTypeEnum {
 	PNG = "png",
+	GIF = "gif",
 	Source = "source",
 }
 

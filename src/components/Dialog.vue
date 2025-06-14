@@ -20,6 +20,7 @@ watch(
 	() => props.visible,
 	(visible) => {
 		if (visible) {
+			// @ts-ignore
 			nextTick(() => dialogRef.value?.focus());
 		}
 	},

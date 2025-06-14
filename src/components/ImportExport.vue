@@ -55,6 +55,11 @@ const onFileChange = (e: Event) => {
 	target.value = "";
 };
 
+const upload = () => {
+	// @ts-ignore
+	uploadRef.value?.click();
+};
+
 const onExport = (exportType: ExportTypeEnum) => {
 	canvasStore.exportFile(exportType);
 	visible.value = false;
@@ -65,7 +70,7 @@ const onExport = (exportType: ExportTypeEnum) => {
     <PixelBorderUltimate>
       <Upload
         class='w-6 h-6 p-1'
-        @click='() => uploadRef?.click()'
+        @click='upload'
       />
       <input
         ref='upload'

@@ -1,7 +1,7 @@
 ## [2.0.0] - 2025-06-15
 - Support frame sprite animation
   - Create frame
-  - Copay frame
+  - Copy frame
   - Delete frame
   - undo/redo for all frame actions
 - Export file as gif

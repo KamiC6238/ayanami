@@ -42,11 +42,11 @@ describe('Toolbar', () => {
       type => type !== ToolTypeEnum.Broom && type !== ToolTypeEnum.Unknown
     )
     
-    toolTypes.forEach(newToolType => {
+    for (const toolType of toolTypes) {
       configStore.setToolType.mockClear()
-      wrapper.vm.toolHandler(newToolType)
-      expect(configStore.setToolType).toHaveBeenCalledWith(newToolType)
-      expect(mockStorage.value).toBe(newToolType)
-    })
+      wrapper.vm.toolHandler(toolType)
+      expect(configStore.setToolType).toHaveBeenCalledWith(toolType)
+      expect(mockStorage.value).toBe(toolType)
+    }
   })
 }) 

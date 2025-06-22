@@ -51,6 +51,7 @@ const toolHandler = (type: ToolTypeEnum) => {
     <PixelBorderUltimate
       v-for="(item, index) of tools" :key='index'
       :active='item.type === configStore.toolType'
+      :data-testid="`tooltype-${item.type}`"
     >
       <img
         :src="item.url"

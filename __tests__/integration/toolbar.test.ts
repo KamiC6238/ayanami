@@ -1,10 +1,15 @@
 import { useCanvasStore, useConfigStore } from '@/store';
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { mount, VueWrapper } from '@vue/test-utils'
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
 import { Toolbar } from '@/components';
 import { type ComponentPublicInstance } from 'vue';
 import { ToolTypeEnum } from '@/types';
+
+type ToolbarInstance = VueWrapper<ComponentPublicInstance & {
+  toolHandler?: (toolType: ToolTypeEnum) => void
+  storage?: number
+}>
 
 vi.mock('@/components/ImportExport/index.vue', () => ({
   default: {
@@ -14,9 +19,7 @@ vi.mock('@/components/ImportExport/index.vue', () => ({
 }))
 
 describe('Toolbar feature testing', () => {
-  let wrapper: VueWrapper<ComponentPublicInstance & {
-    toolHandler?: (toolType: ToolTypeEnum) => void
-  }>
+  let wrapper: ToolbarInstance
 
   beforeEach(() => {
     const pinia = createPinia()
@@ -75,7 +78,37 @@ describe('Toolbar feature testing', () => {
     record.mockRestore()
   })
 
-  // it('should persist and restore selected tool across component remounts', async () => {
+  it('should set toolType to localStorage for the selected tool', () => {
+    const configStore = useConfigStore()
 
-  // })
+    wrapper.vm.toolHandler?.(ToolTypeEnum.Square)
+    expect(configStore.toolType).toBe(ToolTypeEnum.Square)
+    expect(wrapper.vm.storage).toBe(ToolTypeEnum.Square)
+  })
+
+  it('should persist and restore selected tool across component remounts', async () => {
+    const configStore = useConfigStore()
+
+    wrapper.vm.toolHandler?.(ToolTypeEnum.Circle)
+    expect(configStore.toolType).toBe(ToolTypeEnum.Circle)
+    expect(wrapper.vm.storage).toBe(ToolTypeEnum.Circle)
+
+    await flushPromises()
+
+    wrapper.unmount()
+
+    // use re-mount component to mock refresh page
+    const newPinia = createPinia()
+    setActivePinia(newPinia)
+
+    const newWrapper = mount(Toolbar, {
+      global: {
+        plugins: [newPinia]
+      }
+    }) as ToolbarInstance
+
+    const newConfigStore = useConfigStore()
+    expect(newConfigStore.toolType).toBe(ToolTypeEnum.Circle)
+    expect(newWrapper.vm.storage).toBe(ToolTypeEnum.Circle)
+  })
 })

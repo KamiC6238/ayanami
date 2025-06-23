@@ -1,3 +1,25 @@
+/**
+ * integration testing
+ * 
+ * Toolbar -> select tools
+ *    -> pencil
+ *    -> eraser
+ *    -> line
+ *    -> circle
+ *    -> ellipsis
+ *    -> square
+ *    -> configStore.toolType === selected tool
+ * 
+ * Toolbar -> select tools
+ *    -> toolType in localStorage === selected tool
+ *    -> refresh (re-mount Toolbar)
+ *    -> configStore.toolType === tool from localStorage
+ * 
+ * Toolbar -> click broom
+ *    -> invoke clearAllPixels
+ *    -> invoke record
+ */
+
 import { useCanvasStore, useConfigStore } from '@/store';
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'

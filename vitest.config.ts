@@ -11,6 +11,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },
+    setupFiles: ['@vitest/web-worker'],
     // ui: true,
   },
   resolve: {

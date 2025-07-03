@@ -60,6 +60,9 @@ devDependencies:
   '@vitest/ui':
     specifier: ^3.1.3
     version: 3.1.3(vitest@3.1.3)
+  '@vitest/web-worker':
+    specifier: ^3.2.4
+    version: 3.2.4(vitest@3.1.3)
   '@vue/test-utils':
     specifier: ^2.4.6
     version: 2.4.6
@@ -962,6 +965,17 @@ packages:
       tinyrainbow: 2.0.0
     dev: true
 
+  /@vitest/web-worker@3.2.4(vitest@3.1.3):
+    resolution: {integrity: sha512-JXK3lMyZHDrJ/BrJmxSZxe3RYT9oy2juxN4kpdrQ8NL8iibz352lXbcrnqG4WuSoBDwhjgghgvmIpsTv9Be7eA==}
+    peerDependencies:
+      vitest: 3.2.4
+    dependencies:
+      debug: 4.4.1
+      vitest: 3.1.3(@types/node@22.9.3)(@vitest/ui@3.1.3)(jsdom@26.1.0)
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /@volar/language-core@2.4.0:
     resolution: {integrity: sha512-FTla+khE+sYK0qJP+6hwPAAUwiNHVMph4RUXpxf/FIPKUP61NFrVZorml4mjFShnueR2y9/j8/vnh09YwVdH7A==}
     dependencies:
@@ -1364,6 +1378,18 @@ packages:
       ms: 2.1.3
     dev: true
 
+  /debug@4.4.1:
+    resolution: {integrity: sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.3
+    dev: true
+
   /decimal.js@10.5.0:
     resolution: {integrity: sha512-8vDa8Qxvr/+d94hSh5P3IJwI5t8/c0KsMp+g8bNw9cY2icONa5aPfvKeieW1WlG0WQYwwhJ7mjui2xtiePQSXw==}
     dev: true
@@ -1621,7 +1647,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1631,7 +1657,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2522,7 +2548,7 @@ packages:
     hasBin: true
     dependencies:
       cac: 6.7.14
-      debug: 4.4.0
+      debug: 4.4.1
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 5.4.1(@types/node@22.9.3)
